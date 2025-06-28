@@ -9,15 +9,15 @@ import {
 } from '@/data/skilltree';
 
 // ─── Layout Constants ────────────────────────────────────────
-const VW = 1400;
-const VH = 950;
+const VW = 1800;
+const VH = 1200;
 const CX = VW / 2;
 const CY = VH / 2 - 10;
-const CAT_R = 240;
-const SKILL_R = 148;
-const ROOT_R = 40;
-const CAT_NODE_R = 32;
-const SKILL_NODE_R = 24;
+const CAT_R = 340;
+const SKILL_R = 210;
+const ROOT_R = 44;
+const CAT_NODE_R = 36;
+const SKILL_NODE_R = 26;
 
 // ─── Positioned Types ────────────────────────────────────────
 interface PosSkill extends SkillNode {
@@ -39,7 +39,7 @@ function computeLayout(): PosBranch[] {
     const bx = CX + CAT_R * Math.cos(a);
     const by = CY + CAT_R * Math.sin(a);
 
-    const arcDeg = Math.min(85, Math.max(30, branch.skills.length * 10));
+    const arcDeg = Math.min(120, Math.max(40, branch.skills.length * 12));
     const arcRad = (arcDeg * Math.PI) / 180;
 
     const skills: PosSkill[] = branch.skills.map((skill, j) => {

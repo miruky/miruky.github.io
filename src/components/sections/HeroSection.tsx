@@ -126,7 +126,10 @@ export default function HeroSection() {
             transition={{ delay: 0.6, duration: 0.6 }}
             className="flex flex-wrap items-center justify-center gap-4"
           >
-            <Link href="/articles/" className="btn-primary">
+            <Link
+              href="/articles/"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium bg-[#55C500] text-white hover:bg-[#4AB000] transition-all duration-300 shadow-lg shadow-[#55C500]/20"
+            >
               <SiQiita className="w-4 h-4" />
               Qiita Articles
             </Link>
@@ -134,7 +137,7 @@ export default function HeroSection() {
               href="https://github.com/miruky"
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-outline"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium bg-[#24292e] text-white hover:bg-[#2f363d] transition-all duration-300 shadow-lg shadow-black/20"
             >
               <FaGithub className="w-4 h-4" />
               GitHub

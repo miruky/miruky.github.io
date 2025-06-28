@@ -63,7 +63,7 @@ export interface CareerItem {
   year: string;
   title: string;
   description: string;
-  icon: string;
+  icon?: string;
 }
 
 export interface Skill {

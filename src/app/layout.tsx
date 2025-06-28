@@ -3,6 +3,7 @@ import './globals.css';
 import Providers from './providers';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import AnalyticsTracker from '@/components/AnalyticsTracker';
 
 export const metadata: Metadata = {
   title: {
@@ -46,8 +47,16 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja" suppressHydrationWarning>
+      <head>
+        <meta
+          httpEquiv="Content-Security-Policy"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://qiita-user-contents.imgix.net https://avatars.githubusercontent.com data:; connect-src 'self' https://qiita.com https://api.github.com; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://api.github.com;"
+        />
+        <meta name="referrer" content="strict-origin-when-cross-origin" />
+      </head>
       <body className="min-h-screen flex flex-col">
         <Providers>
+          <AnalyticsTracker />
           <Header />
           <main className="flex-grow">{children}</main>
           <Footer />
