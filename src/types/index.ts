@@ -85,6 +85,7 @@ export interface Certification {
   date?: string;
   badge?: string;
   level?: string;
+  image?: string;
 }
 
 export interface Project {

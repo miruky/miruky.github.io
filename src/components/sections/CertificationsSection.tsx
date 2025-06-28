@@ -67,13 +67,22 @@ export default function CertificationsSection() {
           return (
             <ScrollReveal key={cert.name} delay={index * 0.03}>
               <div className="glass-card p-4 hover-card text-center group">
-                <div
-                  className={`w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br ${style.gradient} flex items-center justify-center border ${style.border} transition-colors`}
-                >
-                  <span className={`text-xs font-bold font-mono ${style.text}`}>
-                    {cert.badge}
-                  </span>
-                </div>
+                {cert.image ? (
+                  <img
+                    src={cert.image}
+                    alt={cert.name}
+                    className="w-20 h-20 mx-auto mb-3 object-contain"
+                    loading="lazy"
+                  />
+                ) : (
+                  <div
+                    className={`w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br ${style.gradient} flex items-center justify-center border ${style.border} transition-colors`}
+                  >
+                    <span className={`text-xs font-bold font-mono ${style.text}`}>
+                      {cert.badge}
+                    </span>
+                  </div>
+                )}
                 <div className="text-xs font-medium dark:text-white text-slate-900 leading-tight">
                   {cert.name.replace('AWS Certified ', '').replace(' - ', '\n')}
                 </div>
