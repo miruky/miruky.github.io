@@ -2,38 +2,38 @@ import { CareerItem } from '@/types';
 
 export const careerTimeline: CareerItem[] = [
   {
-    year: '2025.04',
-    title: '新卒入社・エンジニアとしてのキャリア開始',
+    year: '~ 2025.03',
+    title: '大学時代・独学でCS基礎と資格取得',
     description:
-      'AWSを使用したクラウドインフラの設計・構築〜運用・保守業務を開始。配属直後からAWSサービスに触れる日々。',
-    icon: '🚀',
-  },
-  {
-    year: '2025.04 - 09',
-    title: 'AWS認定資格の取得開始',
-    description:
-      'Cloud Practitioner から学習を開始し、Solutions Architect Associate、Developer Associate と取得を進める。実務と並行して資格学習を継続。',
+      '文系（歴史学科）に在籍しながら大学2年次より独学でCS基礎を学習。ITパスポート → 基本情報 → 応用情報 → ネットワークスペシャリスト → 情報処理安全確保支援士に合格。AWS CLF・SAA、LPIC-3も在学中に取得。',
     icon: '📚',
   },
   {
-    year: '2025.10',
-    title: 'AWS全冠（12冠）達成',
+    year: '2025.04',
+    title: '新卒入社・エンジニアとしてのキャリア開始',
     description:
-      '入社から約6ヶ月でAWS認定全12資格を取得。新卒1年目での全冠達成を実現。',
+      'AWSを使用したクラウドインフラの設計・構築〜運用・保守業務を開始。Gitやチーム開発の洗礼を受けつつ、Pythonを学び直しAWS Lambdaへのデプロイを経験。',
+    icon: '🚀',
+  },
+  {
+    year: '2025.10 - 2026.01',
+    title: 'AWS認定資格の集中取得・12冠達成',
+    description:
+      '10月から資格学習を再開し、SAP・SCS・ANS・DEAを取得。1月にはAIF・MLA・MLSを同日受験、COA・DVAも同日受験するなど怒涛の追い込みで、2026年1月24日にAWS認定12冠を達成。',
     icon: '🏆',
   },
   {
-    year: '2025.10 -',
-    title: 'Qiita記事投稿開始・技術発信',
+    year: '2026.02 -',
+    title: 'Qiita記事投稿・技術発信開始',
     description:
-      'AWS・AI を中心に技術記事の投稿を開始。最高363いいねを獲得した「Claude Codeで行うべきセキュリティ設定 10選」をはじめ、多数の記事を執筆。',
+      'AWS・AIを中心に技術記事の投稿を開始。最高363いいねを獲得した「Claude Codeで行うべきセキュリティ設定 10選」をはじめ、多数の記事を執筆。',
     icon: '✍️',
   },
   {
-    year: '2026.01 -',
-    title: 'IPA資格取得・ポートフォリオ構築',
+    year: '2026.03 -',
+    title: 'ポートフォリオ構築・さらなる挑戦',
     description:
-      'ネットワークスペシャリスト、情報処理安全確保支援士試験に合格。LPIC-3も取得。並行してGitHubポートフォリオの構築を開始。',
+      'GitHubでポートフォリオを構築開始。LLM RAG Chatbot、AWS Serverless URL Shortenerなどのプロジェクトを公開し、OSSへの貢献やさらなる技術領域の拡大を目指す。',
     icon: '🎯',
   },
 ];
