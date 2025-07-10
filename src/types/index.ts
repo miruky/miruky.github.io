@@ -82,8 +82,9 @@ export interface SkillCategory {
 export interface Certification {
   name: string;
   issuer: string;
-  date: string;
+  date?: string;
   badge?: string;
+  level?: string;
 }
 
 export interface Project {
