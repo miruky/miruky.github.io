@@ -4,6 +4,46 @@ import ScrollReveal from '@/components/ScrollReveal';
 import SectionHeading from '@/components/SectionHeading';
 import { certifications } from '@/data/certifications';
 
+const levelStyle = (level?: string) => {
+  switch (level) {
+    case 'professional':
+      return {
+        gradient: 'from-amber-400/20 to-yellow-500/20',
+        border: 'border-amber-400/20 group-hover:border-amber-400/40',
+        text: 'text-amber-400',
+        label: 'Professional',
+      };
+    case 'associate':
+      return {
+        gradient: 'from-cyan-400/20 to-blue-500/20',
+        border: 'border-cyan-400/20 group-hover:border-cyan-400/40',
+        text: 'text-cyan-400',
+        label: 'Associate',
+      };
+    case 'specialty':
+      return {
+        gradient: 'from-violet-400/20 to-purple-500/20',
+        border: 'border-violet-400/20 group-hover:border-violet-400/40',
+        text: 'text-violet-400',
+        label: 'Specialty',
+      };
+    case 'foundational':
+      return {
+        gradient: 'from-emerald-400/20 to-green-500/20',
+        border: 'border-emerald-400/20 group-hover:border-emerald-400/40',
+        text: 'text-emerald-400',
+        label: 'Foundational',
+      };
+    default:
+      return {
+        gradient: 'from-accent-purple/20 to-accent-pink/20',
+        border: 'border-accent-purple/20 group-hover:border-accent-purple/40',
+        text: 'text-accent-purple',
+        label: '',
+      };
+  }
+};
+
 export default function CertificationsSection() {
   const awsCerts = certifications.filter((c) => c.issuer.includes('Amazon'));
   const otherCerts = certifications.filter((c) => !c.issuer.includes('Amazon'));
@@ -22,21 +62,30 @@ export default function CertificationsSection() {
         </h3>
       </ScrollReveal>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 mb-12">
-        {awsCerts.map((cert, index) => (
-          <ScrollReveal key={cert.name} delay={index * 0.03}>
-            <div className="glass-card p-4 hover-card text-center group">
-              <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br from-accent-cyan/20 to-accent-purple/20 flex items-center justify-center border border-accent-cyan/20 group-hover:border-accent-cyan/40 transition-colors">
-                <span className="text-xs font-bold font-mono text-accent-cyan">
-                  {cert.badge}
-                </span>
+        {awsCerts.map((cert, index) => {
+          const style = levelStyle(cert.level);
+          return (
+            <ScrollReveal key={cert.name} delay={index * 0.03}>
+              <div className="glass-card p-4 hover-card text-center group">
+                <div
+                  className={`w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br ${style.gradient} flex items-center justify-center border ${style.border} transition-colors`}
+                >
+                  <span className={`text-xs font-bold font-mono ${style.text}`}>
+                    {cert.badge}
+                  </span>
+                </div>
+                <div className="text-xs font-medium dark:text-white text-slate-900 leading-tight">
+                  {cert.name.replace('AWS Certified ', '').replace(' - ', '\n')}
+                </div>
+                {style.label && (
+                  <div className={`text-[10px] mt-1 ${style.text} opacity-70`}>
+                    {style.label}
+                  </div>
+                )}
               </div>
-              <div className="text-xs font-medium dark:text-white text-slate-900 leading-tight">
-                {cert.name.replace('AWS Certified ', '').replace(' - ', '\n')}
-              </div>
-              <div className="text-[10px] text-slate-400 mt-1">{cert.date}</div>
-            </div>
-          </ScrollReveal>
-        ))}
+            </ScrollReveal>
+          );
+        })}
       </div>
 
       {/* Other Certifications */}
@@ -57,7 +106,6 @@ export default function CertificationsSection() {
               <div className="text-xs font-medium dark:text-white text-slate-900 leading-tight">
                 {cert.name}
               </div>
-              <div className="text-[10px] text-slate-400 mt-1">{cert.date}</div>
             </div>
           </ScrollReveal>
         ))}
