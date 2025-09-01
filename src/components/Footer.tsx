@@ -12,9 +12,11 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-accent-purple flex items-center justify-center text-white font-bold text-sm">
-                M
-              </div>
+              <img
+                src="/images/icon.png"
+                alt="miruky"
+                className="w-8 h-8 rounded-lg object-cover"
+              />
               <span className="font-bold text-lg dark:text-white text-slate-900">
                 miruky<span className="gradient-text-static">.io</span>
               </span>

@@ -41,9 +41,11 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent-cyan to-accent-purple flex items-center justify-center text-white font-bold text-sm group-hover:scale-110 transition-transform">
-              M
-            </div>
+            <img
+              src="/images/icon.png"
+              alt="miruky"
+              className="w-8 h-8 rounded-lg object-cover group-hover:scale-110 transition-transform"
+            />
             <span className="font-bold text-lg hidden sm:block dark:text-white text-slate-900">
               miruky<span className="gradient-text-static">.io</span>
             </span>
