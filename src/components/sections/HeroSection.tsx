@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { FaGithub } from 'react-icons/fa6';
@@ -7,6 +8,39 @@ import { SiQiita } from 'react-icons/si';
 import ParticleBackground from '@/components/ParticleBackground';
 
 export default function HeroSection() {
+  const [qiitaStats, setQiitaStats] = useState({ articles: '49+', contribution: '1900+' });
+
+  useEffect(() => {
+    async function fetchStats() {
+      try {
+        const all: Array<{ likes_count: number; stocks_count: number }> = [];
+        let page = 1;
+        while (true) {
+          const res = await fetch(
+            `https://qiita.com/api/v2/users/miruky/items?page=${page}&per_page=100`
+          );
+          if (!res.ok) break;
+          const data = await res.json();
+          if (data.length === 0) break;
+          all.push(...data);
+          if (data.length < 100) break;
+          page++;
+        }
+        const totalLikes = all.reduce((s, a) => s + a.likes_count, 0);
+        const totalStocks = all.reduce((s, a) => s + a.stocks_count, 0);
+        const contrib = all.length + totalLikes + Math.floor(totalStocks / 2);
+        const rounded = Math.floor(contrib / 100) * 100;
+        setQiitaStats({
+          articles: `${all.length}+`,
+          contribution: `${rounded}+`,
+        });
+      } catch {
+        // keep defaults
+      }
+    }
+    fetchStats();
+  }, []);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background */}
@@ -70,9 +104,9 @@ export default function HeroSection() {
             className="flex items-center justify-center gap-8 md:gap-12 mb-10"
           >
             {[
-              { label: 'AWS全冠', value: '12冠' },
-              { label: 'Qiita記事', value: '49+' },
-              { label: 'Qiitaフォロワー', value: '140+' },
+              { label: 'AWS認定資格', value: '12冠' },
+              { label: 'Qiita記事', value: qiitaStats.articles },
+              { label: 'Contribution', value: qiitaStats.contribution },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-2xl md:text-3xl font-bold gradient-text-static">
