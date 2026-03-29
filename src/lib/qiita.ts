@@ -1,6 +1,17 @@
 import { QiitaArticle, QiitaUser } from '@/types';
 
 const QIITA_API_BASE = 'https://qiita.com/api/v2';
+const QIITA_TOKEN = process.env.QIITA_API_TOKEN;
+
+function getHeaders(): HeadersInit {
+  const headers: HeadersInit = {
+    'Content-Type': 'application/json',
+  };
+  if (QIITA_TOKEN) {
+    headers['Authorization'] = `Bearer ${QIITA_TOKEN}`;
+  }
+  return headers;
+}
 
 export async function fetchQiitaArticles(
   userId: string,
@@ -11,9 +22,7 @@ export async function fetchQiitaArticles(
     const res = await fetch(
       `${QIITA_API_BASE}/users/${userId}/items?page=${page}&per_page=${perPage}`,
       {
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getHeaders(),
         next: { revalidate: 3600 },
       }
     );
@@ -50,9 +59,7 @@ export async function fetchAllQiitaArticles(
 export async function fetchQiitaUser(userId: string): Promise<QiitaUser | null> {
   try {
     const res = await fetch(`${QIITA_API_BASE}/users/${userId}`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers: getHeaders(),
       next: { revalidate: 3600 },
     });
 
