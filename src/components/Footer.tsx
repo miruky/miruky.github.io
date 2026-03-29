@@ -45,7 +45,7 @@ export default function Footer() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-sm text-slate-500 dark:text-slate-400 hover:text-accent-cyan transition-colors"
+                    className="text-sm text-slate-500 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-accent-cyan transition-colors"
                   >
                     {item.label}
                   </Link>
@@ -64,7 +64,7 @@ export default function Footer() {
                 href="https://github.com/miruky"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-dark-700 text-slate-600 dark:text-slate-400 hover:text-accent-cyan hover:bg-slate-200 dark:hover:bg-dark-600 transition-all"
+                className="w-10 h-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-dark-700 text-slate-600 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-accent-cyan hover:bg-slate-200 dark:hover:bg-dark-600 transition-all"
                 aria-label="GitHub"
               >
                 <FaGithub className="w-5 h-5" />
@@ -73,7 +73,7 @@ export default function Footer() {
                 href="https://qiita.com/miruky"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-dark-700 text-slate-600 dark:text-slate-400 hover:text-accent-cyan hover:bg-slate-200 dark:hover:bg-dark-600 transition-all"
+                className="w-10 h-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-dark-700 text-slate-600 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-accent-cyan hover:bg-slate-200 dark:hover:bg-dark-600 transition-all"
                 aria-label="Qiita"
               >
                 <SiQiita className="w-5 h-5" />
@@ -82,7 +82,7 @@ export default function Footer() {
                 href="https://x.com/miruky_tech"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-10 h-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-dark-700 text-slate-600 dark:text-slate-400 hover:text-accent-cyan hover:bg-slate-200 dark:hover:bg-dark-600 transition-all"
+                className="w-10 h-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-dark-700 text-slate-600 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-accent-cyan hover:bg-slate-200 dark:hover:bg-dark-600 transition-all"
                 aria-label="X (Twitter)"
               >
                 <FaXTwitter className="w-5 h-5" />

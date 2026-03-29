@@ -42,7 +42,7 @@ export default function BlogPage() {
                 href={`/blog/${post.slug}`}
                 className="glass-card p-6 hover-card neon-border group block"
               >
-                <h2 className="text-lg font-bold dark:text-white text-slate-900 group-hover:text-accent-cyan transition-colors mb-2">
+                <h2 className="text-lg font-bold dark:text-white text-slate-900 group-hover:text-cyan-700 dark:group-hover:text-accent-cyan transition-colors mb-2">
                   {post.title}
                 </h2>
                 {post.description && (
@@ -63,7 +63,7 @@ export default function BlogPage() {
                       </div>
                     )}
                   </div>
-                  <FaArrowRight className="w-3 h-3 text-slate-400 group-hover:text-accent-cyan group-hover:translate-x-1 transition-all" />
+                  <FaArrowRight className="w-3 h-3 text-slate-400 group-hover:text-cyan-700 dark:group-hover:text-accent-cyan group-hover:translate-x-1 transition-all" />
                 </div>
               </Link>
             ))}

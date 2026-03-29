@@ -77,7 +77,7 @@ export default function ContactPage() {
                   <link.icon className="w-6 h-6" />
                 </div>
                 <div className="text-left">
-                  <div className="font-bold dark:text-white text-slate-900 text-sm group-hover:text-accent-cyan transition-colors">
+                  <div className="font-bold dark:text-white text-slate-900 text-sm group-hover:text-cyan-700 dark:group-hover:text-accent-cyan transition-colors">
                     {link.name}
                   </div>
                   <div className="text-xs text-slate-500 dark:text-slate-400">

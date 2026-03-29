@@ -29,7 +29,7 @@ export default function ProjectsPage() {
               className="glass-card p-6 hover-card neon-border group"
             >
               <div className="flex items-start justify-between mb-4">
-                <h2 className="text-lg font-bold dark:text-white text-slate-900 group-hover:text-accent-cyan transition-colors">
+                <h2 className="text-lg font-bold dark:text-white text-slate-900 group-hover:text-cyan-700 dark:group-hover:text-accent-cyan transition-colors">
                   {project.name}
                 </h2>
                 <div className="flex items-center gap-2">
@@ -38,7 +38,7 @@ export default function ProjectsPage() {
                       href={project.githubUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-slate-400 hover:text-accent-cyan transition-colors"
+                      className="text-slate-400 hover:text-cyan-700 dark:hover:text-accent-cyan transition-colors"
                     >
                       <FaGithub className="w-5 h-5" />
                     </a>
@@ -48,7 +48,7 @@ export default function ProjectsPage() {
                       href={project.demoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-slate-400 hover:text-accent-cyan transition-colors"
+                      className="text-slate-400 hover:text-cyan-700 dark:hover:text-accent-cyan transition-colors"
                     >
                       <FaExternalLinkAlt className="w-4 h-4" />
                     </a>
@@ -67,7 +67,7 @@ export default function ProjectsPage() {
                     key={highlight}
                     className="flex items-center gap-2 text-xs"
                   >
-                    <FaStar className="w-3 h-3 text-accent-cyan shrink-0" />
+                    <FaStar className="w-3 h-3 text-cyan-600 dark:text-accent-cyan shrink-0" />
                     <span className="text-slate-600 dark:text-slate-400">
                       {highlight}
                     </span>

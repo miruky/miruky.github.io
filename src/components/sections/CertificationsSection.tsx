@@ -10,35 +10,35 @@ const levelStyle = (level?: string) => {
       return {
         gradient: 'from-amber-400/20 to-yellow-500/20',
         border: 'border-amber-400/20 group-hover:border-amber-400/40',
-        text: 'text-amber-400',
+        text: 'text-amber-600 dark:text-amber-400',
         label: 'Professional',
       };
     case 'associate':
       return {
         gradient: 'from-cyan-400/20 to-blue-500/20',
         border: 'border-cyan-400/20 group-hover:border-cyan-400/40',
-        text: 'text-cyan-400',
+        text: 'text-cyan-700 dark:text-cyan-400',
         label: 'Associate',
       };
     case 'specialty':
       return {
         gradient: 'from-violet-400/20 to-purple-500/20',
         border: 'border-violet-400/20 group-hover:border-violet-400/40',
-        text: 'text-violet-400',
+        text: 'text-violet-600 dark:text-violet-400',
         label: 'Specialty',
       };
     case 'foundational':
       return {
         gradient: 'from-emerald-400/20 to-green-500/20',
         border: 'border-emerald-400/20 group-hover:border-emerald-400/40',
-        text: 'text-emerald-400',
+        text: 'text-emerald-600 dark:text-emerald-400',
         label: 'Foundational',
       };
     default:
       return {
         gradient: 'from-accent-purple/20 to-accent-pink/20',
         border: 'border-accent-purple/20 group-hover:border-accent-purple/40',
-        text: 'text-accent-purple',
+        text: 'text-purple-600 dark:text-accent-purple',
         label: '',
       };
   }
@@ -108,7 +108,7 @@ export default function CertificationsSection() {
           <ScrollReveal key={cert.name} delay={index * 0.05}>
             <div className="glass-card p-4 hover-card text-center h-full flex flex-col items-center justify-center">
               <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br from-accent-purple/20 to-accent-pink/20 flex items-center justify-center border border-accent-purple/20">
-                <span className="text-xs font-bold font-mono text-accent-purple">
+                <span className="text-xs font-bold font-mono text-purple-600 dark:text-accent-purple">
                   {cert.badge}
                 </span>
               </div>

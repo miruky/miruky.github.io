@@ -41,11 +41,11 @@ export default function AboutSection() {
               </p>
               <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                 大学時代に独学でIPA資格（NW・SC）やLPIC-3、AWS CLF・SAAを取得。
-                25卒として入社後、2025年10月から集中受験を開始し、2026年1月に<span className="text-accent-cyan font-semibold">AWS認定12冠</span>を達成しました。
+                25卒として入社後、2025年10月から集中受験を開始し、2026年1月に<span className="text-cyan-700 dark:text-accent-cyan font-semibold">AWS認定12冠</span>を達成しました。
               </p>
               <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                Qiitaでは<span className="text-accent-cyan font-semibold">49本以上</span>の技術記事を投稿し、
-                最高<span className="text-accent-cyan font-semibold">363いいね</span>を獲得。
+                Qiitaでは<span className="text-cyan-700 dark:text-accent-cyan font-semibold">49本以上</span>の技術記事を投稿し、
+                最高<span className="text-cyan-700 dark:text-accent-cyan font-semibold">363いいね</span>を獲得。
                 クラウドインフラ・AI・セキュリティを中心に発信しています。
               </p>
             </div>

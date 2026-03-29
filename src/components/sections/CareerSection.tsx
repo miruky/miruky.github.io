@@ -40,7 +40,7 @@ export default function CareerSection() {
                 >
                   <div className="glass-card p-5 hover-card neon-border">
                     <div className="flex items-center gap-2 mb-2 justify-start">
-                      <span className="text-xs font-mono text-accent-cyan">
+                      <span className="text-xs font-mono text-cyan-600 dark:text-accent-cyan">
                         {item.year}
                       </span>
                     </div>

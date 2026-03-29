@@ -91,7 +91,7 @@ export default function QiitaSidebar() {
             <div className="flex flex-col w-1/2 border-r border-slate-200/50 dark:border-dark-700/50">
               {/* Blog Header */}
               <div className="flex items-center gap-2 px-3 py-4 border-b border-slate-200 dark:border-dark-700 mt-16">
-                <FiFileText className="w-4 h-4 text-accent-cyan shrink-0" />
+                <FiFileText className="w-4 h-4 text-cyan-600 dark:text-accent-cyan shrink-0" />
                 <span className="font-bold text-sm text-slate-700 dark:text-slate-300">
                   Blog
                 </span>
@@ -114,7 +114,7 @@ export default function QiitaSidebar() {
                       href={`/blog/${post.slug}/`}
                       className="block px-3 py-3 border-b border-slate-100 dark:border-dark-700/50 hover:bg-slate-50 dark:hover:bg-dark-800 transition-colors group"
                     >
-                      <p className="text-xs font-medium text-slate-800 dark:text-slate-200 leading-snug line-clamp-2 group-hover:text-accent-cyan transition-colors">
+                      <p className="text-xs font-medium text-slate-800 dark:text-slate-200 leading-snug line-clamp-2 group-hover:text-cyan-700 dark:group-hover:text-accent-cyan transition-colors">
                         {post.title}
                       </p>
                       <div className="flex items-center gap-2 mt-1.5">
@@ -143,7 +143,7 @@ export default function QiitaSidebar() {
               <div className="px-3 py-3 border-t border-slate-200 dark:border-dark-700">
                 <Link
                   href="/blog/"
-                  className="flex items-center justify-center gap-1.5 text-xs font-medium text-accent-cyan hover:text-accent-cyan/80 transition-colors"
+                  className="flex items-center justify-center gap-1.5 text-xs font-medium text-cyan-600 dark:text-accent-cyan hover:text-cyan-700 dark:hover:text-accent-cyan/80 transition-colors"
                 >
                   <FiFileText className="w-3.5 h-3.5" />
                   View all posts
@@ -178,7 +178,7 @@ export default function QiitaSidebar() {
                     >
                       <div className="flex items-start gap-1.5">
                         <div className="flex-1 min-w-0">
-                          <p className="text-xs font-medium text-slate-800 dark:text-slate-200 leading-snug line-clamp-2 group-hover:text-accent-cyan transition-colors">
+                          <p className="text-xs font-medium text-slate-800 dark:text-slate-200 leading-snug line-clamp-2 group-hover:text-cyan-700 dark:group-hover:text-accent-cyan transition-colors">
                             {article.title}
                           </p>
                           <div className="flex items-center gap-2 mt-1.5">

@@ -130,7 +130,14 @@ export function parseWord(word: string): Chunk[] {
       if (next) {
         // 次のかなの子音を重複: "ka" → "kka", "shi" → "sshi"
         const doubled = next.options.map(opt => opt[0] + opt);
-        chunks.push({ kana: 'っ' + next.kana, options: doubled });
+        // xtu / ltu / xtsu / ltsu + 次のかなも許可
+        const explicit = ['xtu', 'ltu', 'xtsu', 'ltsu'].flatMap(
+          prefix => next.options.map(opt => prefix + opt)
+        );
+        const allOpts = [...doubled, ...explicit];
+        // 重複除去
+        const unique = Array.from(new Set(allOpts));
+        chunks.push({ kana: 'っ' + next.kana, options: unique });
         i += 1 + next.kana.length;
       } else {
         // 末尾の っ（単独）

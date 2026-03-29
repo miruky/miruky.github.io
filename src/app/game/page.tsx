@@ -6,8 +6,9 @@ import dynamic from 'next/dynamic';
 
 const TypingGame = dynamic(() => import('@/components/TypingGame'), { ssr: false });
 const BlockGame = dynamic(() => import('@/components/BlockGame'), { ssr: false });
+const QuizGame = dynamic(() => import('@/components/QuizGame'), { ssr: false });
 
-type GameMode = 'select' | 'typing' | 'blocks';
+type GameMode = 'select' | 'typing' | 'blocks' | 'quiz';
 
 export default function GamePage() {
   const [mode, setMode] = useState<GameMode>('select');
@@ -38,7 +39,7 @@ export default function GamePage() {
             </div>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
             {/* タイピングゲーム */}
             <motion.button
               initial={{ opacity: 0, y: 20 }}
@@ -72,6 +73,21 @@ export default function GamePage() {
               <h3 className="text-lg font-bold text-white mb-1">ブロック積みゲーム</h3>
               <p className="text-xs text-slate-400">落ちるブロックを積み上げろ</p>
             </motion.button>
+
+            {/* IT知識クイズ */}
+            <motion.button
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.45 }}
+              onClick={() => setMode('quiz')}
+              className="glass-card p-6 hover-card neon-border text-center group transition-all"
+            >
+              <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-amber-400/20 to-orange-500/20 flex items-center justify-center border border-amber-400/20 group-hover:border-amber-400/40 transition-colors">
+                <span className="text-2xl">📝</span>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-1">IT知識クイズ</h3>
+              <p className="text-xs text-slate-400">IPA試験レベルの選択問題</p>
+            </motion.button>
           </div>
 
           <p className="text-slate-600 text-[10px] mt-8">ゲーム内メニューからいつでも戻れます</p>
@@ -80,6 +96,7 @@ export default function GamePage() {
 
       {mode === 'typing' && <TypingGame onBack={() => setMode('select')} />}
       {mode === 'blocks' && <BlockGame onBack={() => setMode('select')} />}
+      {mode === 'quiz' && <QuizGame onBack={() => setMode('select')} />}
     </div>
   );
 }

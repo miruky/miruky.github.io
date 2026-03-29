@@ -150,7 +150,7 @@ export default function ArticlesPage() {
                 className="glass-card p-5 hover-card neon-border flex flex-col sm:flex-row sm:items-center gap-3 group"
               >
                 <div className="flex-grow min-w-0">
-                  <h3 className="text-sm font-bold dark:text-white text-slate-900 group-hover:text-accent-cyan transition-colors truncate">
+                  <h3 className="text-sm font-bold dark:text-white text-slate-900 group-hover:text-cyan-700 dark:group-hover:text-accent-cyan transition-colors truncate">
                     {article.title}
                   </h3>
                   <div className="flex flex-wrap items-center gap-2 mt-2">
@@ -163,11 +163,11 @@ export default function ArticlesPage() {
                 </div>
                 <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400 shrink-0">
                   <div className="flex items-center gap-1">
-                    <FaHeart className="w-3 h-3 text-accent-pink" />
+                    <FaHeart className="w-3 h-3 text-pink-600 dark:text-accent-pink" />
                     {article.likes_count}
                   </div>
                   <div className="flex items-center gap-1">
-                    <FaBookmark className="w-3 h-3 text-accent-purple" />
+                    <FaBookmark className="w-3 h-3 text-purple-600 dark:text-accent-purple" />
                     {article.stocks_count}
                   </div>
                   <span className="font-mono">

@@ -60,7 +60,7 @@ export default function SkillsSection() {
                   <span className="text-sm font-medium dark:text-white text-slate-900">
                     {skill.name}
                   </span>
-                  <span className="text-xs text-accent-cyan font-mono">
+                  <span className="text-xs text-cyan-600 dark:text-accent-cyan font-mono">
                     {skill.level}%
                   </span>
                 </div>

@@ -33,7 +33,7 @@ export default function ContactSection() {
                 className="flex items-center gap-4 p-4 rounded-lg bg-slate-50 dark:bg-dark-800 hover:bg-slate-100 dark:hover:bg-dark-700 transition-colors group"
               >
                 <div className="w-12 h-12 rounded-lg bg-slate-200 dark:bg-dark-600 flex items-center justify-center group-hover:bg-accent-cyan/10 transition-colors">
-                  <FaGithub className="w-6 h-6 text-slate-600 dark:text-slate-400 group-hover:text-accent-cyan transition-colors" />
+                  <FaGithub className="w-6 h-6 text-slate-600 dark:text-slate-400 group-hover:text-cyan-700 dark:group-hover:text-accent-cyan transition-colors" />
                 </div>
                 <div>
                   <div className="text-sm font-semibold dark:text-white text-slate-900">
@@ -52,7 +52,7 @@ export default function ContactSection() {
                 className="flex items-center gap-4 p-4 rounded-lg bg-slate-50 dark:bg-dark-800 hover:bg-slate-100 dark:hover:bg-dark-700 transition-colors group"
               >
                 <div className="w-12 h-12 rounded-lg bg-slate-200 dark:bg-dark-600 flex items-center justify-center group-hover:bg-accent-cyan/10 transition-colors">
-                  <SiQiita className="w-6 h-6 text-slate-600 dark:text-slate-400 group-hover:text-accent-cyan transition-colors" />
+                  <SiQiita className="w-6 h-6 text-slate-600 dark:text-slate-400 group-hover:text-cyan-700 dark:group-hover:text-accent-cyan transition-colors" />
                 </div>
                 <div>
                   <div className="text-sm font-semibold dark:text-white text-slate-900">
@@ -71,7 +71,7 @@ export default function ContactSection() {
                 className="flex items-center gap-4 p-4 rounded-lg bg-slate-50 dark:bg-dark-800 hover:bg-slate-100 dark:hover:bg-dark-700 transition-colors group"
               >
                 <div className="w-12 h-12 rounded-lg bg-slate-200 dark:bg-dark-600 flex items-center justify-center group-hover:bg-accent-cyan/10 transition-colors">
-                  <FaXTwitter className="w-6 h-6 text-slate-600 dark:text-slate-400 group-hover:text-accent-cyan transition-colors" />
+                  <FaXTwitter className="w-6 h-6 text-slate-600 dark:text-slate-400 group-hover:text-cyan-700 dark:group-hover:text-accent-cyan transition-colors" />
                 </div>
                 <div>
                   <div className="text-sm font-semibold dark:text-white text-slate-900">

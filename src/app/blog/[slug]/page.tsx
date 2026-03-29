@@ -41,7 +41,7 @@ export default async function BlogPostPage({
           {/* Back link */}
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-accent-cyan transition-colors mb-8"
+            className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-cyan-700 dark:hover:text-accent-cyan transition-colors mb-8"
           >
             <FaArrowLeft className="w-3 h-3" />
             Back to Blog
@@ -73,7 +73,7 @@ export default async function BlogPostPage({
               prose-headings:font-bold
               prose-h2:text-xl prose-h2:mt-10 prose-h2:mb-4
               prose-h3:text-lg prose-h3:mt-8 prose-h3:mb-3
-              prose-a:text-accent-cyan prose-a:no-underline hover:prose-a:underline
+              prose-a:text-cyan-700 dark:prose-a:text-accent-cyan prose-a:no-underline hover:prose-a:underline
               prose-code:text-accent-green prose-code:bg-dark-700/50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
               prose-pre:bg-dark-800 prose-pre:border prose-pre:border-dark-600
               prose-img:rounded-lg

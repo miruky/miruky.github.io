@@ -21,7 +21,7 @@ export default function ProjectsSection() {
               <div className="flex items-start justify-between mb-4">
                 <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-accent-cyan/20 to-accent-purple/20 flex items-center justify-center">
                   <svg
-                    className="w-5 h-5 text-accent-cyan"
+                    className="w-5 h-5 text-cyan-600 dark:text-accent-cyan"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -59,7 +59,7 @@ export default function ProjectsSection() {
                     key={highlight}
                     className="text-xs text-slate-500 dark:text-slate-400 flex items-start gap-2"
                   >
-                    <span className="text-accent-cyan mt-0.5">&#9654;</span>
+                    <span className="text-cyan-600 dark:text-accent-cyan mt-0.5">&#9654;</span>
                     {highlight}
                   </li>
                 ))}
