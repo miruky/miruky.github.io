@@ -26,6 +26,7 @@ export default function HeroSection() {
           if (data.length < 100) break;
           page++;
         }
+        if (all.length === 0) return; // API失敗時はデフォルト値を維持
         const totalLikes = all.reduce((s, a) => s + a.likes_count, 0);
         const totalStocks = all.reduce((s, a) => s + a.stocks_count, 0);
         const contrib = all.length + totalLikes + Math.floor(totalStocks / 2);
@@ -89,10 +90,10 @@ export default function HeroSection() {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-4 leading-relaxed">
+          <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-4 leading-relaxed">
             AWSを中心としたクラウドインフラの設計・構築〜運用・保守を担当。
           </p>
-          <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
             AWS・AIを中心とした技術記事をQiitaにて発信中。
           </p>
 
@@ -112,7 +113,7 @@ export default function HeroSection() {
                 <div className="text-2xl md:text-3xl font-bold gradient-text-static">
                   {stat.value}
                 </div>
-                <div className="text-xs md:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                <div className="text-xs md:text-sm text-slate-400 mt-1">
                   {stat.label}
                 </div>
               </div>

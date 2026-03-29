@@ -12,6 +12,7 @@ const navItems = [
   { href: '/skilltree/', label: 'Skills' },
   { href: '/projects/', label: 'Projects' },
   { href: '/blog/', label: 'Blog' },
+  { href: '/game/', label: 'Game' },
   { href: '/contact/', label: 'Contact' },
 ];
 
@@ -50,7 +51,7 @@ export default function Header() {
               className="w-8 h-8 rounded-lg object-cover group-hover:scale-110 transition-transform"
             />
             <span className="font-bold text-lg hidden sm:block">
-              <span className={isPastHero ? 'text-slate-900 dark:text-white' : 'text-white'}>miruky</span><span className="gradient-text-static">のIT備忘録</span>
+              <span className={pathname === '/' && !isPastHero ? 'text-white' : 'text-slate-900 dark:text-white'}>miruky</span><span className="gradient-text-static">のIT備忘録</span>
             </span>
           </Link>
 
