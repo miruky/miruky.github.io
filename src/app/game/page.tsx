@@ -82,8 +82,11 @@ export default function GamePage() {
               onClick={() => setMode('quiz')}
               className="glass-card p-6 hover-card neon-border text-center group transition-all"
             >
-              <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-amber-400/20 to-orange-500/20 flex items-center justify-center border border-amber-400/20 group-hover:border-amber-400/40 transition-colors">
-                <span className="text-2xl">📝</span>
+              <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-emerald-400/20 to-teal-500/20 flex items-center justify-center border border-emerald-400/20 group-hover:border-emerald-400/40 transition-colors">
+                <svg className="w-7 h-7 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 11l3 3L22 4" />
+                  <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                </svg>
               </div>
               <h3 className="text-lg font-bold text-white mb-1">IT知識クイズ</h3>
               <p className="text-xs text-slate-400">IPA試験レベルの選択問題</p>

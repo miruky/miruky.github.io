@@ -1,5 +1,45 @@
 import { SkillCategory } from '@/types';
 
+/** shields.io badge slug mapping */
+export const BADGE_MAP: Record<string, { slug: string; color: string }> = {
+  'Amazon Web Services (AWS)': { slug: 'amazonwebservices', color: '232F3E' },
+  'Amazon EC2': { slug: 'amazonec2', color: 'FF9900' },
+  'Amazon S3': { slug: 'amazons3', color: '569A31' },
+  'AWS Lambda': { slug: 'awslambda', color: 'FF9900' },
+  'Amazon VPC': { slug: 'amazonwebservices', color: '232F3E' },
+  'Amazon RDS': { slug: 'amazonrds', color: '527FFF' },
+  'Amazon CloudFront': { slug: 'amazoncloudwatch', color: 'FF4F8B' },
+  'Amazon Connect': { slug: 'amazonwebservices', color: 'FF9900' },
+  'Amazon Bedrock': { slug: 'amazonwebservices', color: '232F3E' },
+  'Amazon Lex': { slug: 'amazonalexa', color: '00CAFF' },
+  'Terraform': { slug: 'terraform', color: '844FBA' },
+  'AWS CloudFormation': { slug: 'amazonwebservices', color: 'FF4F8B' },
+  'AWS CDK': { slug: 'amazonwebservices', color: 'FF9900' },
+  'RAG (Retrieval-Augmented Generation)': { slug: 'openai', color: '412991' },
+  'LangChain': { slug: 'langchain', color: '1C3C3C' },
+  'ChromaDB / FAISS': { slug: 'chroma', color: 'FF6446' },
+  'GitHub Actions': { slug: 'githubactions', color: '2088FF' },
+  'AWS CodePipeline': { slug: 'amazonwebservices', color: '232F3E' },
+  'AWS CodeBuild': { slug: 'amazonwebservices', color: '232F3E' },
+  'Python': { slug: 'python', color: '3776AB' },
+  'TypeScript': { slug: 'typescript', color: '3178C6' },
+  'JavaScript': { slug: 'javascript', color: 'F7DF1E' },
+  'Bash': { slug: 'gnubash', color: '4EAA25' },
+  'SQL': { slug: 'postgresql', color: '4169E1' },
+  'Git / GitHub': { slug: 'github', color: '181717' },
+  'Docker': { slug: 'docker', color: '2496ED' },
+  'Linux': { slug: 'linux', color: 'FCC624' },
+  'Nginx': { slug: 'nginx', color: '009639' },
+  'Claude Code': { slug: 'anthropic', color: '191919' },
+};
+
+export function getBadgeUrl(skillName: string): string | null {
+  const badge = BADGE_MAP[skillName];
+  if (!badge) return null;
+  const label = encodeURIComponent(skillName);
+  return `https://img.shields.io/badge/${label}-${badge.color}?style=flat&logo=${badge.slug}&logoColor=white`;
+}
+
 export const skillCategories: SkillCategory[] = [
   {
     name: 'Cloud',
