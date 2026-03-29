@@ -6,6 +6,7 @@ import {
   skillTreeData,
   type SkillBranch,
   type SkillNode,
+  getSkillLogoUrl,
 } from '@/data/skilltree';
 
 // ─── Layout Constants ────────────────────────────────────────
@@ -472,15 +473,32 @@ export default function SkillTreeViz() {
             className="glass-card p-5 max-w-lg mx-auto neon-border"
           >
             <div className="flex items-center gap-4">
-              <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                style={{
-                  background: `${detail.branch.color}18`,
-                  border: `2px solid ${detail.branch.color}50`,
-                }}
-              >
-                <span className="text-lg">{detail.branch.icon}</span>
-              </div>
+              {(() => {
+                const logoUrl = getSkillLogoUrl(detail.skill.id, detail.branch.color);
+                return logoUrl ? (
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 overflow-hidden"
+                    style={{
+                      background: `${detail.branch.color}18`,
+                      border: `2px solid ${detail.branch.color}50`,
+                    }}
+                  >
+                    <img src={logoUrl} alt="" className="h-6" loading="lazy" />
+                  </div>
+                ) : (
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                    style={{
+                      background: `${detail.branch.color}18`,
+                      border: `2px solid ${detail.branch.color}50`,
+                    }}
+                  >
+                    <span className="text-xs font-bold font-mono" style={{ color: detail.branch.color }}>
+                      {detail.skill.shortName}
+                    </span>
+                  </div>
+                );
+              })()}
               <div className="min-w-0 flex-grow">
                 <h3 className="font-bold text-sm text-white truncate">
                   {detail.skill.name}

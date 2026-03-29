@@ -36,7 +36,8 @@ export const BADGE_MAP: Record<string, { slug: string; color: string }> = {
 export function getBadgeUrl(skillName: string): string | null {
   const badge = BADGE_MAP[skillName];
   if (!badge) return null;
-  const label = encodeURIComponent(skillName);
+  // shields.io: ハイフンは -- でエスケープ、アンダースコアは __ でエスケープ
+  const label = encodeURIComponent(skillName.replace(/-/g, '--').replace(/_/g, '__'));
   return `https://img.shields.io/badge/${label}-${badge.color}?style=flat&logo=${badge.slug}&logoColor=white`;
 }
 

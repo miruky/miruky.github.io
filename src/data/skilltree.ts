@@ -14,6 +14,47 @@ export interface SkillBranch {
   skills: SkillNode[];
 }
 
+/** skilltree skill id → shields.io simple-icons slug */
+export const SKILLTREE_LOGO_MAP: Record<string, string> = {
+  aws: 'amazonwebservices',
+  ec2: 'amazonec2',
+  s3: 'amazons3',
+  lambda: 'awslambda',
+  vpc: 'amazonwebservices',
+  rds: 'amazonrds',
+  cloudfront: 'amazoncloudwatch',
+  connect: 'amazonwebservices',
+  bedrock: 'amazonwebservices',
+  lex: 'amazonalexa',
+  terraform: 'terraform',
+  cfn: 'amazonwebservices',
+  cdk: 'amazonwebservices',
+  'bedrock-ai': 'amazonwebservices',
+  rag: 'amazonwebservices',
+  langchain: 'langchain',
+  vectordb: 'chroma',
+  gha: 'githubactions',
+  codepipeline: 'amazonwebservices',
+  codebuild: 'amazonwebservices',
+  python: 'python',
+  typescript: 'typescript',
+  javascript: 'javascript',
+  bash: 'gnubash',
+  sql: 'postgresql',
+  git: 'github',
+  docker: 'docker',
+  linux: 'linux',
+  nginx: 'nginx',
+  claude: 'anthropic',
+};
+
+export function getSkillLogoUrl(skillId: string, color: string): string | null {
+  const slug = SKILLTREE_LOGO_MAP[skillId];
+  if (!slug) return null;
+  const cleanColor = color.replace('#', '');
+  return `https://img.shields.io/badge/${encodeURIComponent(' ')}-${cleanColor}?style=flat-square&logo=${slug}&logoColor=white`;
+}
+
 export const skillTreeData: SkillBranch[] = [
   {
     id: 'cloud',
