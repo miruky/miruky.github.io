@@ -34,11 +34,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       setReady(true);
       return;
     }
-    if (!isAuthenticated()) {
-      router.replace('/admin/');
-      return;
-    }
-    setReady(true);
+    isAuthenticated().then((authed) => {
+      if (!authed) {
+        router.replace('/admin/');
+      } else {
+        setReady(true);
+      }
+    });
   }, [isLoginPage, router, pathname]);
 
   function handleLogout() {

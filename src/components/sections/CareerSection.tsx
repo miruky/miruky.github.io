@@ -28,7 +28,7 @@ export default function CareerSection() {
                 } flex-row`}
               >
                 {/* Timeline dot */}
-                <div className="absolute left-4 md:left-1/2 w-3 h-3 bg-accent-cyan rounded-full border-2 border-dark-900 transform -translate-x-1/2 z-10 mt-6 shadow-[0_0_10px_rgba(0,212,255,0.5)]" />
+                <div className="absolute left-4 md:left-1/2 w-3 h-3 bg-accent-cyan rounded-full border-2 border-white dark:border-dark-900 transform -translate-x-1/2 z-10 mt-6 shadow-[0_0_10px_rgba(0,212,255,0.5)]" />
 
                 {/* Content */}
                 <div

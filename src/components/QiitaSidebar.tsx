@@ -5,6 +5,7 @@ import { SiQiita } from 'react-icons/si';
 import { FiExternalLink, FiChevronLeft, FiChevronRight, FiFileText } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { safeUrl } from '@/lib/sanitize';
 
 interface QiitaItem {
   id: string;
@@ -170,7 +171,7 @@ export default function QiitaSidebar() {
                   qiitaArticles.map((article) => (
                     <a
                       key={article.id}
-                      href={article.url}
+                      href={safeUrl(article.url)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block px-3 py-3 border-b border-slate-100 dark:border-dark-700/50 hover:bg-slate-50 dark:hover:bg-dark-800 transition-colors group"

@@ -83,7 +83,7 @@ export default function CertificationsSection() {
                     </span>
                   </div>
                 )}
-                <div className="text-xs font-medium dark:text-white text-slate-900 leading-tight">
+                <div className="text-xs font-medium dark:text-white text-slate-900 leading-tight whitespace-pre-line">
                   {cert.name.replace('AWS Certified ', '').replace(' - ', '\n')}
                 </div>
                 {style.label && (
@@ -103,7 +103,7 @@ export default function CertificationsSection() {
           その他の資格
         </h3>
       </ScrollReveal>
-      <div className="grid grid-cols-3 gap-3 max-w-2xl mx-auto">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto">
         {otherCerts.map((cert, index) => (
           <ScrollReveal key={cert.name} delay={index * 0.05}>
             <div className="glass-card p-4 hover-card text-center h-full flex flex-col items-center justify-center">

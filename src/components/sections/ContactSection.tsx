@@ -83,22 +83,21 @@ export default function ContactSection() {
                 </div>
               </a>
 
-              <a
-                href="mailto:contact@example.com"
-                className="flex items-center gap-4 p-4 rounded-lg bg-slate-50 dark:bg-dark-800 hover:bg-slate-100 dark:hover:bg-dark-700 transition-colors group"
+              <div
+                className="flex items-center gap-4 p-4 rounded-lg bg-slate-50 dark:bg-dark-800 opacity-50 cursor-not-allowed"
               >
-                <div className="w-12 h-12 rounded-lg bg-slate-200 dark:bg-dark-600 flex items-center justify-center group-hover:bg-accent-cyan/10 transition-colors">
-                  <FaEnvelope className="w-6 h-6 text-slate-600 dark:text-slate-400 group-hover:text-accent-cyan transition-colors" />
+                <div className="w-12 h-12 rounded-lg bg-slate-200 dark:bg-dark-600 flex items-center justify-center">
+                  <FaEnvelope className="w-6 h-6 text-slate-600 dark:text-slate-400" />
                 </div>
                 <div>
                   <div className="text-sm font-semibold dark:text-white text-slate-900">
-                    Zenn
+                    Email
                   </div>
                   <div className="text-xs text-slate-500 dark:text-slate-400">
                     Coming Soon
                   </div>
                 </div>
-              </a>
+              </div>
             </div>
           </div>
         </ScrollReveal>

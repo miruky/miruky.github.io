@@ -78,7 +78,7 @@ const GRADE_MSG: Record<string, string> = {
 };
 
 // ─── メインコンポーネント ───
-export default function TypingGame() {
+export default function TypingGame({ onBack }: { onBack?: () => void }) {
   const [phase, setPhase] = useState<Phase>('menu');
   const [difficulty, setDifficulty] = useState<Difficulty>('easy');
   const [words, setWords] = useState<TypingWord[]>([]);
@@ -258,7 +258,9 @@ export default function TypingGame() {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
 
       if (e.key === 'Escape') {
-        setPhase('menu');
+        if (phaseRef.current === 'playing' || phaseRef.current === 'countdown') {
+          setPhase('menu');
+        }
         return;
       }
 
@@ -411,6 +413,11 @@ export default function TypingGame() {
         </div>
 
         <p className="text-slate-600 text-[10px] mt-6">Esc でメニューに戻る</p>
+        {onBack && (
+          <button onClick={onBack} className="mt-3 text-xs text-slate-500 hover:text-accent-cyan transition-colors">
+            &larr; ゲーム選択に戻る
+          </button>
+        )}
       </div>
     );
   }
@@ -617,7 +624,7 @@ export default function TypingGame() {
               Retry
             </button>
             <button
-              onClick={() => setPhase('menu')}
+              onClick={() => onBack ? onBack() : setPhase('menu')}
               className="px-6 py-3 rounded-lg font-medium border border-accent-cyan/40 text-accent-cyan hover:bg-accent-cyan/10 transition-all"
             >
               Menu

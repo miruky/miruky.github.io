@@ -23,7 +23,7 @@ export default function NewPostPage() {
   // Generate preview
   const renderPreview = useCallback(async () => {
     try {
-      const result = await remark().use(remarkHtml).process(body);
+      const result = await remark().use(remarkHtml, { sanitize: true }).process(body);
       setPreviewHtml(result.toString());
       setTab('preview');
     } catch {

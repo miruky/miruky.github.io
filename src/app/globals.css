@@ -12,7 +12,7 @@
     --color-text-secondary: #475569;
     --color-border: #e2e8f0;
     --glass-bg: rgba(255, 255, 255, 0.85);
-    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-border: rgba(148, 163, 184, 0.2);
   }
 
   .dark {
@@ -31,7 +31,7 @@
   }
 
   ::selection {
-    @apply bg-accent-cyan/30 text-white;
+    @apply bg-accent-cyan/30 text-slate-900 dark:text-white;
   }
 }
 
@@ -214,4 +214,10 @@
 }
 .mascot-bounce {
   animation: mascot-bounce 3s ease-in-out infinite;
+}
+
+/* Dark context: force dark glass variables on always-dark pages */
+.dark-context {
+  --glass-bg: rgba(10, 14, 39, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.08);
 }

@@ -4,9 +4,9 @@ import SkillTreeViz from '@/components/SkillTreeViz';
 
 export default function SkillTreePage() {
   return (
-    <div className="relative min-h-screen pt-24 pb-20">
+    <div className="relative min-h-screen pt-24 pb-20 dark-context">
       {/* Background */}
-      <div className="absolute inset-0 bg-hero-gradient dark:bg-hero-gradient bg-white" />
+      <div className="absolute inset-0 bg-hero-gradient" />
       <div
         className="absolute inset-0 opacity-[0.02] dark:opacity-[0.03]"
         style={{

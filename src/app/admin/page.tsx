@@ -41,8 +41,9 @@ export default function AdminLoginPage() {
         await encryptPAT(pat.trim(), password);
       }
 
-      createSession();
-      router.push('/admin/dashboard/');
+      createSession().then(() => {
+        router.push('/admin/dashboard/');
+      });
     } catch {
       setError('認証処理中にエラーが発生しました。');
     } finally {

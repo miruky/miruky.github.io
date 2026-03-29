@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { QiitaArticle } from '@/types';
 import { FaHeart, FaBookmark, FaSearch } from 'react-icons/fa';
 import { motion } from 'framer-motion';
+import { safeUrl } from '@/lib/sanitize';
 
 export default function ArticlesPage() {
   const [articles, setArticles] = useState<QiitaArticle[]>([]);
@@ -140,13 +141,13 @@ export default function ArticlesPage() {
             {filteredArticles.map((article, index) => (
               <motion.a
                 key={article.id}
-                href={article.url}
+                href={safeUrl(article.url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.02 }}
-                className="glass-card p-5 hover-card neon-border flex flex-col sm:flex-row sm:items-center gap-3 group block"
+                className="glass-card p-5 hover-card neon-border flex flex-col sm:flex-row sm:items-center gap-3 group"
               >
                 <div className="flex-grow min-w-0">
                   <h3 className="text-sm font-bold dark:text-white text-slate-900 group-hover:text-accent-cyan transition-colors truncate">

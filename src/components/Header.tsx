@@ -18,14 +18,12 @@ const navItems = [
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isPastHero, setIsPastHero] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
-      setIsPastHero(window.scrollY > window.innerHeight * 0.8);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -34,6 +32,15 @@ export default function Header() {
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [pathname]);
+
+  // 常にダーク背景を持つページ
+  const darkBgRoutes = ['/', '/game', '/game/', '/skilltree', '/skilltree/'];
+  const isOnDarkBgPage = darkBgRoutes.includes(pathname);
+
+  // ヘッダーが透明（未スクロール）かつダーク背景ページ → 背景は暗い → 白文字
+  // ヘッダーがglass-nav（スクロール済み）→ ライトモードでは白い背景 → 黒文字
+  // 通常ページ（白背景）→ 黒文字
+  const isHeaderOverDark = isOnDarkBgPage && !isScrolled;
 
   return (
     <header
@@ -51,7 +58,7 @@ export default function Header() {
               className="w-8 h-8 rounded-lg object-cover group-hover:scale-110 transition-transform"
             />
             <span className="font-bold text-lg hidden sm:block">
-              <span className={pathname === '/' && !isPastHero ? 'text-white' : 'text-slate-900 dark:text-white'}>miruky</span><span className="gradient-text-static">のIT備忘録</span>
+              <span className={isHeaderOverDark ? 'text-white' : 'text-slate-900 dark:text-white'}>miruky</span><span className="gradient-text-static">のIT備忘録</span>
             </span>
           </Link>
 
@@ -66,6 +73,8 @@ export default function Header() {
                   className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                     isActive
                       ? 'text-accent-cyan'
+                      : isHeaderOverDark
+                      ? 'text-slate-300 hover:text-white'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
@@ -90,7 +99,11 @@ export default function Header() {
             <ThemeToggle />
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-lg text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-dark-700 transition-colors"
+              className={`p-2 rounded-lg transition-colors ${
+                isHeaderOverDark
+                  ? 'text-slate-300 hover:text-white'
+                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-dark-700'
+              }`}
               aria-label="Toggle menu"
             >
               <div className="w-5 h-4 flex flex-col justify-between">

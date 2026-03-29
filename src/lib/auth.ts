@@ -145,22 +145,51 @@ export async function verifyCredentials(
 interface Session {
   authenticated: boolean;
   timestamp: number;
+  nonce: string;
 }
 
-const SESSION_DURATION = 4 * 60 * 60 * 1000; // 4 hours
+const SESSION_DURATION = 4 * 60 * 1000; // 4 hours
 
-export function createSession(): void {
-  const session: Session = { authenticated: true, timestamp: Date.now() };
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+async function hmacSign(data: string): Promise<string> {
+  const enc = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    'raw',
+    enc.encode(PASSWORD_HASH + SALT),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign']
+  );
+  const sig = await crypto.subtle.sign('HMAC', key, enc.encode(data));
+  return hexEncode(sig);
 }
 
-export function isAuthenticated(): boolean {
+function generateNonce(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+export async function createSession(): Promise<void> {
+  const nonce = generateNonce();
+  const session: Session = { authenticated: true, timestamp: Date.now(), nonce };
+  const payload = JSON.stringify(session);
+  const sig = await hmacSign(payload);
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ ...session, sig }));
+}
+
+export async function isAuthenticated(): Promise<boolean> {
   try {
     const raw = sessionStorage.getItem(SESSION_KEY);
     if (!raw) return false;
-    const session: Session = JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    const { sig, ...session } = parsed;
     if (!session.authenticated) return false;
     if (Date.now() - session.timestamp > SESSION_DURATION) {
+      clearSession();
+      return false;
+    }
+    // Verify HMAC signature to prevent session forgery
+    const expected = await hmacSign(JSON.stringify(session));
+    if (sig !== expected) {
       clearSession();
       return false;
     }

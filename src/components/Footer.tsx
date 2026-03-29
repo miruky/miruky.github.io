@@ -39,6 +39,7 @@ export default function Footer() {
                 { href: '/skilltree/', label: 'Skills' },
                 { href: '/projects/', label: 'Projects' },
                 { href: '/blog/', label: 'Blog' },
+                { href: '/game/', label: 'Game' },
                 { href: '/contact/', label: 'Contact' },
               ].map((item) => (
                 <li key={item.href}>
@@ -92,7 +93,7 @@ export default function Footer() {
 
         {/* Copyright */}
         <div className="mt-10 pt-6 border-t border-slate-200 dark:border-dark-700 text-center">
-          <p className="text-sm text-slate-400 dark:text-slate-500">
+          <p className="text-sm text-slate-500 dark:text-slate-500">
             &copy; {currentYear} miruky. All rights reserved.
           </p>
         </div>

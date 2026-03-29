@@ -6,6 +6,7 @@ import SectionHeading from '@/components/SectionHeading';
 import { QiitaArticle } from '@/types';
 import { FaHeart, FaArrowRight } from 'react-icons/fa6';
 import Link from 'next/link';
+import { safeUrl } from '@/lib/sanitize';
 
 export default function QiitaSection() {
   const [articles, setArticles] = useState<QiitaArticle[]>([]);
@@ -62,7 +63,7 @@ export default function QiitaSection() {
           {articles.map((article, index) => (
             <ScrollReveal key={article.id} delay={index * 0.05}>
               <a
-                href={article.url}
+                href={safeUrl(article.url)}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="glass-card p-6 hover-card neon-border block h-full"

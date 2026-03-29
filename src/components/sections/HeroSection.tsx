@@ -45,7 +45,7 @@ export default function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background */}
-      <div className="absolute inset-0 bg-hero-gradient dark:bg-hero-gradient bg-white" />
+      <div className="absolute inset-0 bg-hero-gradient" />
 
       {/* Grid pattern */}
       <div
@@ -157,7 +157,7 @@ export default function HeroSection() {
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-6 h-10 border-2 border-slate-400 dark:border-slate-600 rounded-full flex justify-center pt-2"
+          className="w-6 h-10 border-2 border-slate-500 rounded-full flex justify-center pt-2"
         >
           <div className="w-1.5 h-1.5 bg-accent-cyan rounded-full" />
         </motion.div>
@@ -173,7 +173,7 @@ export default function HeroSection() {
         <div className="mascot-bounce">
           <img
             src="/images/mascot/mascot-happy.png"
-            alt="miruky mascot"
+            alt=""
             className="w-24 lg:w-32 h-auto drop-shadow-lg opacity-90"
           />
         </div>
