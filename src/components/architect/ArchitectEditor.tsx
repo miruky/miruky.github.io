@@ -216,7 +216,7 @@ function ArchitectEditorInner({ lesson }: Props) {
   }, [lesson.configChecks]);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-5rem)]">
+    <div className="flex flex-col h-screen pt-20">
       {/* Top Bar */}
       <div className="flex items-center justify-between px-4 py-2 shrink-0" style={{ background: '#0d0e1a', borderBottom: '1px solid #8C4FFF25' }}>
         <div className="flex items-center gap-3 min-w-0">
