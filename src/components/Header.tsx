@@ -17,12 +17,14 @@ const navItems = [
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isPastHero, setIsPastHero] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
+      setIsPastHero(window.scrollY > window.innerHeight * 0.8);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -48,7 +50,7 @@ export default function Header() {
               className="w-8 h-8 rounded-lg object-cover group-hover:scale-110 transition-transform"
             />
             <span className="font-bold text-lg hidden sm:block">
-              <span className="text-white">miruky</span><span className="gradient-text-static">のIT備忘録</span>
+              <span className={isPastHero ? 'text-slate-900 dark:text-white' : 'text-white'}>miruky</span><span className="gradient-text-static">のIT備忘録</span>
             </span>
           </Link>
 

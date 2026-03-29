@@ -18,7 +18,7 @@ export const skillTreeData: SkillBranch[] = [
   {
     id: 'cloud',
     name: 'Cloud',
-    icon: '☁️',
+    icon: '',
     color: '#00d4ff',
     skills: [
       { id: 'aws', name: 'Amazon Web Services', shortName: 'AWS', level: 95, description: 'クラウドインフラ全般の設計・構築・運用。12冠達成。' },
@@ -36,7 +36,7 @@ export const skillTreeData: SkillBranch[] = [
   {
     id: 'iac',
     name: 'IaC',
-    icon: '🏗️',
+    icon: '',
     color: '#f59e0b',
     skills: [
       { id: 'terraform', name: 'Terraform', shortName: 'TF', level: 80, description: 'HCLによるマルチクラウドIaC管理' },
@@ -47,7 +47,7 @@ export const skillTreeData: SkillBranch[] = [
   {
     id: 'mlai',
     name: 'ML / AI',
-    icon: '🤖',
+    icon: '',
     color: '#a855f7',
     skills: [
       { id: 'bedrock-ai', name: 'Amazon Bedrock', shortName: 'Bedrock', level: 80, description: '基盤モデルの活用・プロンプトエンジニアリング' },
@@ -59,7 +59,7 @@ export const skillTreeData: SkillBranch[] = [
   {
     id: 'cicd',
     name: 'CI/CD',
-    icon: '🔄',
+    icon: '',
     color: '#22c55e',
     skills: [
       { id: 'gha', name: 'GitHub Actions', shortName: 'GHA', level: 85, description: 'CI/CDワークフロー自動化・カスタムアクション' },
@@ -70,7 +70,7 @@ export const skillTreeData: SkillBranch[] = [
   {
     id: 'languages',
     name: 'Languages',
-    icon: '💻',
+    icon: '',
     color: '#3b82f6',
     skills: [
       { id: 'python', name: 'Python', shortName: 'Py', level: 85, description: '主要開発言語。Lambda・ML・自動化スクリプト' },
@@ -83,7 +83,7 @@ export const skillTreeData: SkillBranch[] = [
   {
     id: 'tools',
     name: 'Tools',
-    icon: '🛠️',
+    icon: '',
     color: '#ec4899',
     skills: [
       { id: 'git', name: 'Git / GitHub', shortName: 'Git', level: 85, description: 'バージョン管理・ブランチ戦略・PR運用' },

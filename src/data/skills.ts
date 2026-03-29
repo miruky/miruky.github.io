@@ -3,7 +3,7 @@ import { SkillCategory } from '@/types';
 export const skillCategories: SkillCategory[] = [
   {
     name: 'Cloud',
-    icon: '☁️',
+    icon: '',
     skills: [
       { name: 'Amazon Web Services (AWS)', category: 'Cloud', level: 95 },
       { name: 'Amazon EC2', category: 'Cloud', level: 90 },
@@ -19,7 +19,7 @@ export const skillCategories: SkillCategory[] = [
   },
   {
     name: 'IaC',
-    icon: '🏗️',
+    icon: '',
     skills: [
       { name: 'Terraform', category: 'IaC', level: 80 },
       { name: 'AWS CloudFormation', category: 'IaC', level: 85 },
@@ -28,7 +28,7 @@ export const skillCategories: SkillCategory[] = [
   },
   {
     name: 'ML / AI',
-    icon: '🤖',
+    icon: '',
     skills: [
       { name: 'Amazon Bedrock', category: 'ML / AI', level: 80 },
       { name: 'RAG (Retrieval-Augmented Generation)', category: 'ML / AI', level: 75 },
@@ -38,7 +38,7 @@ export const skillCategories: SkillCategory[] = [
   },
   {
     name: 'CI/CD',
-    icon: '🔄',
+    icon: '',
     skills: [
       { name: 'GitHub Actions', category: 'CI/CD', level: 85 },
       { name: 'AWS CodePipeline', category: 'CI/CD', level: 75 },
@@ -47,7 +47,7 @@ export const skillCategories: SkillCategory[] = [
   },
   {
     name: 'Languages',
-    icon: '💻',
+    icon: '',
     skills: [
       { name: 'Python', category: 'Languages', level: 85 },
       { name: 'TypeScript', category: 'Languages', level: 75 },
@@ -58,7 +58,7 @@ export const skillCategories: SkillCategory[] = [
   },
   {
     name: 'Tools & Others',
-    icon: '🛠️',
+    icon: '',
     skills: [
       { name: 'Git / GitHub', category: 'Tools & Others', level: 85 },
       { name: 'Docker', category: 'Tools & Others', level: 75 },

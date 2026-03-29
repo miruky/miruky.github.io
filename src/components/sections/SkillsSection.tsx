@@ -44,7 +44,6 @@ export default function SkillsSection() {
                   : 'bg-slate-100 dark:bg-dark-700 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-dark-600'
               }`}
             >
-              <span className="mr-1">{category.icon}</span>
               {category.name}
             </button>
           ))}

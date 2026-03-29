@@ -103,16 +103,16 @@ export default function CertificationsSection() {
           その他の資格
         </h3>
       </ScrollReveal>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-2xl mx-auto">
+      <div className="grid grid-cols-3 gap-3 max-w-2xl mx-auto">
         {otherCerts.map((cert, index) => (
           <ScrollReveal key={cert.name} delay={index * 0.05}>
-            <div className="glass-card p-4 hover-card text-center">
+            <div className="glass-card p-4 hover-card text-center h-full flex flex-col items-center justify-center">
               <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br from-accent-purple/20 to-accent-pink/20 flex items-center justify-center border border-accent-purple/20">
                 <span className="text-xs font-bold font-mono text-accent-purple">
                   {cert.badge}
                 </span>
               </div>
-              <div className="text-xs font-medium dark:text-white text-slate-900 leading-tight">
+              <div className="text-xs font-medium dark:text-white text-slate-900 leading-tight text-center">
                 {cert.name}
               </div>
             </div>

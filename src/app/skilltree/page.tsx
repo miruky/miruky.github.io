@@ -19,10 +19,10 @@ export default function SkillTreePage() {
       <div className="relative z-10 section-container">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold dark:text-white text-slate-900 mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Skill Tree
           </h1>
-          <p className="text-slate-500 dark:text-slate-400">
+          <p className="text-slate-400">
             技術スキルの習熟度マップ — カテゴリをクリックするとフィルタ、ノードをクリックすると詳細が表示されます
           </p>
         </div>
