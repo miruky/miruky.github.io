@@ -4,6 +4,7 @@ import Providers from './providers';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
+import QiitaSidebar from '@/components/QiitaSidebar';
 
 export const metadata: Metadata = {
   title: {
@@ -58,7 +59,8 @@ export default function RootLayout({
         <Providers>
           <AnalyticsTracker />
           <Header />
-          <main className="flex-grow">{children}</main>
+          <QiitaSidebar />
+          <main className="flex-grow 2xl:ml-72">{children}</main>
           <Footer />
         </Providers>
       </body>

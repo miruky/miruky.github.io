@@ -83,7 +83,7 @@ export default function HeroSection() {
           </motion.div>
 
           {/* Title */}
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 dark:text-white text-slate-900">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold mb-6 text-white pb-2">
             Hi, I&apos;m{' '}
             <span className="gradient-text">miruky</span>
           </h1>

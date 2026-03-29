@@ -6,7 +6,7 @@ export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative border-t border-slate-200 dark:border-dark-700 bg-slate-50 dark:bg-dark-950">
+    <footer className="relative border-t border-slate-200 dark:border-dark-700 bg-slate-50 dark:bg-dark-950 2xl:ml-72">
       <div className="section-container py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
@@ -18,7 +18,7 @@ export default function Footer() {
                 className="w-8 h-8 rounded-lg object-cover"
               />
               <span className="font-bold text-lg dark:text-white text-slate-900">
-                miruky<span className="gradient-text-static">.io</span>
+                <span className="dark:text-white text-slate-900">miruky</span><span className="gradient-text-static">のIT備忘録</span>
               </span>
             </Link>
             <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">

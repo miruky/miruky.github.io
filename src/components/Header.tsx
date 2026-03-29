@@ -34,7 +34,7 @@ export default function Header() {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      className={`fixed top-0 left-0 2xl:left-72 right-0 z-50 transition-all duration-300 ${
         isScrolled ? 'glass-nav shadow-lg' : 'bg-transparent'
       }`}
     >
@@ -47,8 +47,8 @@ export default function Header() {
               alt="miruky"
               className="w-8 h-8 rounded-lg object-cover group-hover:scale-110 transition-transform"
             />
-            <span className="font-bold text-lg hidden sm:block dark:text-white text-slate-900">
-              miruky<span className="gradient-text-static">.io</span>
+            <span className="font-bold text-lg hidden sm:block">
+              <span className="text-white">miruky</span><span className="gradient-text-static">のIT備忘録</span>
             </span>
           </Link>
 
