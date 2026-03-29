@@ -38,6 +38,7 @@ export default function Footer() {
                 { href: '/articles/', label: 'Articles' },
                 { href: '/skilltree/', label: 'Skills' },
                 { href: '/program/', label: 'Program' },
+                { href: '/architect/', label: 'Architect' },
                 { href: '/projects/', label: 'Projects' },
                 { href: '/blog/', label: 'Blog' },
                 { href: '/game/', label: 'Game' },

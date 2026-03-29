@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { SiQiita } from 'react-icons/si';
 import { FiExternalLink, FiChevronLeft, FiChevronRight, FiFileText } from 'react-icons/fi';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,12 +26,17 @@ interface BlogItem {
 }
 
 export default function QiitaSidebar() {
+  const pathname = usePathname();
   const [qiitaArticles, setQiitaArticles] = useState<QiitaItem[]>([]);
   const [blogPosts, setBlogPosts] = useState<BlogItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [isOpen, setIsOpen] = useState(true);
 
+  // ホームセクション（/ のみ）以外では表示しない
+  const isHome = pathname === '/' || pathname === '';
+
   useEffect(() => {
+    if (!isHome) return;
     async function fetchAll() {
       try {
         const [qiitaRes, blogRes] = await Promise.allSettled([
@@ -54,7 +60,9 @@ export default function QiitaSidebar() {
       }
     }
     fetchAll();
-  }, []);
+  }, [isHome]);
+
+  if (!isHome) return null;
 
   return (
     <>
