@@ -15,7 +15,7 @@ export const BADGE_MAP: Record<string, { slug: string; color: string }> = {
   'Terraform': { slug: 'terraform', color: '844FBA' },
   'AWS CloudFormation': { slug: 'amazonwebservices', color: 'FF4F8B' },
   'AWS CDK': { slug: 'amazonwebservices', color: 'FF9900' },
-  'RAG (Retrieval-Augmented Generation)': { slug: 'openai', color: '412991' },
+  'RAG (Retrieval-Augmented Generation)': { slug: 'amazonwebservices', color: 'FF9900' },
   'LangChain': { slug: 'langchain', color: '1C3C3C' },
   'ChromaDB / FAISS': { slug: 'chroma', color: 'FF6446' },
   'GitHub Actions': { slug: 'githubactions', color: '2088FF' },

@@ -482,10 +482,10 @@ export default function SkillTreeViz() {
                 <span className="text-lg">{detail.branch.icon}</span>
               </div>
               <div className="min-w-0 flex-grow">
-                <h3 className="font-bold text-sm dark:text-white text-slate-900 truncate">
+                <h3 className="font-bold text-sm text-white truncate">
                   {detail.skill.name}
                 </h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-400">
                   {detail.branch.name} /{' '}
                   <span style={{ color: detail.branch.color }}>
                     {levelLabel(detail.skill.level)}
@@ -502,7 +502,7 @@ export default function SkillTreeViz() {
               </div>
             </div>
 
-            <p className="mt-3 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            <p className="mt-3 text-sm text-slate-300 leading-relaxed">
               {detail.skill.description}
             </p>
 
