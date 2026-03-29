@@ -13,6 +13,16 @@ export default function ContactSection() {
       id="contact"
     >
       <div className="max-w-2xl mx-auto">
+        {/* Mascot - shy */}
+        <div className="flex justify-center mb-6">
+          <div className="mascot-float">
+            <img
+              src="/images/mascot/mascot-shy.png"
+              alt=""
+              className="w-20 md:w-24 h-auto drop-shadow-md"
+            />
+          </div>
+        </div>
         <ScrollReveal>
           <div className="glass-card p-8 neon-border">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

@@ -60,7 +60,7 @@ export default function RootLayout({
           <AnalyticsTracker />
           <Header />
           <QiitaSidebar />
-          <main className="flex-grow 2xl:ml-72">{children}</main>
+          <main className="flex-grow">{children}</main>
           <Footer />
         </Providers>
       </body>

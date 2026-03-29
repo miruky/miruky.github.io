@@ -161,6 +161,22 @@ export default function HeroSection() {
           <div className="w-1.5 h-1.5 bg-accent-cyan rounded-full" />
         </motion.div>
       </motion.div>
+
+      {/* Mascot - happy jumping */}
+      <motion.div
+        initial={{ opacity: 0, x: 40, y: 20 }}
+        animate={{ opacity: 1, x: 0, y: 0 }}
+        transition={{ delay: 1, duration: 0.8, ease: 'easeOut' }}
+        className="absolute bottom-20 right-8 md:right-16 lg:right-24 hidden md:block pointer-events-none"
+      >
+        <div className="mascot-bounce">
+          <img
+            src="/images/mascot/mascot-happy.png"
+            alt="miruky mascot"
+            className="w-24 lg:w-32 h-auto drop-shadow-lg opacity-90"
+          />
+        </div>
+      </motion.div>
     </section>
   );
 }

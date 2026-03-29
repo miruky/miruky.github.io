@@ -35,8 +35,18 @@ export default function QiitaSection() {
       title="Qiita Articles"
       subtitle="最新の技術記事"
       id="qiita"
-      className="bg-slate-50 dark:bg-dark-950"
+      className="bg-slate-50 dark:bg-dark-950 relative"
     >
+      {/* Mascot - reading */}
+      <div className="absolute bottom-8 left-4 md:left-12 hidden md:block pointer-events-none z-10">
+        <div className="mascot-float" style={{ animationDelay: '1s' }}>
+          <img
+            src="/images/mascot/mascot-reading.png"
+            alt=""
+            className="w-20 lg:w-28 h-auto drop-shadow-md opacity-75"
+          />
+        </div>
+      </div>
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (

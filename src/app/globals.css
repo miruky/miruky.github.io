@@ -198,3 +198,20 @@
   background-color: rgba(148, 163, 184, 0.3);
   border-radius: 2px;
 }
+
+/* Mascot floating animation */
+@keyframes mascot-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-8px) rotate(2deg); }
+  75% { transform: translateY(4px) rotate(-1deg); }
+}
+@keyframes mascot-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-12px) scale(1.03); }
+}
+.mascot-float {
+  animation: mascot-float 4s ease-in-out infinite;
+}
+.mascot-bounce {
+  animation: mascot-bounce 3s ease-in-out infinite;
+}

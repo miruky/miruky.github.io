@@ -18,8 +18,19 @@ export default function SkillsSection() {
       title="Skills"
       subtitle="技術スタックと習熟度"
       id="skills"
-      className="bg-slate-50 dark:bg-dark-950"
+      className="bg-slate-50 dark:bg-dark-950 relative"
     >
+      {/* Mascot - questioning */}
+      <div className="absolute -top-4 right-4 md:right-12 lg:right-20 hidden md:block pointer-events-none z-10">
+        <div className="mascot-float">
+          <img
+            src="/images/mascot/mascot-question.png"
+            alt=""
+            className="w-20 lg:w-24 h-auto drop-shadow-md opacity-80"
+          />
+        </div>
+      </div>
+
       {/* Category Tabs */}
       <ScrollReveal>
         <div className="flex flex-wrap justify-center gap-2 mb-12">
