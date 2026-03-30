@@ -28,16 +28,16 @@ function ServiceNode({ data, selected }: NodeProps<ServiceNodeType>) {
         ${selected ? 'ring-2 ring-offset-1 ring-offset-transparent shadow-lg scale-105' : 'shadow-md hover:shadow-lg'}
       `}
       style={{
-        background: `${data.color}10`,
-        borderColor: selected ? data.color : `${data.color}50`,
-        boxShadow: selected ? `0 0 0 2px ${data.color}` : undefined,
+        background: `${data.color}15`,
+        borderColor: selected ? data.color : `${data.color}60`,
+        boxShadow: selected ? `0 0 0 2px ${data.color}` : `0 1px 4px rgba(0,0,0,0.08)`,
       }}
     >
       <Handle
         type="target"
         position={Position.Top}
         className="!w-2.5 !h-2.5 !border-2 !rounded-full !-top-1.5"
-        style={{ background: '#1e293b', borderColor: data.color }}
+        style={{ background: '#ffffff', borderColor: data.color }}
       />
       <Handle
         type="source"
@@ -57,12 +57,12 @@ function ServiceNode({ data, selected }: NodeProps<ServiceNodeType>) {
         position={Position.Left}
         id="left"
         className="!w-2.5 !h-2.5 !border-2 !rounded-full !-left-1.5"
-        style={{ background: '#1e293b', borderColor: data.color }}
+        style={{ background: '#ffffff', borderColor: data.color }}
       />
 
       <div className="flex items-center gap-2">
         <AwsServiceIcon serviceId={data.serviceId} category={data.category} size={22} />
-        <span className="text-xs font-bold text-slate-200 whitespace-nowrap">{data.label}</span>
+        <span className="text-xs font-bold text-slate-700 whitespace-nowrap">{data.label}</span>
       </div>
     </div>
   );

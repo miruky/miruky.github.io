@@ -46,13 +46,11 @@ export default function Header() {
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? isOnDarkBgPage
-            ? 'shadow-lg backdrop-blur-2xl'
-            : 'glass-nav shadow-lg'
-          : 'bg-transparent'
+        isOnDarkBgPage
+          ? `backdrop-blur-2xl ${isScrolled ? 'shadow-lg' : ''}`
+          : isScrolled ? 'glass-nav shadow-lg' : 'bg-transparent'
       }`}
-      style={isScrolled && isOnDarkBgPage ? { background: 'rgba(10, 14, 39, 0.92)', borderBottom: '1px solid rgba(255,255,255,0.08)' } : undefined}
+      style={isOnDarkBgPage ? { background: 'rgba(10, 14, 39, 0.95)', borderBottom: '1px solid rgba(255,255,255,0.08)' } : undefined}
     >
       <div className="section-container">
         <div className="flex items-center justify-between h-16 md:h-20">

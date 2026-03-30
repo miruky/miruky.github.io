@@ -253,7 +253,7 @@ function ArchitectEditorInner({ lesson }: Props) {
       </div>
 
       {/* Scenario & Requirements */}
-      <div className="shrink-0 px-4 py-2.5 flex items-start gap-3" style={{ background: '#8C4FFF08', borderBottom: '1px solid #8C4FFF15' }}>
+      <div className="shrink-0 px-4 py-2.5 flex items-start gap-3" style={{ background: '#0d0e1a', borderBottom: '1px solid #8C4FFF25' }}>
         <div className="w-6 h-6 rounded flex items-center justify-center text-xs font-bold shrink-0 mt-0.5" style={{ background: '#8C4FFF20', color: '#8C4FFF' }}>!</div>
         <div className="min-w-0 flex-1">
           <p className="text-[13px] text-slate-300 leading-relaxed">{lesson.scenario}</p>
@@ -294,20 +294,20 @@ function ArchitectEditorInner({ lesson }: Props) {
             onDrop={onDrop}
             nodeTypes={nodeTypes}
             fitView
-            className="bg-[#080914]"
+            className="bg-white"
             defaultEdgeOptions={{
               animated: true,
               style: { stroke: '#8C4FFF', strokeWidth: 2 },
             }}
           >
-            <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#1e293b40" />
+            <Background variant={BackgroundVariant.Dots} gap={20} size={1} color="#cbd5e130" />
             <Controls
-              className="!bg-[#0d0e1a] !border-slate-700/50 !rounded-lg !shadow-xl [&>button]:!bg-[#0d0e1a] [&>button]:!border-slate-700/50 [&>button]:!text-slate-400 [&>button:hover]:!bg-slate-800"
+              className="!bg-white !border-slate-200 !rounded-lg !shadow-md [&>button]:!bg-white [&>button]:!border-slate-200 [&>button]:!text-slate-500 [&>button:hover]:!bg-slate-50"
             />
             <MiniMap
               nodeColor="#8C4FFF"
-              maskColor="rgba(0,0,0,0.7)"
-              className="!bg-[#0d0e1a] !border-slate-700/50 !rounded-lg"
+              maskColor="rgba(255,255,255,0.7)"
+              className="!bg-white !border-slate-200 !rounded-lg"
             />
           </ReactFlow>
 
@@ -315,11 +315,11 @@ function ArchitectEditorInner({ lesson }: Props) {
           {nodes.length === 0 && (
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center">
-                <svg className="w-12 h-12 text-slate-700 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                <svg className="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
                 </svg>
-                <p className="text-sm text-slate-600">左のパレットからサービスをドラッグ&ドロップ</p>
-                <p className="text-xs text-slate-700 mt-1">ノード間をドラッグして接続</p>
+                <p className="text-sm text-slate-400">左のパレットからサービスをドラッグ&ドロップ</p>
+                <p className="text-xs text-slate-400 mt-1">ノード間をドラッグして接続</p>
               </div>
             </div>
           )}
