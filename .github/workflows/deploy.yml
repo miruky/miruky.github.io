@@ -3,6 +3,9 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: ['main']
+  schedule:
+    # 毎日 AM 9:00 (JST) = UTC 0:00 に自動再ビルド → Qiita記事を最新化
+    - cron: '0 0 * * *'
   workflow_dispatch:
 
 permissions:
