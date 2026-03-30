@@ -112,31 +112,92 @@ function createGalaxyTexture(size: number, arms: number, tilt: number): HTMLCanv
 }
 
 /* ─── Pre-render milky way band onto offscreen canvas ─── */
+/* Thick, cloudy nebulous river of gas/dust stretching diagonally across the viewport */
 function createMilkyWayTexture(w: number, h: number): HTMLCanvasElement {
   const off = document.createElement('canvas');
   off.width = w;
   off.height = h;
   const c = off.getContext('2d')!;
 
-  // The milky way is a wide, angled band across the screen
   c.save();
   c.translate(w / 2, h / 2);
-  c.rotate(-0.25); // slight angle
+  c.rotate(-0.2); // diagonal slant like reference image
 
-  const bandH = h * 0.35;
-  // Multiple passes for organic look
-  for (let pass = 0; pass < 3; pass++) {
-    const spread = bandH * (0.8 + pass * 0.3);
-    const alpha = 0.025 - pass * 0.006;
-    for (let i = 0; i < 2000; i++) {
-      const px = (Math.random() - 0.5) * w * 1.6;
-      const py = (Math.random() - 0.5) * spread * (0.5 + 0.5 * Math.pow(Math.random(), 0.5));
+  const bandW = w * 1.8;
+  const bandH = h * 0.38;
+
+  // === Layer 1: Wide diffuse background glow ===
+  // Multiple large soft blobs form the broad gaseous body
+  const blobConfigs = [
+    // center cluster — dense bright core region
+    { x: 0, y: 0, rx: bandW * 0.28, ry: bandH * 0.45, r: 180, g: 190, b: 220, a: 0.09 },
+    { x: -0.08 * bandW, y: 0.02 * bandH, rx: bandW * 0.22, ry: bandH * 0.5, r: 170, g: 175, b: 210, a: 0.08 },
+    { x: 0.12 * bandW, y: -0.04 * bandH, rx: bandW * 0.24, ry: bandH * 0.4, r: 190, g: 200, b: 230, a: 0.07 },
+    // left extension — wispy, pinkish
+    { x: -0.3 * bandW, y: 0.05 * bandH, rx: bandW * 0.2, ry: bandH * 0.5, r: 180, g: 160, b: 200, a: 0.06 },
+    { x: -0.42 * bandW, y: 0.08 * bandH, rx: bandW * 0.15, ry: bandH * 0.45, r: 200, g: 150, b: 180, a: 0.05 },
+    // right extension — greenish-blue wisps
+    { x: 0.3 * bandW, y: -0.06 * bandH, rx: bandW * 0.22, ry: bandH * 0.55, r: 160, g: 190, b: 210, a: 0.065 },
+    { x: 0.42 * bandW, y: -0.02 * bandH, rx: bandW * 0.16, ry: bandH * 0.4, r: 170, g: 200, b: 195, a: 0.05 },
+  ];
+
+  for (const b of blobConfigs) {
+    c.save();
+    c.translate(b.x, b.y);
+    c.scale(1, b.ry / b.rx); // elliptical
+    const grad = c.createRadialGradient(0, 0, 0, 0, 0, b.rx);
+    grad.addColorStop(0, `rgba(${b.r},${b.g},${b.b},${b.a * 1.5})`);
+    grad.addColorStop(0.25, `rgba(${b.r},${b.g},${b.b},${b.a})`);
+    grad.addColorStop(0.6, `rgba(${b.r},${b.g},${b.b},${b.a * 0.4})`);
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = grad;
+    c.fillRect(-b.rx, -b.rx, b.rx * 2, b.rx * 2);
+    c.restore();
+  }
+
+  // === Layer 2: Medium cloud blobs for structure and wisps ===
+  for (let i = 0; i < 40; i++) {
+    const px = (Math.random() - 0.5) * bandW * 0.9;
+    const distFromCenter = Math.abs(px) / (bandW * 0.45);
+    const ySpread = bandH * 0.4 * (1 - distFromCenter * 0.3);
+    const py = (Math.random() - 0.5) * ySpread;
+    const rx = 20 + Math.random() * bandW * 0.08;
+    const ry = rx * (0.5 + Math.random() * 0.8);
+    const rot = Math.random() * Math.PI;
+
+    const tone = Math.random();
+    const rr = Math.floor(150 + tone * 60);
+    const gg = Math.floor(160 + tone * 50);
+    const bb = Math.floor(190 + tone * 50);
+    const aa = 0.025 + Math.random() * 0.04;
+
+    c.save();
+    c.translate(px, py);
+    c.rotate(rot);
+    c.scale(1, ry / rx);
+    const g = c.createRadialGradient(0, 0, 0, 0, 0, rx);
+    g.addColorStop(0, `rgba(${rr},${gg},${bb},${aa * 1.5})`);
+    g.addColorStop(0.4, `rgba(${rr},${gg},${bb},${aa})`);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = g;
+    c.fillRect(-rx, -rx, rx * 2, rx * 2);
+    c.restore();
+  }
+
+  // === Layer 3: Dense star field within the band ===
+  for (let pass = 0; pass < 4; pass++) {
+    const count = [3000, 2000, 1500, 800][pass];
+    const spread = bandH * (0.6 + pass * 0.15);
+    const maxAlpha = [0.035, 0.025, 0.02, 0.015][pass];
+    for (let i = 0; i < count; i++) {
+      const px = (Math.random() - 0.5) * bandW;
+      const gaussY = (Math.random() + Math.random() + Math.random()) / 3 - 0.5;
+      const py = gaussY * spread;
       const dist = Math.abs(py) / (spread * 0.5);
-      const fade = Math.max(0, 1 - dist);
-      const a = alpha * fade * (0.5 + Math.random() * 0.5);
-      const sz = 1 + Math.random() * 3;
+      const fade = Math.max(0, 1 - dist * 0.8);
+      const a = maxAlpha * fade * (0.4 + Math.random() * 0.6);
+      const sz = 0.3 + Math.random() * (pass < 2 ? 1.8 : 2.5);
 
-      // Mix of warm and cool whites
       const tone = Math.random();
       const rr = Math.floor(180 + tone * 60);
       const gg = Math.floor(185 + tone * 50);
@@ -147,27 +208,70 @@ function createMilkyWayTexture(w: number, h: number): HTMLCanvasElement {
       c.fillStyle = `rgba(${rr},${gg},${bb},${a})`;
       c.fill();
     }
-
-    // Soft glow band
-    const grad = c.createLinearGradient(0, -spread * 0.6, 0, spread * 0.6);
-    grad.addColorStop(0, 'rgba(0,0,0,0)');
-    grad.addColorStop(0.3, `rgba(160,170,200,${alpha * 0.8})`);
-    grad.addColorStop(0.5, `rgba(180,185,210,${alpha * 1.2})`);
-    grad.addColorStop(0.7, `rgba(160,170,200,${alpha * 0.8})`);
-    grad.addColorStop(1, 'rgba(0,0,0,0)');
-    c.fillStyle = grad;
-    c.fillRect(-w, -spread * 0.6, w * 2, spread * 1.2);
   }
 
-  // Dark dust lanes through the center
-  for (let i = 0; i < 800; i++) {
-    const px = (Math.random() - 0.5) * w * 1.4;
+  // === Layer 4: Bright accent glows along the core ===
+  const accentBlobs = [
+    { x: 0, y: 0, r: bandW * 0.08, a: 0.06 },
+    { x: -bandW * 0.15, y: bandH * 0.02, r: bandW * 0.06, a: 0.05 },
+    { x: bandW * 0.1, y: -bandH * 0.03, r: bandW * 0.07, a: 0.045 },
+    { x: bandW * 0.25, y: -bandH * 0.05, r: bandW * 0.05, a: 0.04 },
+    { x: -bandW * 0.28, y: bandH * 0.06, r: bandW * 0.05, a: 0.04 },
+  ];
+  for (const ab of accentBlobs) {
+    const g = c.createRadialGradient(ab.x, ab.y, 0, ab.x, ab.y, ab.r);
+    g.addColorStop(0, `rgba(220,225,245,${ab.a})`);
+    g.addColorStop(0.3, `rgba(200,210,235,${ab.a * 0.6})`);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = g;
+    c.fillRect(ab.x - ab.r, ab.y - ab.r, ab.r * 2, ab.r * 2);
+  }
+
+  // === Layer 5: Dark dust lanes through the center ===
+  // Large soft dark blobs
+  for (let i = 0; i < 15; i++) {
+    const px = (Math.random() - 0.5) * bandW * 0.7;
+    const py = (Math.random() - 0.5) * bandH * 0.12;
+    const rx = 15 + Math.random() * bandW * 0.06;
+    const ry = rx * (0.3 + Math.random() * 0.4);
+    const rot = -0.3 + Math.random() * 0.6;
+
+    c.save();
+    c.translate(px, py);
+    c.rotate(rot);
+    c.scale(1, ry / rx);
+    const g = c.createRadialGradient(0, 0, 0, 0, 0, rx);
+    g.addColorStop(0, `rgba(8,12,30,${0.06 + Math.random() * 0.06})`);
+    g.addColorStop(0.6, `rgba(8,12,30,${0.03 + Math.random() * 0.03})`);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = g;
+    c.fillRect(-rx, -rx, rx * 2, rx * 2);
+    c.restore();
+  }
+  // Small granular dust
+  for (let i = 0; i < 1200; i++) {
+    const px = (Math.random() - 0.5) * bandW * 0.8;
     const py = (Math.random() - 0.5) * bandH * 0.15;
-    const sz = 2 + Math.random() * 5;
+    const sz = 1 + Math.random() * 4;
     c.beginPath();
     c.arc(px, py, sz, 0, Math.PI * 2);
-    c.fillStyle = `rgba(10,14,39,${0.03 + Math.random() * 0.05})`;
+    c.fillStyle = `rgba(10,14,39,${0.02 + Math.random() * 0.04})`;
     c.fill();
+  }
+
+  // === Layer 6: Pink/purple edge tints ===
+  const edgeBlobs = [
+    { x: -bandW * 0.35, y: bandH * 0.15, r: bandW * 0.1, rr: 200, gg: 130, bb: 170, a: 0.03 },
+    { x: bandW * 0.35, y: -bandH * 0.1, r: bandW * 0.08, rr: 180, gg: 150, bb: 190, a: 0.025 },
+    { x: -bandW * 0.15, y: -bandH * 0.18, r: bandW * 0.07, rr: 190, gg: 140, bb: 180, a: 0.025 },
+    { x: bandW * 0.2, y: bandH * 0.14, r: bandW * 0.06, rr: 210, gg: 120, bb: 160, a: 0.02 },
+  ];
+  for (const eb of edgeBlobs) {
+    const g = c.createRadialGradient(eb.x, eb.y, 0, eb.x, eb.y, eb.r);
+    g.addColorStop(0, `rgba(${eb.rr},${eb.gg},${eb.bb},${eb.a})`);
+    g.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = g;
+    c.fillRect(eb.x - eb.r, eb.y - eb.r, eb.r * 2, eb.r * 2);
   }
 
   c.restore();
@@ -229,20 +333,27 @@ export default function SpaceBackground() {
 
       const S = Math.max(w, h);
       nebulae = [
-        { x: w * 0.15, y: h * 0.35, radius: S * 0.25, r: 40, g: 70, b: 220, alpha: 0.06, driftX: 0.1, driftY: 0.04, pulseSpeed: 0.3, pulseOffset: 0, lobes: makeLobes(4, S * 0.25) },
-        { x: w * 0.8, y: h * 0.55, radius: S * 0.3, r: 160, g: 30, b: 200, alpha: 0.05, driftX: -0.08, driftY: 0.05, pulseSpeed: 0.25, pulseOffset: 2, lobes: makeLobes(5, S * 0.3) },
-        { x: w * 0.5, y: h * 0.12, radius: S * 0.18, r: 20, g: 180, b: 240, alpha: 0.055, driftX: 0.06, driftY: -0.03, pulseSpeed: 0.4, pulseOffset: 4, lobes: makeLobes(3, S * 0.18) },
-        { x: w * 0.35, y: h * 0.75, radius: S * 0.2, r: 200, g: 60, b: 120, alpha: 0.04, driftX: 0.05, driftY: -0.06, pulseSpeed: 0.35, pulseOffset: 1, lobes: makeLobes(3, S * 0.2) },
-        { x: w * 0.9, y: h * 0.2, radius: S * 0.15, r: 80, g: 40, b: 180, alpha: 0.045, driftX: -0.04, driftY: 0.03, pulseSpeed: 0.45, pulseOffset: 3, lobes: makeLobes(3, S * 0.15) },
+        // Primary large nebulae (bigger, more vivid)
+        { x: w * 0.15, y: h * 0.35, radius: S * 0.30, r: 40, g: 70, b: 220, alpha: 0.08, driftX: 0.1, driftY: 0.04, pulseSpeed: 0.3, pulseOffset: 0, lobes: makeLobes(5, S * 0.30) },
+        { x: w * 0.8, y: h * 0.55, radius: S * 0.35, r: 160, g: 30, b: 200, alpha: 0.07, driftX: -0.08, driftY: 0.05, pulseSpeed: 0.25, pulseOffset: 2, lobes: makeLobes(6, S * 0.35) },
+        { x: w * 0.5, y: h * 0.12, radius: S * 0.22, r: 20, g: 180, b: 240, alpha: 0.07, driftX: 0.06, driftY: -0.03, pulseSpeed: 0.4, pulseOffset: 4, lobes: makeLobes(4, S * 0.22) },
+        { x: w * 0.35, y: h * 0.75, radius: S * 0.24, r: 200, g: 60, b: 120, alpha: 0.06, driftX: 0.05, driftY: -0.06, pulseSpeed: 0.35, pulseOffset: 1, lobes: makeLobes(4, S * 0.24) },
+        { x: w * 0.9, y: h * 0.2, radius: S * 0.18, r: 80, g: 40, b: 180, alpha: 0.06, driftX: -0.04, driftY: 0.03, pulseSpeed: 0.45, pulseOffset: 3, lobes: makeLobes(4, S * 0.18) },
+        // Additional nebulae for richer atmosphere
+        { x: w * 0.6, y: h * 0.45, radius: S * 0.28, r: 100, g: 120, b: 210, alpha: 0.055, driftX: -0.06, driftY: -0.04, pulseSpeed: 0.28, pulseOffset: 5, lobes: makeLobes(5, S * 0.28) },
+        { x: w * 0.25, y: h * 0.58, radius: S * 0.20, r: 180, g: 80, b: 160, alpha: 0.05, driftX: 0.07, driftY: 0.05, pulseSpeed: 0.32, pulseOffset: 0.5, lobes: makeLobes(4, S * 0.20) },
+        { x: w * 0.7, y: h * 0.82, radius: S * 0.16, r: 60, g: 100, b: 200, alpha: 0.05, driftX: -0.05, driftY: -0.03, pulseSpeed: 0.38, pulseOffset: 3.5, lobes: makeLobes(3, S * 0.16) },
       ];
 
       shootingStars = [];
 
-      // Spiral galaxies – pre-rendered textures for performance
+      // Spiral galaxies – pre-rendered textures for performance (5 total)
       const galaxyConfigs = [
         { x: 0.12, y: 0.22, sizeMul: 0.08, tilt: 0.55, rotSpeed: 0.02, brightness: 0.7 },
         { x: 0.72, y: 0.15, sizeMul: 0.06, tilt: 0.45, rotSpeed: -0.015, brightness: 0.6 },
         { x: 0.88, y: 0.65, sizeMul: 0.05, tilt: 0.6, rotSpeed: 0.018, brightness: 0.55 },
+        { x: 0.05, y: 0.08, sizeMul: 0.045, tilt: 0.4, rotSpeed: -0.012, brightness: 0.5 },
+        { x: 0.55, y: 0.78, sizeMul: 0.055, tilt: 0.5, rotSpeed: 0.014, brightness: 0.5 },
       ];
       galaxies = galaxyConfigs.map((gc) => {
         const sz = Math.max(w, h) * gc.sizeMul;
