@@ -8,5 +8,5 @@ export const siteConfig: SiteConfig = {
   qiitaUserId: 'miruky',
   githubUsername: 'miruky',
   twitterUrl: 'https://x.com/miruky_tech',
-  zennUrl: undefined,
+  zennUrl: 'https://zenn.dev/miruky',
 };

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FaGithub, FaXTwitter } from 'react-icons/fa6';
-import { SiQiita } from 'react-icons/si';
+import { SiQiita, SiZenn } from 'react-icons/si';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -86,6 +86,15 @@ export default function Footer() {
                 aria-label="Qiita"
               >
                 <SiQiita className="w-5 h-5" />
+              </a>
+              <a
+                href="https://zenn.dev/miruky"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-10 h-10 rounded-lg flex items-center justify-center bg-slate-100 dark:bg-dark-700 text-slate-600 dark:text-slate-400 hover:text-[#3EA8FF] dark:hover:text-[#3EA8FF] hover:bg-slate-200 dark:hover:bg-dark-600 transition-all"
+                aria-label="Zenn"
+              >
+                <SiZenn className="w-5 h-5" />
               </a>
               <a
                 href="https://x.com/miruky_tech"

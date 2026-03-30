@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { FaGithub } from 'react-icons/fa6';
-import { SiQiita } from 'react-icons/si';
+import { SiQiita, SiZenn } from 'react-icons/si';
 import ParticleBackground from '@/components/ParticleBackground';
 
 /* ─── Planet Config ─────────────────────────────────────────── */
@@ -218,6 +218,15 @@ export default function HeroSection() {
               <SiQiita className="w-4 h-4" />
               Qiita Articles
             </Link>
+            <a
+              href="https://zenn.dev/miruky"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium bg-[#3EA8FF] text-white hover:bg-[#3595E0] transition-all duration-300 shadow-lg shadow-[#3EA8FF]/20"
+            >
+              <SiZenn className="w-4 h-4" />
+              Zenn Articles
+            </a>
             <a
               href="https://github.com/miruky"
               target="_blank"

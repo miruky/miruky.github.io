@@ -31,9 +31,9 @@ const socialLinks = [
   {
     name: 'Zenn',
     icon: SiZenn,
-    href: '#',
+    href: 'https://zenn.dev/miruky',
     color: 'hover:text-[#3EA8FF]',
-    description: '準備中',
+    description: '技術記事・知見の共有',
   },
 ];
 

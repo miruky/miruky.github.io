@@ -3,7 +3,7 @@
 import ScrollReveal from '@/components/ScrollReveal';
 import SectionHeading from '@/components/SectionHeading';
 import { FaEnvelope, FaGithub, FaXTwitter } from 'react-icons/fa6';
-import { SiQiita } from 'react-icons/si';
+import { SiQiita, SiZenn } from 'react-icons/si';
 
 export default function ContactSection() {
   return (
@@ -57,6 +57,25 @@ export default function ContactSection() {
                 <div>
                   <div className="text-sm font-semibold dark:text-white text-slate-900">
                     Qiita
+                  </div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">
+                    @miruky
+                  </div>
+                </div>
+              </a>
+
+              <a
+                href="https://zenn.dev/miruky"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-4 p-4 rounded-lg bg-slate-50 dark:bg-dark-800 hover:bg-slate-100 dark:hover:bg-dark-700 transition-colors group"
+              >
+                <div className="w-12 h-12 rounded-lg bg-slate-200 dark:bg-dark-600 flex items-center justify-center group-hover:bg-accent-cyan/10 transition-colors">
+                  <SiZenn className="w-6 h-6 text-slate-600 dark:text-slate-400 group-hover:text-cyan-700 dark:group-hover:text-accent-cyan transition-colors" />
+                </div>
+                <div>
+                  <div className="text-sm font-semibold dark:text-white text-slate-900">
+                    Zenn
                   </div>
                   <div className="text-xs text-slate-500 dark:text-slate-400">
                     @miruky

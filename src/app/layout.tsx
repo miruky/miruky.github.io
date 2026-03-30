@@ -52,7 +52,7 @@ export default function RootLayout({
       <head>
         <meta
           httpEquiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://qiita-user-contents.imgix.net https://avatars.githubusercontent.com https://img.shields.io data:; connect-src 'self' https://qiita.com https://api.github.com; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://api.github.com; upgrade-insecure-requests;"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://qiita-user-contents.imgix.net https://avatars.githubusercontent.com https://img.shields.io data:; connect-src 'self' https://qiita.com https://api.github.com https://zenn.dev; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://api.github.com; upgrade-insecure-requests;"
         />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
       </head>
