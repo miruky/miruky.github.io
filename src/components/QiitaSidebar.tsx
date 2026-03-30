@@ -84,31 +84,36 @@ export default function QiitaSidebar() {
 
   return (
     <>
-      {/* Toggle Button — 2-color: Zenn blue (top) + Qiita green (bottom), chevron at boundary */}
+      {/* Toggle Button — 2-color: Zenn blue (top) + Qiita green (bottom) */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="hidden 2xl:flex fixed top-1/2 -translate-y-1/2 z-[55] items-center justify-center transition-all duration-300"
         style={{ left: isOpen ? '34rem' : '0' }}
         aria-label="Toggle sidebar"
       >
-        <div className="relative flex flex-col rounded-r-lg shadow-lg overflow-hidden">
-          {/* Top: Zenn blue */}
-          <div className="flex items-center justify-center px-2 py-2.5 bg-[#3EA8FF] text-white">
-            {!isOpen && <SiZenn className="w-4 h-4" />}
+        {isOpen ? (
+          /* ── Close toggle: larger hit area ── */
+          <div className="flex flex-col rounded-r-xl shadow-lg overflow-hidden hover:brightness-110 transition-all">
+            <div className="flex items-center justify-center px-2.5 py-4 bg-[#3EA8FF] text-white">
+              <FiChevronLeft className="w-5 h-5" />
+            </div>
+            <div className="flex items-center justify-center px-2.5 py-4 bg-[#55C500] text-white">
+              <FiChevronLeft className="w-5 h-5 opacity-0" />
+            </div>
           </div>
-          {/* Bottom: Qiita green */}
-          <div className="flex items-center justify-center px-2 py-2.5 bg-[#55C500] text-white">
-            {!isOpen && <SiQiita className="w-4 h-4" />}
+        ) : (
+          /* ── Open toggle: logos + chevron to the right ── */
+          <div className="flex flex-col rounded-r-xl shadow-lg overflow-hidden hover:brightness-110 transition-all">
+            <div className="flex items-center gap-1.5 pl-2.5 pr-2 py-3 bg-[#3EA8FF] text-white">
+              <SiZenn className="w-5 h-5" />
+              <FiChevronRight className="w-4 h-4 opacity-70" />
+            </div>
+            <div className="flex items-center gap-1.5 pl-2.5 pr-2 py-3 bg-[#55C500] text-white">
+              <SiQiita className="w-5 h-5" />
+              <FiChevronRight className="w-4 h-4 opacity-70" />
+            </div>
           </div>
-          {/* Chevron centered at boundary */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            {isOpen ? (
-              <FiChevronLeft className="w-4 h-4 text-white drop-shadow-md" />
-            ) : (
-              <FiChevronRight className="w-3.5 h-3.5 text-white drop-shadow-md" />
-            )}
-          </div>
-        </div>
+        )}
       </button>
 
       {/* Sidebar Panel */}
