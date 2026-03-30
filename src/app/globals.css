@@ -55,10 +55,16 @@
     @apply bg-gradient-to-r from-accent-cyan via-accent-purple to-accent-pink bg-clip-text text-transparent;
     background-size: 200% auto;
     animation: gradientShift 4s ease infinite;
+    padding-bottom: 0.1em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 
   .gradient-text-static {
     @apply bg-gradient-to-r from-accent-cyan to-accent-purple bg-clip-text text-transparent;
+    padding-bottom: 0.1em;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
   }
 
   .neon-border {
