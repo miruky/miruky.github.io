@@ -1,4 +1,5 @@
 import { SkillCategory } from '@/types';
+import { SKILL_SVG_ICONS } from './icons';
 
 /** shields.io badge slug mapping */
 export const BADGE_MAP: Record<string, { slug: string; color: string }> = {
@@ -38,6 +39,11 @@ export function getBadgeUrl(skillName: string): string | null {
   if (!badge) return null;
   // shields.io: ハイフンは -- でエスケープ、アンダースコアは __ でエスケープ
   const label = encodeURIComponent(skillName.replace(/-/g, '--').replace(/_/g, '__'));
+  // カスタム SVG アイコンがあれば data URI として logo に渡す
+  const customSvg = SKILL_SVG_ICONS[skillName];
+  if (customSvg) {
+    return `https://img.shields.io/badge/${label}-${badge.color}?style=flat&logo=data:image/svg+xml;base64,${customSvg}&logoColor=white`;
+  }
   return `https://img.shields.io/badge/${label}-${badge.color}?style=flat&logo=${badge.slug}&logoColor=white`;
 }
 

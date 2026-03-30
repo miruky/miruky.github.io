@@ -14,6 +14,8 @@ export interface SkillBranch {
   skills: SkillNode[];
 }
 
+import { SKILLTREE_SVG_ICONS } from './icons';
+
 /** skilltree skill id → shields.io simple-icons slug */
 export const SKILLTREE_LOGO_MAP: Record<string, string> = {
   aws: 'amazonwebservices',
@@ -52,6 +54,11 @@ export function getSkillLogoUrl(skillId: string, color: string): string | null {
   const slug = SKILLTREE_LOGO_MAP[skillId];
   if (!slug) return null;
   const cleanColor = color.replace('#', '');
+  // カスタム SVG アイコンがあれば data URI として logo に渡す
+  const customSvg = SKILLTREE_SVG_ICONS[skillId];
+  if (customSvg) {
+    return `https://img.shields.io/badge/${encodeURIComponent(' ')}-${cleanColor}?style=flat-square&logo=data:image/svg+xml;base64,${customSvg}&logoColor=white`;
+  }
   return `https://img.shields.io/badge/${encodeURIComponent(' ')}-${cleanColor}?style=flat-square&logo=${slug}&logoColor=white`;
 }
 
