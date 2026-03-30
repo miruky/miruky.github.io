@@ -218,6 +218,12 @@
   animation: mascot-bounce 3s ease-in-out infinite;
 }
 
+/* Planet self-rotation */
+@keyframes planet-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* Dark context: force dark glass variables on always-dark pages */
 .dark-context {
   --glass-bg: rgba(10, 14, 39, 0.85);

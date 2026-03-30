@@ -7,6 +7,76 @@ import { FaGithub } from 'react-icons/fa6';
 import { SiQiita } from 'react-icons/si';
 import ParticleBackground from '@/components/ParticleBackground';
 
+/* ─── Planet Config ─────────────────────────────────────────── */
+const planets = [
+  {
+    name: 'earth',
+    src: '/images/hero/earth.png',
+    style: { bottom: '2%', right: '4%' } as React.CSSProperties,
+    size: 'w-36 md:w-52 lg:w-64',
+    orbit: { dur: 55, x: 12, y: 18 },
+    spin: 90,
+    opacity: 0.82,
+    glow: '0 0 80px rgba(59,130,246,0.25)',
+    delay: 0,
+  },
+  {
+    name: 'jupiter',
+    src: '/images/hero/jupiter.png',
+    style: { top: '4%', right: '6%' } as React.CSSProperties,
+    size: 'w-28 md:w-40 lg:w-48',
+    orbit: { dur: 70, x: 18, y: 10 },
+    spin: 110,
+    opacity: 0.6,
+    glow: '',
+    delay: 2,
+  },
+  {
+    name: 'saturn',
+    src: '/images/hero/saturn.png',
+    style: { top: '10%', left: '1%' } as React.CSSProperties,
+    size: 'w-32 md:w-44 lg:w-52',
+    orbit: { dur: 62, x: 14, y: 20 },
+    spin: 0, // rings — no self-spin
+    opacity: 0.55,
+    glow: '',
+    delay: 4,
+  },
+  {
+    name: 'mars',
+    src: '/images/hero/mars.png',
+    style: { top: '18%', left: '18%' } as React.CSSProperties,
+    size: 'w-14 md:w-22 lg:w-28',
+    orbit: { dur: 46, x: 24, y: 16 },
+    spin: 72,
+    opacity: 0.65,
+    glow: '',
+    delay: 1,
+  },
+  {
+    name: 'moon',
+    src: '/images/hero/moon.png',
+    style: { bottom: '14%', left: '6%' } as React.CSSProperties,
+    size: 'w-10 md:w-16 lg:w-20',
+    orbit: { dur: 38, x: 22, y: 28 },
+    spin: 120,
+    opacity: 0.5,
+    glow: '',
+    delay: 3,
+  },
+  {
+    name: 'venus',
+    src: '/images/hero/venus.png',
+    style: { bottom: '32%', right: '1%' } as React.CSSProperties,
+    size: 'w-12 md:w-18 lg:w-24',
+    orbit: { dur: 52, x: 10, y: 22 },
+    spin: 85,
+    opacity: 0.5,
+    glow: '',
+    delay: 5,
+  },
+];
+
 export default function HeroSection() {
   const [qiitaStats, setQiitaStats] = useState({ articles: '49+', contribution: '1900+' });
 
@@ -30,25 +100,51 @@ export default function HeroSection() {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-hero-gradient" />
+      {/* Space background image */}
+      <div className="absolute inset-0">
+        <img
+          src="/images/hero/space-bg.jpg"
+          alt=""
+          className="w-full h-full object-cover"
+        />
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0e27]/60 via-[#0a0e27]/40 to-[#0a0e27]/80" />
+      </div>
 
-      {/* Grid pattern */}
-      <div
-        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
-        style={{
-          backgroundImage:
-            'linear-gradient(rgba(0, 212, 255, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 212, 255, 0.3) 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-        }}
-      />
+      {/* Planets with orbit + self-rotation */}
+      {planets.map((p) => (
+        <motion.div
+          key={p.name}
+          className={`absolute pointer-events-none ${p.size}`}
+          style={{ ...p.style, opacity: p.opacity }}
+          initial={{ opacity: 0, scale: 0.6 }}
+          animate={{
+            opacity: p.opacity,
+            scale: 1,
+            x: [0, p.orbit.x, 0, -p.orbit.x, 0],
+            y: [0, -p.orbit.y, 0, p.orbit.y, 0],
+          }}
+          transition={{
+            opacity: { delay: p.delay * 0.3, duration: 1.5 },
+            scale: { delay: p.delay * 0.3, duration: 1.5, ease: 'easeOut' },
+            x: { duration: p.orbit.dur, repeat: Infinity, ease: 'linear', delay: p.delay * 0.3 },
+            y: { duration: p.orbit.dur, repeat: Infinity, ease: 'linear', delay: p.delay * 0.3 },
+          }}
+        >
+          <img
+            src={p.src}
+            alt=""
+            className="w-full h-auto rounded-full"
+            style={{
+              animation: p.spin ? `planet-spin ${p.spin}s linear infinite` : undefined,
+              boxShadow: p.glow || undefined,
+              borderRadius: p.name === 'saturn' ? '0' : '50%',
+            }}
+          />
+        </motion.div>
+      ))}
 
-      {/* Floating orbs */}
-      <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-accent-cyan/10 rounded-full blur-[100px] animate-pulse-slow" />
-      <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent-purple/10 rounded-full blur-[120px] animate-pulse-slow" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent-cyan/5 rounded-full blur-[150px]" />
-
-      {/* Particle animation */}
+      {/* Particle animation (preserved) */}
       <ParticleBackground />
 
       {/* Content */}
