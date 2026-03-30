@@ -12,7 +12,7 @@ const planets = [
   {
     name: 'earth',
     src: '/images/hero/earth.png',
-    style: { bottom: '2%', right: '4%' } as React.CSSProperties,
+    style: { bottom: '25%', right: '4%' } as React.CSSProperties,
     size: 'w-36 md:w-52 lg:w-64',
     orbit: { dur: 55, x: 12, y: 18 },
     spin: 90,
@@ -153,6 +153,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.21, 0.47, 0.32, 0.98] }}
+          className="inline-block backdrop-blur-md bg-slate-900/30 rounded-3xl px-8 py-10 md:px-14 md:py-12 border border-white/[0.06]"
         >
           {/* Badge */}
           <motion.div

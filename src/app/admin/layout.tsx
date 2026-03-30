@@ -48,19 +48,22 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     router.push('/admin/');
   }
 
-  // Login page — render without sidebar
-  if (isLoginPage) return <>{children}</>;
+  // Login page — render without sidebar (force dark theme)
+  if (isLoginPage) return <div className="dark">{children}</div>;
 
   // Loading
   if (!ready) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-accent-cyan border-t-transparent rounded-full animate-spin" />
+      <div className="dark">
+        <div className="min-h-screen bg-dark-900 flex items-center justify-center">
+          <div className="w-8 h-8 border-2 border-accent-cyan border-t-transparent rounded-full animate-spin" />
+        </div>
       </div>
     );
   }
 
   return (
+    <div className="dark">
     <div className="min-h-screen bg-dark-900 flex">
       {/* Overlay for mobile sidebar */}
       {sidebarOpen && (
@@ -155,6 +158,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           {children}
         </main>
       </div>
+    </div>
     </div>
   );
 }
