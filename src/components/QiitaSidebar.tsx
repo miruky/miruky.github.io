@@ -40,13 +40,13 @@ export default function QiitaSidebar() {
     async function fetchAll() {
       try {
         const [qiitaRes, blogRes] = await Promise.allSettled([
-          fetch('https://qiita.com/api/v2/users/miruky/items?page=1&per_page=10'),
+          fetch('/data/qiita-articles.json'),
           fetch('/data/blog-posts.json'),
         ]);
 
         if (qiitaRes.status === 'fulfilled' && qiitaRes.value.ok) {
-          const data: QiitaItem[] = await qiitaRes.value.json();
-          setQiitaArticles(data);
+          const json = await qiitaRes.value.json();
+          setQiitaArticles((json.articles || []).slice(0, 10));
         }
 
         if (blogRes.status === 'fulfilled' && blogRes.value.ok) {

@@ -13,22 +13,20 @@ export default function QiitaSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchArticles() {
+    async function loadArticles() {
       try {
-        const res = await fetch(
-          'https://qiita.com/api/v2/users/miruky/items?page=1&per_page=6'
-        );
+        const res = await fetch('/data/qiita-articles.json');
         if (res.ok) {
           const data = await res.json();
-          setArticles(data);
+          setArticles((data.articles || []).slice(0, 6));
         }
       } catch (error) {
-        console.error('Failed to fetch articles:', error);
+        console.error('Failed to load Qiita articles:', error);
       } finally {
         setLoading(false);
       }
     }
-    fetchArticles();
+    loadArticles();
   }, []);
 
   return (

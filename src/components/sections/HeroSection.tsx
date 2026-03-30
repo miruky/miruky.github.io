@@ -11,35 +11,21 @@ export default function HeroSection() {
   const [qiitaStats, setQiitaStats] = useState({ articles: '49+', contribution: '1900+' });
 
   useEffect(() => {
-    async function fetchStats() {
+    async function loadStats() {
       try {
-        const all: Array<{ likes_count: number; stocks_count: number }> = [];
-        let page = 1;
-        while (true) {
-          const res = await fetch(
-            `https://qiita.com/api/v2/users/miruky/items?page=${page}&per_page=100`
-          );
-          if (!res.ok) break;
-          const data = await res.json();
-          if (data.length === 0) break;
-          all.push(...data);
-          if (data.length < 100) break;
-          page++;
-        }
-        if (all.length === 0) return; // API失敗時はデフォルト値を維持
-        const totalLikes = all.reduce((s, a) => s + a.likes_count, 0);
-        const totalStocks = all.reduce((s, a) => s + a.stocks_count, 0);
-        const contrib = all.length + totalLikes + Math.floor(totalStocks / 2);
-        const rounded = Math.floor(contrib / 100) * 100;
+        const res = await fetch('/data/qiita-articles.json');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data.stats || data.stats.articleCount === 0) return;
         setQiitaStats({
-          articles: `${all.length}+`,
-          contribution: `${rounded}+`,
+          articles: `${data.stats.articleCount}+`,
+          contribution: data.stats.contribution,
         });
       } catch {
         // keep defaults
       }
     }
-    fetchStats();
+    loadStats();
   }, []);
 
   return (

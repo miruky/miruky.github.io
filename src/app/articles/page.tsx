@@ -13,29 +13,20 @@ export default function ArticlesPage() {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchAll() {
+    async function loadAll() {
       try {
-        const allArticles: QiitaArticle[] = [];
-        let page = 1;
-        while (true) {
-          const res = await fetch(
-            `https://qiita.com/api/v2/users/miruky/items?page=${page}&per_page=100`
-          );
-          if (!res.ok) break;
-          const data: QiitaArticle[] = await res.json();
-          if (data.length === 0) break;
-          allArticles.push(...data);
-          if (data.length < 100) break;
-          page++;
+        const res = await fetch('/data/qiita-articles.json');
+        if (res.ok) {
+          const data = await res.json();
+          setArticles(data.articles || []);
         }
-        setArticles(allArticles);
       } catch (error) {
-        console.error('Failed to fetch articles:', error);
+        console.error('Failed to load articles:', error);
       } finally {
         setLoading(false);
       }
     }
-    fetchAll();
+    loadAll();
   }, []);
 
   const allTags = Array.from(
