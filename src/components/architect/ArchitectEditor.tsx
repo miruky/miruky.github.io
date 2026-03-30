@@ -57,7 +57,7 @@ function ArchitectEditorInner({ lesson }: Props) {
   const [showAnswer, setShowAnswer] = useState(false);
   const [result, setResult] = useState<null | { pass: boolean; details: string[] }>(null);
   const [configValues, setConfigValues] = useState<Record<string, Record<string, string>>>({});
-  const [showRequirements, setShowRequirements] = useState(true);
+  const [showRequirements, setShowRequirements] = useState(false);
 
   // Reset on lesson change
   useEffect(() => {
@@ -69,7 +69,7 @@ function ArchitectEditorInner({ lesson }: Props) {
     setShowAnswer(false);
     setResult(null);
     setConfigValues({});
-    setShowRequirements(true);
+    setShowRequirements(false);
   }, [lesson.id, setNodes, setEdges]);
 
   const onConnect: OnConnect = useCallback(

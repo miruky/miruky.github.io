@@ -41,13 +41,18 @@ export default function Header() {
   // ヘッダーが透明（未スクロール）かつダーク背景ページ → 背景は暗い → 白文字
   // ヘッダーがglass-nav（スクロール済み）→ ライトモードでは白い背景 → 黒文字
   // 通常ページ（白背景）→ 黒文字
-  const isHeaderOverDark = isOnDarkBgPage && !isScrolled;
+  const isHeaderOverDark = isOnDarkBgPage;
 
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'glass-nav shadow-lg' : 'bg-transparent'
+        isScrolled
+          ? isOnDarkBgPage
+            ? 'shadow-lg backdrop-blur-2xl'
+            : 'glass-nav shadow-lg'
+          : 'bg-transparent'
       }`}
+      style={isScrolled && isOnDarkBgPage ? { background: 'rgba(10, 14, 39, 0.92)', borderBottom: '1px solid rgba(255,255,255,0.08)' } : undefined}
     >
       <div className="section-container">
         <div className="flex items-center justify-between h-16 md:h-20">

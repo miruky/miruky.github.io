@@ -50,7 +50,7 @@ export default function ProgramEditor({
   const [showAnswer, setShowAnswer] = useState(false);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [consoleExpanded, setConsoleExpanded] = useState(true);
-  const [sampleExpanded, setSampleExpanded] = useState(true);
+  const [sampleExpanded, setSampleExpanded] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const lineNumRef = useRef<HTMLDivElement>(null);
@@ -232,7 +232,7 @@ export default function ProgramEditor({
   const fileName = LANG_FILE_EXT[langId] || 'code.txt';
 
   return (
-    <div className="flex flex-col h-[calc(100vh-5rem)]">
+    <div className="flex flex-col h-screen pt-20">
       {/* Top Navigation Bar */}
       <div
         className="flex items-center justify-between px-4 py-2 shrink-0"
