@@ -57,7 +57,7 @@ export default function AdminLoginPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-white mb-2">Admin Panel</h1>
-          <p className="text-slate-400 text-sm">mirukyのIT備忘録 管理画面</p>
+          <p className="text-slate-400 text-sm"><span className="text-white">miruky</span>のIT備忘録 管理画面</p>
         </div>
 
         {/* Login Card */}
