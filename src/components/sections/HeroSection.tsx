@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { FaGithub } from 'react-icons/fa6';
 import { SiQiita, SiZenn } from 'react-icons/si';
 import ParticleBackground from '@/components/ParticleBackground';
+import SpaceBackground from '@/components/SpaceBackground';
 
 /* ─── Planet Config ─────────────────────────────────────────── */
 const planets = [
@@ -100,16 +101,10 @@ export default function HeroSection() {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Space background image */}
-      <div className="absolute inset-0">
-        <img
-          src="/images/hero/space-bg.jpg"
-          alt=""
-          className="w-full h-full object-cover"
-        />
-        {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0e27]/60 via-[#0a0e27]/40 to-[#0a0e27]/80" />
-      </div>
+      {/* Animated space background */}
+      <SpaceBackground />
+      {/* Dark overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0e27]/30 via-transparent to-[#0a0e27]/60" style={{ zIndex: 0 }} />
 
       {/* Planets with orbit + self-rotation */}
       {planets.map((p) => (

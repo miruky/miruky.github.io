@@ -85,36 +85,50 @@ export default function QiitaSidebar() {
   return (
     <>
       {/* Toggle Button — 2-color: Zenn blue (top) + Qiita green (bottom) */}
-      <button
+      <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="hidden 2xl:flex fixed top-1/2 -translate-y-1/2 z-[55] items-center justify-center transition-all duration-300"
-        style={{ left: isOpen ? '34rem' : '0' }}
+        className="hidden 2xl:flex fixed top-1/2 -translate-y-1/2 z-[55] items-center justify-center"
+        animate={{ left: isOpen ? '34rem' : '0rem' }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         aria-label="Toggle sidebar"
       >
-        {isOpen ? (
-          /* ── Close toggle: larger hit area ── */
-          <div className="flex flex-col rounded-r-xl shadow-lg overflow-hidden hover:brightness-110 transition-all">
-            <div className="flex items-center justify-center px-2.5 py-4 bg-[#3EA8FF] text-white">
-              <FiChevronLeft className="w-5 h-5" />
-            </div>
-            <div className="flex items-center justify-center px-2.5 py-4 bg-[#55C500] text-white">
-              <FiChevronLeft className="w-5 h-5" />
-            </div>
+        <div className="flex flex-col rounded-r-xl shadow-lg overflow-hidden hover:brightness-110 transition-[filter] duration-200">
+          {/* Top: Zenn blue */}
+          <div className="flex items-center justify-center bg-[#3EA8FF] text-white"
+            style={{ padding: isOpen ? '1rem 0.625rem' : '0.75rem 0.625rem 0.75rem 0.625rem' }}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {isOpen ? (
+                <motion.div key="close-z" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} transition={{ duration: 0.15 }}>
+                  <FiChevronLeft className="w-5 h-5" />
+                </motion.div>
+              ) : (
+                <motion.div key="open-z" className="flex items-center gap-1.5" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 8 }} transition={{ duration: 0.15 }}>
+                  <SiZenn className="w-5 h-5" />
+                  <FiChevronRight className="w-4 h-4 opacity-70" />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-        ) : (
-          /* ── Open toggle: logos + chevron to the right ── */
-          <div className="flex flex-col rounded-r-xl shadow-lg overflow-hidden hover:brightness-110 transition-all">
-            <div className="flex items-center gap-1.5 pl-2.5 pr-2 py-3 bg-[#3EA8FF] text-white">
-              <SiZenn className="w-5 h-5" />
-              <FiChevronRight className="w-4 h-4 opacity-70" />
-            </div>
-            <div className="flex items-center gap-1.5 pl-2.5 pr-2 py-3 bg-[#55C500] text-white">
-              <SiQiita className="w-5 h-5" />
-              <FiChevronRight className="w-4 h-4 opacity-70" />
-            </div>
+          {/* Bottom: Qiita green */}
+          <div className="flex items-center justify-center bg-[#55C500] text-white"
+            style={{ padding: isOpen ? '1rem 0.625rem' : '0.75rem 0.625rem 0.75rem 0.625rem' }}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              {isOpen ? (
+                <motion.div key="close-q" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} transition={{ duration: 0.15 }}>
+                  <FiChevronLeft className="w-5 h-5" />
+                </motion.div>
+              ) : (
+                <motion.div key="open-q" className="flex items-center gap-1.5" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 8 }} transition={{ duration: 0.15 }}>
+                  <SiQiita className="w-5 h-5" />
+                  <FiChevronRight className="w-4 h-4 opacity-70" />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-        )}
-      </button>
+        </div>
+      </motion.button>
 
       {/* Sidebar Panel */}
       <AnimatePresence>
