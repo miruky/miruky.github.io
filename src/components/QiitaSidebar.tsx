@@ -84,31 +84,28 @@ export default function QiitaSidebar() {
 
   return (
     <>
-      {/* Toggle Button — 2-color: Zenn blue (left) + Qiita green (right) */}
+      {/* Toggle Button — 2-color: Zenn blue (top) + Qiita green (bottom), chevron at boundary */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="hidden 2xl:flex fixed top-1/2 -translate-y-1/2 z-[55] items-center justify-center transition-all duration-300"
         style={{ left: isOpen ? '34rem' : '0' }}
         aria-label="Toggle sidebar"
       >
-        <div className="flex flex-col rounded-r-lg shadow-lg overflow-hidden">
+        <div className="relative flex flex-col rounded-r-lg shadow-lg overflow-hidden">
           {/* Top: Zenn blue */}
-          <div className="flex items-center gap-0.5 px-1.5 py-1.5 bg-[#3EA8FF] text-white hover:bg-[#3595E0] transition-colors">
-            {isOpen ? (
-              <FiChevronLeft className="w-4 h-4" />
-            ) : (
-              <SiZenn className="w-4 h-4" />
-            )}
+          <div className="flex items-center justify-center px-2 py-2.5 bg-[#3EA8FF] text-white">
+            {!isOpen && <SiZenn className="w-4 h-4" />}
           </div>
           {/* Bottom: Qiita green */}
-          <div className="flex items-center gap-0.5 px-1.5 py-1.5 bg-[#55C500] text-white hover:bg-[#4AB000] transition-colors">
+          <div className="flex items-center justify-center px-2 py-2.5 bg-[#55C500] text-white">
+            {!isOpen && <SiQiita className="w-4 h-4" />}
+          </div>
+          {/* Chevron centered at boundary */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             {isOpen ? (
-              <FiChevronLeft className="w-4 h-4" />
+              <FiChevronLeft className="w-4 h-4 text-white drop-shadow-md" />
             ) : (
-              <>
-                <SiQiita className="w-4 h-4" />
-                <FiChevronRight className="w-3 h-3" />
-              </>
+              <FiChevronRight className="w-3.5 h-3.5 text-white drop-shadow-md" />
             )}
           </div>
         </div>

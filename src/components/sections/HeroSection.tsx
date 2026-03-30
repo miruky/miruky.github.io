@@ -13,7 +13,7 @@ const planets = [
     name: 'earth',
     src: '/images/hero/earth.png',
     style: { bottom: '25%', right: '14%' } as React.CSSProperties,
-    size: 'w-[14rem] md:w-[19rem] lg:w-[24rem]',
+    size: 'w-[21rem] md:w-[28.5rem] lg:w-[36rem]',
     orbit: { dur: 55, x: 12, y: 18 },
     spin: 90,
     opacity: 0.82,
