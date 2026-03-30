@@ -2,7 +2,7 @@
 
 [![Deploy to GitHub Pages](https://github.com/miruky/miruky.github.io/actions/workflows/deploy.yml/badge.svg)](https://github.com/miruky/miruky.github.io/actions/workflows/deploy.yml)
 
-> AWS 全冠エンジニア **miruky** のポートフォリオサイト・技術ブログ・学習プラットフォームです。
+AWS 全冠エンジニア **miruky** のポートフォリオサイト・技術ブログ・学習プラットフォームです。
 
 **URL**: [https://miruky.github.io](https://miruky.github.io)
 
