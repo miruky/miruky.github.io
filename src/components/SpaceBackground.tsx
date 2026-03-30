@@ -9,7 +9,6 @@ interface Star {
   brightness: number;
   twinkleSpeed: number;
   twinkleOffset: number;
-  /** drift velocity (parallax layers) */
   vx: number;
   vy: number;
 }
@@ -36,8 +35,143 @@ interface Nebula {
   driftY: number;
   pulseSpeed: number;
   pulseOffset: number;
-  /** secondary lobes for organic shape */
   lobes: { angle: number; dist: number; radius: number; phaseSpeed: number; phase: number }[];
+}
+
+interface Galaxy {
+  x: number;
+  y: number;
+  size: number;
+  angle: number;       // current rotation
+  rotSpeed: number;     // rad/s
+  tilt: number;         // perspective tilt (0-1, lower = more edge-on)
+  brightness: number;
+  texture: HTMLCanvasElement; // pre-rendered texture
+}
+
+/* ─── Pre-render a spiral galaxy onto an offscreen canvas ─── */
+function createGalaxyTexture(size: number, arms: number, tilt: number): HTMLCanvasElement {
+  const s = Math.ceil(size * 2);
+  const off = document.createElement('canvas');
+  off.width = s;
+  off.height = s;
+  const c = off.getContext('2d')!;
+  const cx = s / 2;
+  const cy = s / 2;
+  const r = size;
+
+  // Bright core glow
+  const core = c.createRadialGradient(cx, cy, 0, cx, cy, r * 0.15);
+  core.addColorStop(0, 'rgba(255,245,220,0.9)');
+  core.addColorStop(0.3, 'rgba(255,230,180,0.5)');
+  core.addColorStop(1, 'rgba(255,230,180,0)');
+  c.fillStyle = core;
+  c.fillRect(0, 0, s, s);
+
+  // Spiral arms – many small dots along logarithmic spirals
+  for (let arm = 0; arm < arms; arm++) {
+    const armAngle = (arm / arms) * Math.PI * 2;
+    for (let i = 0; i < 600; i++) {
+      const t = i / 600;
+      const spiralR = r * 0.08 + r * 0.85 * t;
+      const theta = armAngle + t * Math.PI * 3 + (Math.random() - 0.5) * 0.6;
+      // Add spread perpendicular to arm
+      const spread = (Math.random() - 0.5) * r * 0.12 * (0.3 + t * 0.7);
+      const px = cx + Math.cos(theta) * spiralR + Math.cos(theta + Math.PI / 2) * spread;
+      const py = cy + (Math.sin(theta) * spiralR + Math.sin(theta + Math.PI / 2) * spread) * tilt;
+
+      const dist = Math.sqrt((px - cx) ** 2 + ((py - cy) / tilt) ** 2) / r;
+      const fade = Math.max(0, 1 - dist * 1.1);
+      const alpha = fade * (0.15 + Math.random() * 0.35);
+      const dotSize = (0.5 + Math.random() * 1.5) * (1 - t * 0.5);
+
+      // Slight blue tint for young stars in outer arms, warm in center
+      const warmth = 1 - t;
+      const rr = Math.floor(180 + warmth * 60);
+      const gg = Math.floor(190 + warmth * 40 - t * 40);
+      const bb = Math.floor(220 + t * 35);
+
+      c.beginPath();
+      c.arc(px, py, dotSize, 0, Math.PI * 2);
+      c.fillStyle = `rgba(${rr},${gg},${bb},${alpha})`;
+      c.fill();
+    }
+  }
+
+  // Diffuse disk glow
+  const disk = c.createRadialGradient(cx, cy, 0, cx, cy, r * 0.7);
+  disk.addColorStop(0, 'rgba(200,210,240,0.12)');
+  disk.addColorStop(0.5, 'rgba(180,190,220,0.04)');
+  disk.addColorStop(1, 'rgba(0,0,0,0)');
+  c.globalCompositeOperation = 'screen';
+  c.fillStyle = disk;
+  c.fillRect(0, 0, s, s);
+  c.globalCompositeOperation = 'source-over';
+
+  return off;
+}
+
+/* ─── Pre-render milky way band onto offscreen canvas ─── */
+function createMilkyWayTexture(w: number, h: number): HTMLCanvasElement {
+  const off = document.createElement('canvas');
+  off.width = w;
+  off.height = h;
+  const c = off.getContext('2d')!;
+
+  // The milky way is a wide, angled band across the screen
+  c.save();
+  c.translate(w / 2, h / 2);
+  c.rotate(-0.25); // slight angle
+
+  const bandH = h * 0.35;
+  // Multiple passes for organic look
+  for (let pass = 0; pass < 3; pass++) {
+    const spread = bandH * (0.8 + pass * 0.3);
+    const alpha = 0.025 - pass * 0.006;
+    for (let i = 0; i < 2000; i++) {
+      const px = (Math.random() - 0.5) * w * 1.6;
+      const py = (Math.random() - 0.5) * spread * (0.5 + 0.5 * Math.pow(Math.random(), 0.5));
+      const dist = Math.abs(py) / (spread * 0.5);
+      const fade = Math.max(0, 1 - dist);
+      const a = alpha * fade * (0.5 + Math.random() * 0.5);
+      const sz = 1 + Math.random() * 3;
+
+      // Mix of warm and cool whites
+      const tone = Math.random();
+      const rr = Math.floor(180 + tone * 60);
+      const gg = Math.floor(185 + tone * 50);
+      const bb = Math.floor(200 + tone * 55);
+
+      c.beginPath();
+      c.arc(px, py, sz, 0, Math.PI * 2);
+      c.fillStyle = `rgba(${rr},${gg},${bb},${a})`;
+      c.fill();
+    }
+
+    // Soft glow band
+    const grad = c.createLinearGradient(0, -spread * 0.6, 0, spread * 0.6);
+    grad.addColorStop(0, 'rgba(0,0,0,0)');
+    grad.addColorStop(0.3, `rgba(160,170,200,${alpha * 0.8})`);
+    grad.addColorStop(0.5, `rgba(180,185,210,${alpha * 1.2})`);
+    grad.addColorStop(0.7, `rgba(160,170,200,${alpha * 0.8})`);
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = grad;
+    c.fillRect(-w, -spread * 0.6, w * 2, spread * 1.2);
+  }
+
+  // Dark dust lanes through the center
+  for (let i = 0; i < 800; i++) {
+    const px = (Math.random() - 0.5) * w * 1.4;
+    const py = (Math.random() - 0.5) * bandH * 0.15;
+    const sz = 2 + Math.random() * 5;
+    c.beginPath();
+    c.arc(px, py, sz, 0, Math.PI * 2);
+    c.fillStyle = `rgba(10,14,39,${0.03 + Math.random() * 0.05})`;
+    c.fill();
+  }
+
+  c.restore();
+  return off;
 }
 
 export default function SpaceBackground() {
@@ -53,6 +187,8 @@ export default function SpaceBackground() {
     let stars: Star[] = [];
     let shootingStars: ShootingStar[] = [];
     let nebulae: Nebula[] = [];
+    let galaxies: Galaxy[] = [];
+    let milkyWayTex: HTMLCanvasElement | null = null;
     let w = 0;
     let h = 0;
     let time = 0;
@@ -101,6 +237,29 @@ export default function SpaceBackground() {
       ];
 
       shootingStars = [];
+
+      // Spiral galaxies – pre-rendered textures for performance
+      const galaxyConfigs = [
+        { x: 0.12, y: 0.22, sizeMul: 0.08, tilt: 0.55, rotSpeed: 0.02, brightness: 0.7 },
+        { x: 0.72, y: 0.15, sizeMul: 0.06, tilt: 0.45, rotSpeed: -0.015, brightness: 0.6 },
+        { x: 0.88, y: 0.65, sizeMul: 0.05, tilt: 0.6, rotSpeed: 0.018, brightness: 0.55 },
+      ];
+      galaxies = galaxyConfigs.map((gc) => {
+        const sz = Math.max(w, h) * gc.sizeMul;
+        return {
+          x: w * gc.x,
+          y: h * gc.y,
+          size: sz,
+          angle: Math.random() * Math.PI * 2,
+          rotSpeed: gc.rotSpeed,
+          tilt: gc.tilt,
+          brightness: gc.brightness,
+          texture: createGalaxyTexture(sz, 2, gc.tilt),
+        };
+      });
+
+      // Milky way – pre-rendered once
+      milkyWayTex = createMilkyWayTexture(w, h);
     };
 
     const spawnShootingStar = () => {
@@ -123,6 +282,31 @@ export default function SpaceBackground() {
       // Deep space base
       ctx.fillStyle = '#0a0e27';
       ctx.fillRect(0, 0, w, h);
+
+      // Milky way band (pre-rendered, very slight drift)
+      if (milkyWayTex) {
+        const mx = Math.sin(time * 0.02) * 8;
+        const my = Math.cos(time * 0.015) * 5;
+        ctx.globalAlpha = 0.85;
+        ctx.drawImage(milkyWayTex, mx, my);
+        ctx.globalAlpha = 1;
+      }
+
+      // Spiral galaxies (pre-rendered textures, slowly rotating)
+      ctx.globalCompositeOperation = 'screen';
+      galaxies.forEach((g) => {
+        g.angle += g.rotSpeed * 0.016;
+        const pulse = 1 + Math.sin(time * 0.3) * 0.05;
+        ctx.save();
+        ctx.translate(g.x, g.y);
+        ctx.rotate(g.angle);
+        ctx.globalAlpha = g.brightness * pulse;
+        const s = g.size * 2;
+        ctx.drawImage(g.texture, -s / 2, -s / 2, s, s);
+        ctx.restore();
+      });
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
 
       // Nebulae (multi-lobe organic gas clouds)
       ctx.globalCompositeOperation = 'screen';

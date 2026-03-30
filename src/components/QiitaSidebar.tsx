@@ -85,60 +85,37 @@ export default function QiitaSidebar() {
   return (
     <>
       {/* Toggle Button — 2-color: Zenn blue (top) + Qiita green (bottom) */}
+      {/* Fixed-size container; only icon opacity changes — no layout shift */}
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
-        className="hidden 2xl:flex fixed top-1/2 -translate-y-1/2 z-[55] items-center justify-center"
-        animate={{
-          left: isOpen ? '34rem' : '0rem',
-          width: isOpen ? 40 : 56,
-        }}
+        className="hidden 2xl:flex fixed top-1/2 -translate-y-1/2 z-[55] flex-col rounded-r-xl shadow-lg overflow-hidden"
+        animate={{ left: isOpen ? '34rem' : '0rem' }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         aria-label="Toggle sidebar"
+        style={{ width: 52 }}
       >
-        <motion.div
-          className="flex flex-col rounded-r-xl shadow-lg overflow-hidden hover:brightness-110 transition-[filter] duration-200 w-full"
-          layout
-          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        >
-          {/* Top: Zenn blue */}
-          <motion.div
-            className="flex items-center justify-center bg-[#3EA8FF] text-white"
-            animate={{ height: isOpen ? 48 : 44 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          >
-            <AnimatePresence mode="popLayout" initial={false}>
-              {isOpen ? (
-                <motion.div key="close-z" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.12 }}>
-                  <FiChevronLeft className="w-5 h-5" />
-                </motion.div>
-              ) : (
-                <motion.div key="open-z" className="flex items-center gap-1.5" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.12 }}>
-                  <SiZenn className="w-5 h-5" />
-                  <FiChevronRight className="w-4 h-4 opacity-70" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-          {/* Bottom: Qiita green */}
-          <motion.div
-            className="flex items-center justify-center bg-[#55C500] text-white"
-            animate={{ height: isOpen ? 48 : 44 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          >
-            <AnimatePresence mode="popLayout" initial={false}>
-              {isOpen ? (
-                <motion.div key="close-q" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.12 }}>
-                  <FiChevronLeft className="w-5 h-5" />
-                </motion.div>
-              ) : (
-                <motion.div key="open-q" className="flex items-center gap-1.5" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.12 }}>
-                  <SiQiita className="w-5 h-5" />
-                  <FiChevronRight className="w-4 h-4 opacity-70" />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        </motion.div>
+        {/* Top: Zenn blue — height fixed */}
+        <div className="relative flex items-center justify-center bg-[#3EA8FF] text-white hover:brightness-110 transition-[filter]" style={{ height: 46 }}>
+          {/* Chevron (close) */}
+          <motion.span className="absolute inset-0 flex items-center justify-center" animate={{ opacity: isOpen ? 1 : 0 }} transition={{ duration: 0.18 }}>
+            <FiChevronLeft className="w-5 h-5" />
+          </motion.span>
+          {/* Logo + arrow (open) */}
+          <motion.span className="absolute inset-0 flex items-center justify-center gap-1" animate={{ opacity: isOpen ? 0 : 1 }} transition={{ duration: 0.18 }}>
+            <SiZenn className="w-5 h-5" />
+            <FiChevronRight className="w-4 h-4 opacity-70" />
+          </motion.span>
+        </div>
+        {/* Bottom: Qiita green — height fixed */}
+        <div className="relative flex items-center justify-center bg-[#55C500] text-white hover:brightness-110 transition-[filter]" style={{ height: 46 }}>
+          <motion.span className="absolute inset-0 flex items-center justify-center" animate={{ opacity: isOpen ? 1 : 0 }} transition={{ duration: 0.18 }}>
+            <FiChevronLeft className="w-5 h-5" />
+          </motion.span>
+          <motion.span className="absolute inset-0 flex items-center justify-center gap-1" animate={{ opacity: isOpen ? 0 : 1 }} transition={{ duration: 0.18 }}>
+            <SiQiita className="w-5 h-5" />
+            <FiChevronRight className="w-4 h-4 opacity-70" />
+          </motion.span>
+        </div>
       </motion.button>
 
       {/* Sidebar Panel */}
