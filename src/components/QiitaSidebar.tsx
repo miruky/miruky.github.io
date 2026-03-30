@@ -98,7 +98,7 @@ export default function QiitaSidebar() {
               <FiChevronLeft className="w-5 h-5" />
             </div>
             <div className="flex items-center justify-center px-2.5 py-4 bg-[#55C500] text-white">
-              <FiChevronLeft className="w-5 h-5 opacity-0" />
+              <FiChevronLeft className="w-5 h-5" />
             </div>
           </div>
         ) : (
