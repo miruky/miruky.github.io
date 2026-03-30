@@ -1,12 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { usePathname } from 'next/navigation';
 import { SiQiita, SiZenn } from 'react-icons/si';
 import { FiExternalLink, FiChevronLeft, FiChevronRight, FiFileText } from 'react-icons/fi';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { safeUrl } from '@/lib/sanitize';
+
+/* ─── Breakpoints ─── */
+/** Show toggle button from this width */
+const BP_SHOW = 1536;   // 2xl
+/** Auto-open sidebar when viewport is wide enough that it won't overlap hero content */
+const BP_AUTO_OPEN = 1800;
 
 interface QiitaItem {
   id: string;
@@ -42,10 +48,32 @@ export default function QiitaSidebar() {
   const [blogPosts, setBlogPosts] = useState<BlogItem[]>([]);
   const [zennArticles, setZennArticles] = useState<ZennItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   // ホームセクション（/ のみ）以外では表示しない
   const isHome = pathname === '/' || pathname === '';
+
+  /* ─── Responsive: show/hide toggle and auto-open based on viewport width ─── */
+  const handleResize = useCallback(() => {
+    const vw = window.innerWidth;
+    if (vw >= BP_SHOW) {
+      setVisible(true);
+      // Auto-open only when wide enough to not overlap hero
+      if (vw >= BP_AUTO_OPEN) {
+        setIsOpen(true);
+      }
+    } else {
+      setVisible(false);
+      setIsOpen(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [handleResize]);
 
   useEffect(() => {
     if (!isHome) return;
@@ -80,54 +108,26 @@ export default function QiitaSidebar() {
     fetchAll();
   }, [isHome]);
 
-  if (!isHome) return null;
+  if (!isHome || !visible) return null;
+
+  /* Sidebar width in px */
+  const SIDEBAR_W = 544; // w-[34rem] = 544px
+  const TOGGLE_W = 52;
 
   return (
-    <>
-      {/* Toggle Button — 2-color: Zenn blue (top) + Qiita green (bottom) */}
-      {/* Fixed-size container; only icon opacity changes — no layout shift */}
-      <motion.button
-        onClick={() => setIsOpen(!isOpen)}
-        className="hidden 2xl:flex fixed top-1/2 -translate-y-1/2 z-[55] flex-col rounded-r-xl shadow-lg overflow-hidden"
-        animate={{ left: isOpen ? '34rem' : '0rem' }}
-        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        aria-label="Toggle sidebar"
-        style={{ width: 52 }}
+    /* ─── Single container: sidebar + toggle move together ─── */
+    /* Using `x` (transform) instead of `left` → GPU-accelerated, zero layout shift */
+    <motion.div
+      className="fixed left-0 top-0 h-screen z-50 flex"
+      style={{ width: SIDEBAR_W + TOGGLE_W }}
+      animate={{ x: isOpen ? 0 : -SIDEBAR_W }}
+      transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+    >
+      {/* ─── Sidebar Panel ─── */}
+      <div
+        className="flex flex-row h-full bg-white/95 dark:bg-dark-900/95 backdrop-blur-xl shadow-2xl shadow-black/10 dark:shadow-black/30 border-r border-slate-200/50 dark:border-dark-700/50"
+        style={{ width: SIDEBAR_W }}
       >
-        {/* Top: Zenn blue — height fixed */}
-        <div className="relative flex items-center justify-center bg-[#3EA8FF] text-white hover:brightness-110 transition-[filter]" style={{ height: 46 }}>
-          {/* Chevron (close) */}
-          <motion.span className="absolute inset-0 flex items-center justify-center" animate={{ opacity: isOpen ? 1 : 0 }} transition={{ duration: 0.18 }}>
-            <FiChevronLeft className="w-5 h-5" />
-          </motion.span>
-          {/* Logo + arrow (open) */}
-          <motion.span className="absolute inset-0 flex items-center justify-center gap-1" animate={{ opacity: isOpen ? 0 : 1 }} transition={{ duration: 0.18 }}>
-            <SiZenn className="w-5 h-5" />
-            <FiChevronRight className="w-4 h-4 opacity-70" />
-          </motion.span>
-        </div>
-        {/* Bottom: Qiita green — height fixed */}
-        <div className="relative flex items-center justify-center bg-[#55C500] text-white hover:brightness-110 transition-[filter]" style={{ height: 46 }}>
-          <motion.span className="absolute inset-0 flex items-center justify-center" animate={{ opacity: isOpen ? 1 : 0 }} transition={{ duration: 0.18 }}>
-            <FiChevronLeft className="w-5 h-5" />
-          </motion.span>
-          <motion.span className="absolute inset-0 flex items-center justify-center gap-1" animate={{ opacity: isOpen ? 0 : 1 }} transition={{ duration: 0.18 }}>
-            <SiQiita className="w-5 h-5" />
-            <FiChevronRight className="w-4 h-4 opacity-70" />
-          </motion.span>
-        </div>
-      </motion.button>
-
-      {/* Sidebar Panel */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.aside
-            initial={{ x: -544 }}
-            animate={{ x: 0 }}
-            exit={{ x: -544 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="hidden 2xl:flex fixed left-0 top-0 h-screen w-[34rem] z-50 flex-row bg-white/95 dark:bg-dark-900/95 backdrop-blur-xl shadow-2xl shadow-black/10 dark:shadow-black/30 border-r border-slate-200/50 dark:border-dark-700/50"
-          >
             {/* Left Column: Blog (top) + Zenn (bottom) */}
             <div className="flex flex-col w-1/2 border-r border-slate-200/50 dark:border-dark-700/50">
               {/* ── Blog Section ── */}
@@ -342,9 +342,48 @@ export default function QiitaSidebar() {
                 </a>
               </div>
             </div>
-          </motion.aside>
-        )}
-      </AnimatePresence>
-    </>
+          </div>
+
+      {/* ─── Toggle Button (always at right edge of the container) ─── */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="self-center flex flex-col rounded-r-xl shadow-lg overflow-hidden shrink-0"
+        aria-label="Toggle sidebar"
+        style={{ width: TOGGLE_W }}
+      >
+        {/* Top: Zenn blue */}
+        <div className="relative flex items-center justify-center bg-[#3EA8FF] text-white hover:brightness-110 transition-[filter]" style={{ height: 46 }}>
+          <span
+            className="absolute inset-0 flex items-center justify-center transition-opacity duration-150"
+            style={{ opacity: isOpen ? 1 : 0 }}
+          >
+            <FiChevronLeft className="w-5 h-5" />
+          </span>
+          <span
+            className="absolute inset-0 flex items-center justify-center gap-1 transition-opacity duration-150"
+            style={{ opacity: isOpen ? 0 : 1 }}
+          >
+            <SiZenn className="w-5 h-5" />
+            <FiChevronRight className="w-4 h-4 opacity-70" />
+          </span>
+        </div>
+        {/* Bottom: Qiita green */}
+        <div className="relative flex items-center justify-center bg-[#55C500] text-white hover:brightness-110 transition-[filter]" style={{ height: 46 }}>
+          <span
+            className="absolute inset-0 flex items-center justify-center transition-opacity duration-150"
+            style={{ opacity: isOpen ? 1 : 0 }}
+          >
+            <FiChevronLeft className="w-5 h-5" />
+          </span>
+          <span
+            className="absolute inset-0 flex items-center justify-center gap-1 transition-opacity duration-150"
+            style={{ opacity: isOpen ? 0 : 1 }}
+          >
+            <SiQiita className="w-5 h-5" />
+            <FiChevronRight className="w-4 h-4 opacity-70" />
+          </span>
+        </div>
+      </button>
+    </motion.div>
   );
 }
