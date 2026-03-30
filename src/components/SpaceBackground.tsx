@@ -36,6 +36,8 @@ interface Nebula {
   driftY: number;
   pulseSpeed: number;
   pulseOffset: number;
+  /** secondary lobes for organic shape */
+  lobes: { angle: number; dist: number; radius: number; phaseSpeed: number; phase: number }[];
 }
 
 export default function SpaceBackground() {
@@ -79,11 +81,23 @@ export default function SpaceBackground() {
         };
       });
 
-      // Nebulae – colourful gas clouds
+      // Nebulae – larger, more vivid gas clouds with organic lobes
+      const makeLobes = (count: number, baseRadius: number) =>
+        Array.from({ length: count }, () => ({
+          angle: Math.random() * Math.PI * 2,
+          dist: baseRadius * (0.3 + Math.random() * 0.5),
+          radius: baseRadius * (0.4 + Math.random() * 0.4),
+          phaseSpeed: 0.1 + Math.random() * 0.3,
+          phase: Math.random() * Math.PI * 2,
+        }));
+
+      const S = Math.max(w, h);
       nebulae = [
-        { x: w * 0.2, y: h * 0.3, radius: Math.max(w, h) * 0.18, r: 60, g: 80, b: 200, alpha: 0.04, driftX: 0.08, driftY: 0.03, pulseSpeed: 0.4, pulseOffset: 0 },
-        { x: w * 0.75, y: h * 0.6, radius: Math.max(w, h) * 0.22, r: 140, g: 40, b: 180, alpha: 0.03, driftX: -0.06, driftY: 0.04, pulseSpeed: 0.3, pulseOffset: 2 },
-        { x: w * 0.5, y: h * 0.15, radius: Math.max(w, h) * 0.12, r: 30, g: 160, b: 220, alpha: 0.035, driftX: 0.04, driftY: -0.02, pulseSpeed: 0.5, pulseOffset: 4 },
+        { x: w * 0.15, y: h * 0.35, radius: S * 0.25, r: 40, g: 70, b: 220, alpha: 0.06, driftX: 0.1, driftY: 0.04, pulseSpeed: 0.3, pulseOffset: 0, lobes: makeLobes(4, S * 0.25) },
+        { x: w * 0.8, y: h * 0.55, radius: S * 0.3, r: 160, g: 30, b: 200, alpha: 0.05, driftX: -0.08, driftY: 0.05, pulseSpeed: 0.25, pulseOffset: 2, lobes: makeLobes(5, S * 0.3) },
+        { x: w * 0.5, y: h * 0.12, radius: S * 0.18, r: 20, g: 180, b: 240, alpha: 0.055, driftX: 0.06, driftY: -0.03, pulseSpeed: 0.4, pulseOffset: 4, lobes: makeLobes(3, S * 0.18) },
+        { x: w * 0.35, y: h * 0.75, radius: S * 0.2, r: 200, g: 60, b: 120, alpha: 0.04, driftX: 0.05, driftY: -0.06, pulseSpeed: 0.35, pulseOffset: 1, lobes: makeLobes(3, S * 0.2) },
+        { x: w * 0.9, y: h * 0.2, radius: S * 0.15, r: 80, g: 40, b: 180, alpha: 0.045, driftX: -0.04, driftY: 0.03, pulseSpeed: 0.45, pulseOffset: 3, lobes: makeLobes(3, S * 0.15) },
       ];
 
       shootingStars = [];
@@ -110,25 +124,45 @@ export default function SpaceBackground() {
       ctx.fillStyle = '#0a0e27';
       ctx.fillRect(0, 0, w, h);
 
-      // Nebulae (soft radial gradients)
+      // Nebulae (multi-lobe organic gas clouds)
+      ctx.globalCompositeOperation = 'screen';
       nebulae.forEach((n) => {
         n.x += n.driftX;
         n.y += n.driftY;
         // wrap
-        if (n.x < -n.radius) n.x = w + n.radius;
-        if (n.x > w + n.radius) n.x = -n.radius;
-        if (n.y < -n.radius) n.y = h + n.radius;
-        if (n.y > h + n.radius) n.y = -n.radius;
+        if (n.x < -n.radius * 1.5) n.x = w + n.radius * 1.5;
+        if (n.x > w + n.radius * 1.5) n.x = -n.radius * 1.5;
+        if (n.y < -n.radius * 1.5) n.y = h + n.radius * 1.5;
+        if (n.y > h + n.radius * 1.5) n.y = -n.radius * 1.5;
 
-        const pulse = 1 + Math.sin(time * n.pulseSpeed + n.pulseOffset) * 0.15;
+        // Core gradient
+        const pulse = 1 + Math.sin(time * n.pulseSpeed + n.pulseOffset) * 0.2;
         const r = n.radius * pulse;
         const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r);
-        grad.addColorStop(0, `rgba(${n.r},${n.g},${n.b},${n.alpha * 1.5})`);
-        grad.addColorStop(0.4, `rgba(${n.r},${n.g},${n.b},${n.alpha * 0.8})`);
+        grad.addColorStop(0, `rgba(${n.r},${n.g},${n.b},${n.alpha * 1.8})`);
+        grad.addColorStop(0.3, `rgba(${n.r},${n.g},${n.b},${n.alpha})`);
+        grad.addColorStop(0.7, `rgba(${n.r},${n.g},${n.b},${n.alpha * 0.3})`);
         grad.addColorStop(1, 'rgba(0,0,0,0)');
         ctx.fillStyle = grad;
         ctx.fillRect(n.x - r, n.y - r, r * 2, r * 2);
+
+        // Organic lobes – smaller overlapping clouds that orbit the core
+        n.lobes.forEach((lobe) => {
+          const a = lobe.angle + time * lobe.phaseSpeed;
+          const d = lobe.dist * (1 + Math.sin(time * 0.5 + lobe.phase) * 0.2);
+          const lx = n.x + Math.cos(a) * d;
+          const ly = n.y + Math.sin(a) * d;
+          const lr = lobe.radius * (1 + Math.sin(time * lobe.phaseSpeed * 1.3 + lobe.phase) * 0.15);
+
+          const lgrad = ctx.createRadialGradient(lx, ly, 0, lx, ly, lr);
+          lgrad.addColorStop(0, `rgba(${n.r + 30},${n.g + 20},${n.b + 20},${n.alpha * 1.2})`);
+          lgrad.addColorStop(0.5, `rgba(${n.r},${n.g},${n.b},${n.alpha * 0.5})`);
+          lgrad.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = lgrad;
+          ctx.fillRect(lx - lr, ly - lr, lr * 2, lr * 2);
+        });
       });
+      ctx.globalCompositeOperation = 'source-over';
 
       // Stars
       stars.forEach((s) => {

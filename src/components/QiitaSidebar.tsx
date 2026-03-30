@@ -88,46 +88,57 @@ export default function QiitaSidebar() {
       <motion.button
         onClick={() => setIsOpen(!isOpen)}
         className="hidden 2xl:flex fixed top-1/2 -translate-y-1/2 z-[55] items-center justify-center"
-        animate={{ left: isOpen ? '34rem' : '0rem' }}
+        animate={{
+          left: isOpen ? '34rem' : '0rem',
+          width: isOpen ? 40 : 56,
+        }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         aria-label="Toggle sidebar"
       >
-        <div className="flex flex-col rounded-r-xl shadow-lg overflow-hidden hover:brightness-110 transition-[filter] duration-200">
+        <motion.div
+          className="flex flex-col rounded-r-xl shadow-lg overflow-hidden hover:brightness-110 transition-[filter] duration-200 w-full"
+          layout
+          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        >
           {/* Top: Zenn blue */}
-          <div className="flex items-center justify-center bg-[#3EA8FF] text-white"
-            style={{ padding: isOpen ? '1rem 0.625rem' : '0.75rem 0.625rem 0.75rem 0.625rem' }}
+          <motion.div
+            className="flex items-center justify-center bg-[#3EA8FF] text-white"
+            animate={{ height: isOpen ? 48 : 44 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
-            <AnimatePresence mode="wait" initial={false}>
+            <AnimatePresence mode="popLayout" initial={false}>
               {isOpen ? (
-                <motion.div key="close-z" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} transition={{ duration: 0.15 }}>
+                <motion.div key="close-z" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.12 }}>
                   <FiChevronLeft className="w-5 h-5" />
                 </motion.div>
               ) : (
-                <motion.div key="open-z" className="flex items-center gap-1.5" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 8 }} transition={{ duration: 0.15 }}>
+                <motion.div key="open-z" className="flex items-center gap-1.5" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.12 }}>
                   <SiZenn className="w-5 h-5" />
                   <FiChevronRight className="w-4 h-4 opacity-70" />
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </motion.div>
           {/* Bottom: Qiita green */}
-          <div className="flex items-center justify-center bg-[#55C500] text-white"
-            style={{ padding: isOpen ? '1rem 0.625rem' : '0.75rem 0.625rem 0.75rem 0.625rem' }}
+          <motion.div
+            className="flex items-center justify-center bg-[#55C500] text-white"
+            animate={{ height: isOpen ? 48 : 44 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
           >
-            <AnimatePresence mode="wait" initial={false}>
+            <AnimatePresence mode="popLayout" initial={false}>
               {isOpen ? (
-                <motion.div key="close-q" initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -8 }} transition={{ duration: 0.15 }}>
+                <motion.div key="close-q" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.12 }}>
                   <FiChevronLeft className="w-5 h-5" />
                 </motion.div>
               ) : (
-                <motion.div key="open-q" className="flex items-center gap-1.5" initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 8 }} transition={{ duration: 0.15 }}>
+                <motion.div key="open-q" className="flex items-center gap-1.5" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} transition={{ duration: 0.12 }}>
                   <SiQiita className="w-5 h-5" />
                   <FiChevronRight className="w-4 h-4 opacity-70" />
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </motion.button>
 
       {/* Sidebar Panel */}
