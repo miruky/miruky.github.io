@@ -1,9 +1,16 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { FaGithub, FaXTwitter } from 'react-icons/fa6';
 import { SiQiita } from 'react-icons/si';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
+  const pathname = usePathname();
+
+  // Hide on admin pages
+  if (pathname.startsWith('/admin')) return null;
 
   return (
     <footer className="relative border-t border-slate-200 dark:border-dark-700 bg-slate-50 dark:bg-dark-950">

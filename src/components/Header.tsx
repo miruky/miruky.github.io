@@ -23,6 +23,9 @@ export default function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
+  // Hide on admin pages
+  const isAdminPage = pathname.startsWith('/admin');
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -42,6 +45,8 @@ export default function Header() {
   // ヘッダーがglass-nav（スクロール済み）→ ライトモードでは白い背景 → 黒文字
   // 通常ページ（白背景）→ 黒文字
   const isHeaderOverDark = isOnDarkBgPage;
+
+  if (isAdminPage) return null;
 
   return (
     <header
