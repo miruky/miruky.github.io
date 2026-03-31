@@ -43,10 +43,10 @@ print(f"日次平均売上: ¥{avg:,.0f}")
 greeting = format_user_greeting("太郎", "田中")
 print(greeting)`,
       highlights: [
-        { startLine: 5, endLine: 5, color: '#22c55e', label: '定数定義', explanation: 'マジックナンバーを意味ある名前の定数に置き換えている' },
-        { startLine: 7, endLine: 10, color: '#3b82f6', label: '説明的関数名', explanation: '関数名だけで何をするか分かる。引数名も明確' },
-        { startLine: 12, endLine: 15, color: '#3b82f6', label: '意図が明確な命名', explanation: 'full_name という中間変数で読みやすさ向上' },
-        { startLine: 17, endLine: 20, color: '#f59e0b', label: 'ブール関数', explanation: 'is_ プレフィックスで真偽値を返すことが明確' },
+        { startLine: 7, endLine: 7, color: '#22c55e', label: '定数定義', explanation: 'マジックナンバーを意味ある名前の定数に置き換えている' },
+        { startLine: 9, endLine: 12, color: '#3b82f6', label: '説明的関数名', explanation: '関数名だけで何をするか分かる。引数名も明確' },
+        { startLine: 14, endLine: 17, color: '#3b82f6', label: '意図が明確な命名', explanation: 'full_name という中間変数で読みやすさ向上' },
+        { startLine: 19, endLine: 22, color: '#f59e0b', label: 'ブール関数', explanation: 'is_ プレフィックスで真偽値を返すことが明確' },
       ],
       keyPoints: [
         '変数名は「何を表すか」を伝える名前にする',
@@ -115,9 +115,9 @@ print_receipt(items)`,
       highlights: [
         { startLine: 4, endLine: 8, color: '#f59e0b', label: 'データモデル', explanation: 'dataclass で商品データを構造化' },
         { startLine: 10, endLine: 12, color: '#22c55e', label: '単一責任', explanation: '小計計算だけを行う関数。テストも容易' },
-        { startLine: 14, endLine: 15, color: '#22c55e', label: '単一責任', explanation: '税計算のみ。税率変更にも対応しやすい' },
-        { startLine: 23, endLine: 26, color: '#3b82f6', label: 'フォーマット専用', explanation: '表示ロジックだけを担当する関数' },
-        { startLine: 28, endLine: 43, color: '#ec4899', label: 'オーケストレーション', explanation: '小さな関数を組み合わせて全体処理を構成' },
+        { startLine: 14, endLine: 16, color: '#22c55e', label: '単一責任', explanation: '税計算のみ。税率変更にも対応しやすい' },
+        { startLine: 22, endLine: 25, color: '#3b82f6', label: 'フォーマット専用', explanation: '表示ロジックだけを担当する関数' },
+        { startLine: 27, endLine: 41, color: '#ec4899', label: 'オーケストレーション', explanation: '小さな関数を組み合わせて全体処理を構成' },
       ],
       keyPoints: [
         '1関数1責任：計算・整形・出力を分離する',
@@ -185,11 +185,11 @@ try:
 except (UnauthorizedError, InsufficientFundsError, ValueError) as e:
     print(f"エラー: {e}")`,
       highlights: [
-        { startLine: 23, endLine: 25, color: '#ef4444', label: 'Guard 1', explanation: '権限不足を最初に弾く。以降は認証済みユーザーのみ' },
-        { startLine: 28, endLine: 29, color: '#ef4444', label: 'Guard 2', explanation: '不正値を早期に排除' },
-        { startLine: 32, endLine: 33, color: '#ef4444', label: 'Guard 3', explanation: 'ビジネスルールの検証' },
-        { startLine: 36, endLine: 39, color: '#ef4444', label: 'Guard 4', explanation: '残高検証。具体的なエラーメッセージ付き' },
-        { startLine: 42, endLine: 44, color: '#22c55e', label: '正常系', explanation: '全ガードを通過した後のクリーンな処理。ネストゼロ' },
+        { startLine: 22, endLine: 24, color: '#ef4444', label: 'Guard 1', explanation: '権限不足を最初に弾く。以降は認証済みユーザーのみ' },
+        { startLine: 26, endLine: 28, color: '#ef4444', label: 'Guard 2', explanation: '不正値を早期に排除' },
+        { startLine: 30, endLine: 32, color: '#ef4444', label: 'Guard 3', explanation: 'ビジネスルールの検証' },
+        { startLine: 34, endLine: 38, color: '#ef4444', label: 'Guard 4', explanation: '残高検証。具体的なエラーメッセージ付き' },
+        { startLine: 40, endLine: 43, color: '#22c55e', label: '正常系', explanation: '全ガードを通過した後のクリーンな処理。ネストゼロ' },
       ],
       keyPoints: [
         'ガード節で異常系を先に処理し、早期リターンする',
@@ -329,8 +329,8 @@ print(f"成績分布: {unique_grades}")`,
         { startLine: 18, endLine: 18, color: '#22c55e', label: 'フィルタリング', explanation: '条件に合う要素だけ抽出。for+if+appendより簡潔' },
         { startLine: 21, endLine: 21, color: '#3b82f6', label: 'マッピング', explanation: '各要素を変換して新しいリストを作成' },
         { startLine: 24, endLine: 27, color: '#f59e0b', label: '条件式付き', explanation: '三項演算子と組み合わせた条件付き変換' },
-        { startLine: 33, endLine: 33, color: '#a855f7', label: '辞書内包表記', explanation: 'dict comprehension でマップを一発生成' },
-        { startLine: 39, endLine: 40, color: '#ec4899', label: 'ジェネレータ式', explanation: 'リストを作らずイテレーションするのでメモリ効率が良い' },
+        { startLine: 34, endLine: 34, color: '#a855f7', label: '辞書内包表記', explanation: 'dict comprehension でマップを一発生成' },
+        { startLine: 40, endLine: 41, color: '#ec4899', label: 'ジェネレータ式', explanation: 'リストを作らずイテレーションするのでメモリ効率が良い' },
       ],
       keyPoints: [
         'リスト内包表記は for+append パターンより簡潔で高速',
@@ -410,7 +410,7 @@ except ValidationError as e:
         { startLine: 13, endLine: 17, color: '#a855f7', label: 'カスタム例外', explanation: 'フィールド名付きバリデーションエラー' },
         { startLine: 23, endLine: 24, color: '#ef4444', label: '事前チェック', explanation: 'ファイル存在確認を例外発生前に行う' },
         { startLine: 31, endLine: 34, color: '#ef4444', label: '具体的な捕捉', explanation: 'JSONDecodeError を捕捉し行番号付きで再送出' },
-        { startLine: 52, endLine: 57, color: '#ec4899', label: '呼び出し側', explanation: '例外の種類ごとに適切にハンドリング' },
+        { startLine: 51, endLine: 58, color: '#ec4899', label: '呼び出し側', explanation: '例外の種類ごとに適切にハンドリング' },
       ],
       keyPoints: [
         'Exception ではなく具体的な例外を捕捉する',
@@ -486,8 +486,8 @@ with timer("データ処理"):
       highlights: [
         { startLine: 4, endLine: 13, color: '#22c55e', label: '@contextmanager', explanation: 'デコレータベースのCM。yield前が__enter__、finally内が__exit__に相当' },
         { startLine: 15, endLine: 27, color: '#3b82f6', label: 'リソース管理', explanation: 'ファイルを作成し、例外が起きても確実に削除する' },
-        { startLine: 29, endLine: 49, color: '#a855f7', label: 'クラスベースCM', explanation: '__enter__と__exit__を実装する正統的な方法' },
-        { startLine: 55, endLine: 58, color: '#ec4899', label: 'ネストした利用', explanation: 'with文をネストして複数リソースを安全に管理' },
+        { startLine: 29, endLine: 51, color: '#a855f7', label: 'クラスベースCM', explanation: '__enter__と__exit__を実装する正統的な方法' },
+        { startLine: 54, endLine: 57, color: '#ec4899', label: 'ネストした利用', explanation: 'with文をネストして複数リソースを安全に管理' },
       ],
       keyPoints: [
         'with文でリソースの確実な解放を保証する',
@@ -559,7 +559,7 @@ print(f"合計: {user.balance.add(Money(3000))}")`,
       highlights: [
         { startLine: 5, endLine: 12, color: '#f59e0b', label: '基本的なデータクラス', explanation: '__init__, __repr__, __eq__ が自動生成される' },
         { startLine: 14, endLine: 27, color: '#22c55e', label: 'frozen=True', explanation: '不変オブジェクト（Value Object）。ハッシュ可能になる' },
-        { startLine: 29, endLine: 40, color: '#3b82f6', label: 'field()活用', explanation: 'default_factory でミュータブルなデフォルト値を安全に定義' },
+        { startLine: 29, endLine: 39, color: '#3b82f6', label: 'field()活用', explanation: 'default_factory でミュータブルなデフォルト値を安全に定義' },
       ],
       keyPoints: [
         'dataclass でボイラープレートコードを排除',
@@ -705,7 +705,7 @@ print(f"アクティブ: {order.status.is_active}")`,
         { startLine: 4, endLine: 9, color: '#a855f7', label: 'Enum定義', explanation: 'auto()で値を自動割り当て。文字列比較の事故を防ぐ' },
         { startLine: 11, endLine: 24, color: '#22c55e', label: 'プロパティ付与', explanation: 'Enumにロジックを持たせてリッチなドメインモデルに' },
         { startLine: 26, endLine: 32, color: '#f59e0b', label: '状態遷移表', explanation: '有効な遷移をデータとして定義。不正遷移を防止' },
-        { startLine: 39, endLine: 47, color: '#3b82f6', label: '遷移ロジック', explanation: '遷移表に基づいてバリデーション付きで状態変更' },
+        { startLine: 39, endLine: 46, color: '#3b82f6', label: '遷移ロジック', explanation: '遷移表に基づいてバリデーション付きで状態変更' },
       ],
       keyPoints: [
         'Enum で文字列リテラルのタイポを防止する',
@@ -843,10 +843,10 @@ def calculate_fibonacci(n: int) -> int:
 result = calculate_fibonacci(30)
 print(f"fib(30) = {result}")`,
       highlights: [
-        { startLine: 10, endLine: 18, color: '#22c55e', label: '基本デコレータ', explanation: 'functools.wraps で元関数のメタ情報を保持' },
-        { startLine: 20, endLine: 29, color: '#3b82f6', label: '計測デコレータ', explanation: '実行時間を透過的に計測。本体コードに影響なし' },
-        { startLine: 31, endLine: 47, color: '#a855f7', label: '引数付きデコレータ', explanation: '三重ネスト構造。外側関数で設定を受け取る' },
-        { startLine: 50, endLine: 51, color: '#ec4899', label: 'スタック適用', explanation: '複数デコレータを重ねて適用。下から順に実行される' },
+        { startLine: 11, endLine: 19, color: '#22c55e', label: '基本デコレータ', explanation: 'functools.wraps で元関数のメタ情報を保持' },
+        { startLine: 21, endLine: 30, color: '#3b82f6', label: '計測デコレータ', explanation: '実行時間を透過的に計測。本体コードに影響なし' },
+        { startLine: 32, endLine: 48, color: '#a855f7', label: '引数付きデコレータ', explanation: '三重ネスト構造。外側関数で設定を受け取る' },
+        { startLine: 51, endLine: 52, color: '#ec4899', label: 'スタック適用', explanation: '複数デコレータを重ねて適用。下から順に実行される' },
       ],
       keyPoints: [
         'functools.wraps で元関数の __name__ 等を引き継ぐ',
@@ -948,9 +948,9 @@ for label, strategy in strategies:
     order.print_receipt()`,
       highlights: [
         { startLine: 6, endLine: 7, color: '#a855f7', label: 'Strategy Interface', explanation: 'Protocolで策略のインターフェースを定義。ダックタイピング対応' },
-        { startLine: 9, endLine: 42, color: '#22c55e', label: '具体的な戦略群', explanation: '同じインターフェースで異なるアルゴリズムを実装' },
-        { startLine: 45, endLine: 68, color: '#3b82f6', label: 'Context（利用側）', explanation: '戦略を注入され、アルゴリズムの詳細を知らない' },
-        { startLine: 73, endLine: 84, color: '#ec4899', label: '実行時切替', explanation: '戦略を動的に切り替えて同じ注文に異なる割引を適用' },
+        { startLine: 9, endLine: 40, color: '#22c55e', label: '具体的な戦略群', explanation: '同じインターフェースで異なるアルゴリズムを実装' },
+        { startLine: 43, endLine: 65, color: '#3b82f6', label: 'Context（利用側）', explanation: '戦略を注入され、アルゴリズムの詳細を知らない' },
+        { startLine: 68, endLine: 81, color: '#ec4899', label: '実行時切替', explanation: '戦略を動的に切り替えて同じ注文に異なる割引を適用' },
       ],
       keyPoints: [
         'Protocol で暗黙的インターフェースを定義する',
@@ -1050,7 +1050,7 @@ metrics.report()`,
         { startLine: 7, endLine: 11, color: '#f59e0b', label: 'Event データ', explanation: '不変のイベントオブジェクト。名前・データ・タイムスタンプを持つ' },
         { startLine: 14, endLine: 16, color: '#a855f7', label: 'Observer ABC', explanation: '全リスナーが実装すべきインターフェース' },
         { startLine: 19, endLine: 43, color: '#3b82f6', label: '具体的リスナー', explanation: 'ロギング・メール・メトリクスの各リスナー実装' },
-        { startLine: 46, endLine: 63, color: '#22c55e', label: 'EventBus', explanation: 'サブスクライブ/パブリッシュの中核。* でワイルドカード購読可能' },
+        { startLine: 45, endLine: 61, color: '#22c55e', label: 'EventBus', explanation: 'サブスクライブ/パブリッシュの中核。* でワイルドカード購読可能' },
       ],
       keyPoints: [
         'Subject と Observer を疎結合にする',
@@ -1249,7 +1249,7 @@ print(f"\\n{simple}")`,
         { startLine: 4, endLine: 20, color: '#f59e0b', label: 'Product（不変）', explanation: 'frozen=True で構築後は変更不可。安全なデータオブジェクト' },
         { startLine: 22, endLine: 64, color: '#22c55e', label: 'Builder', explanation: '各メソッドが self を返しメソッドチェーンを実現' },
         { startLine: 67, endLine: 72, color: '#3b82f6', label: 'ファクトリー関数', explanation: 'Builderの生成を簡潔にするショートカット' },
-        { startLine: 75, endLine: 83, color: '#ec4899', label: 'メソッドチェーン', explanation: '流れるようなインターフェースで直感的にオブジェクト構築' },
+        { startLine: 74, endLine: 83, color: '#ec4899', label: 'メソッドチェーン', explanation: '流れるようなインターフェースで直感的にオブジェクト構築' },
       ],
       keyPoints: [
         'Builder パターンで複雑なオブジェクト生成を段階的に',
@@ -1357,7 +1357,7 @@ print(f"全ユーザー数: {len(all_users)}")`,
         { startLine: 7, endLine: 12, color: '#f59e0b', label: 'Entity', explanation: 'ドメインエンティティ。IDで識別される' },
         { startLine: 15, endLine: 29, color: '#a855f7', label: 'Repository ABC', explanation: 'データアクセスの抽象インターフェース' },
         { startLine: 32, endLine: 54, color: '#22c55e', label: 'InMemory実装', explanation: 'テスト用のインメモリ実装。本番ではDB実装に差し替え可能' },
-        { startLine: 57, endLine: 77, color: '#3b82f6', label: 'Service層', explanation: 'リポジトリを注入され、ストレージ手段を知らない' },
+        { startLine: 57, endLine: 75, color: '#3b82f6', label: 'Service層', explanation: 'リポジトリを注入され、ストレージ手段を知らない' },
       ],
       keyPoints: [
         'Repository でデータアクセスを抽象化する',
@@ -1488,7 +1488,7 @@ print(f"  文書: {doc}")`,
         { startLine: 4, endLine: 13, color: '#a855f7', label: 'Command ABC', explanation: 'execute/undo/descriptionを持つ共通インターフェース' },
         { startLine: 16, endLine: 32, color: '#f59e0b', label: 'Receiver', explanation: '実際の操作対象。コマンドから操作を受ける' },
         { startLine: 35, endLine: 65, color: '#22c55e', label: '具象コマンド', explanation: '各操作をオブジェクト化。Undo用にデータを保持' },
-        { startLine: 68, endLine: 94, color: '#3b82f6', label: 'CommandHistory', explanation: '実行履歴を管理。Undo/Redo操作を提供' },
+        { startLine: 67, endLine: 94, color: '#3b82f6', label: 'CommandHistory', explanation: '実行履歴を管理。Undo/Redo操作を提供' },
       ],
       keyPoints: [
         '操作をオブジェクト化しUndo/Redoを実現',
@@ -1805,7 +1805,7 @@ for name, depth in Tree(root, "bfs"):
         { startLine: 5, endLine: 13, color: '#f59e0b', label: 'TreeNode', explanation: '再帰的なツリー構造。子ノードのリストを持つ' },
         { startLine: 15, endLine: 29, color: '#22c55e', label: 'DFSイテレータ', explanation: 'スタックで深さ優先走査を実装' },
         { startLine: 31, endLine: 47, color: '#3b82f6', label: 'BFSイテレータ', explanation: 'キューで幅優先走査を実装' },
-        { startLine: 49, endLine: 57, color: '#a855f7', label: 'Iterable Tree', explanation: 'モードに応じてイテレータを切り替え' },
+        { startLine: 48, endLine: 57, color: '#a855f7', label: 'Iterable Tree', explanation: 'モードに応じてイテレータを切り替え' },
       ],
       keyPoints: [
         '__iter__ と __next__ でイテレータプロトコルを実装',
@@ -1913,8 +1913,8 @@ resp2 = pipeline.process(req2)
 print(f"  → {resp2}")`,
       highlights: [
         { startLine: 19, endLine: 33, color: '#a855f7', label: 'Handler ABC', explanation: '次のハンドラへの参照と委譲メソッドを持つ基底クラス' },
-        { startLine: 36, endLine: 63, color: '#22c55e', label: '具象ハンドラ群', explanation: 'ログ・認証・レートリミット。処理できなければ次へ委譲' },
-        { startLine: 70, endLine: 79, color: '#3b82f6', label: 'チェーン構築', explanation: 'set_next()でハンドラを連鎖。メソッドチェーンで記述' },
+        { startLine: 36, endLine: 65, color: '#22c55e', label: '具象ハンドラ群', explanation: 'ログ・認証・レートリミット。処理できなければ次へ委譲' },
+        { startLine: 68, endLine: 79, color: '#3b82f6', label: 'チェーン構築', explanation: 'set_next()でハンドラを連鎖。メソッドチェーンで記述' },
       ],
       keyPoints: [
         'ハンドラを連鎖させてリクエストを順次処理',
@@ -2045,8 +2045,8 @@ for t in tests:
         print(f"  ❌ {t.__name__}: {e}")`,
       highlights: [
         { startLine: 6, endLine: 20, color: '#f59e0b', label: 'プロダクションコード', explanation: 'テスト対象のMoney値オブジェクト' },
-        { startLine: 47, endLine: 50, color: '#3b82f6', label: 'ファクトリー関数', explanation: 'テスト用セットアップを共通化（Fixture相当）' },
-        { startLine: 53, endLine: 60, color: '#22c55e', label: 'AAA パターン', explanation: 'Arrange-Act-Assert の明確な3フェーズ構造' },
+        { startLine: 46, endLine: 50, color: '#3b82f6', label: 'ファクトリー関数', explanation: 'テスト用セットアップを共通化（Fixture相当）' },
+        { startLine: 52, endLine: 60, color: '#22c55e', label: 'AAA パターン', explanation: 'Arrange-Act-Assert の明確な3フェーズ構造' },
         { startLine: 72, endLine: 81, color: '#a855f7', label: 'パラメトライズ', explanation: '複数ケースをデータ駆動でテスト' },
       ],
       keyPoints: [
@@ -2141,7 +2141,7 @@ asyncio.run(main())`,
       highlights: [
         { startLine: 13, endLine: 19, color: '#f59e0b', label: '非同期関数', explanation: 'async def で非同期関数を定義。await で制御を返す' },
         { startLine: 22, endLine: 25, color: '#22c55e', label: 'gather並行実行', explanation: 'asyncio.gather で複数タスクを同時実行' },
-        { startLine: 28, endLine: 33, color: '#ef4444', label: 'タイムアウト', explanation: 'wait_for でタイムアウト制御' },
+        { startLine: 28, endLine: 34, color: '#ef4444', label: 'タイムアウト', explanation: 'wait_for でタイムアウト制御' },
         { startLine: 49, endLine: 57, color: '#a855f7', label: 'セマフォ', explanation: 'Semaphore で並行実行数を制限' },
       ],
       keyPoints: [
@@ -2313,10 +2313,10 @@ def main():
 
 main()`,
       highlights: [
-        { startLine: 12, endLine: 50, color: '#22c55e', label: 'Domain Layer', explanation: 'Value Object, Entity, Repository/Event の Port（抽象）。外部依存ゼロ' },
+        { startLine: 12, endLine: 49, color: '#22c55e', label: 'Domain Layer', explanation: 'Value Object, Entity, Repository/Event の Port（抽象）。外部依存ゼロ' },
         { startLine: 55, endLine: 97, color: '#a855f7', label: 'Application Layer', explanation: 'ユースケース。Input/Output DTOで境界を明確化' },
-        { startLine: 102, endLine: 125, color: '#3b82f6', label: 'Infrastructure', explanation: 'リポジトリ・イベント発行の具体実装' },
-        { startLine: 130, endLine: 148, color: '#ec4899', label: 'Presentation', explanation: 'エントリポイント。依存を組み立てて実行' },
+        { startLine: 103, endLine: 125, color: '#3b82f6', label: 'Infrastructure', explanation: 'リポジトリ・イベント発行の具体実装' },
+        { startLine: 131, endLine: 151, color: '#ec4899', label: 'Presentation', explanation: 'エントリポイント。依存を組み立てて実行' },
       ],
       keyPoints: [
         'Domain層は外部フレームワークに一切依存しない',
@@ -2504,10 +2504,10 @@ print(f"在庫: {laptop.name}={laptop.stock}, {mouse.name}={mouse.stock}")
 for event in order.collect_events():
     print(f"📢 {event}")`,
       highlights: [
-        { startLine: 13, endLine: 49, color: '#f59e0b', label: 'Value Objects', explanation: '不変・等価性で比較。Money, ProductId, Quantity等' },
+        { startLine: 13, endLine: 48, color: '#f59e0b', label: 'Value Objects', explanation: '不変・等価性で比較。Money, ProductId, Quantity等' },
         { startLine: 54, endLine: 67, color: '#3b82f6', label: 'Entity', explanation: 'IDで識別可能な可変オブジェクト。ビジネスルールを持つ' },
-        { startLine: 82, endLine: 140, color: '#22c55e', label: 'Aggregate Root', explanation: 'Order が集約のルート。整合性の境界を守る' },
-        { startLine: 146, endLine: 153, color: '#a855f7', label: 'Domain Service', explanation: '複数集約をまたぐビジネスロジック' },
+        { startLine: 73, endLine: 139, color: '#22c55e', label: 'Aggregate Root', explanation: 'Order が集約のルート。整合性の境界を守る' },
+        { startLine: 145, endLine: 152, color: '#a855f7', label: 'Domain Service', explanation: '複数集約をまたぐビジネスロジック' },
       ],
       keyPoints: [
         'Value Object は不変で等価性で比較する',
@@ -2685,9 +2685,9 @@ for e in store.load("ACC-001"):
     else:
         print(f"  v{e.version} {name}")`,
       highlights: [
-        { startLine: 12, endLine: 37, color: '#f59e0b', label: 'Domain Events', explanation: '不変のイベントデータ。全ての状態変化を記録' },
-        { startLine: 42, endLine: 108, color: '#22c55e', label: 'Event-Sourced Aggregate', explanation: 'コマンド→イベント生成→状態更新。from_eventsで復元' },
-        { startLine: 113, endLine: 124, color: '#3b82f6', label: 'Event Store', explanation: 'イベントの永続化層。時系列で保存' },
+        { startLine: 12, endLine: 35, color: '#f59e0b', label: 'Domain Events', explanation: '不変のイベントデータ。全ての状態変化を記録' },
+        { startLine: 41, endLine: 116, color: '#22c55e', label: 'Event-Sourced Aggregate', explanation: 'コマンド→イベント生成→状態更新。from_eventsで復元' },
+        { startLine: 122, endLine: 134, color: '#3b82f6', label: 'Event Store', explanation: 'イベントの永続化層。時系列で保存' },
       ],
       keyPoints: [
         '状態ではなくイベントの列を永続化する',
@@ -2873,10 +2873,10 @@ detail = query_svc.get_detail(id1)
 if detail:
     print(f"  {detail.name}: {detail.price_display} (在庫{detail.stock}) 更新:{detail.last_updated}")`,
       highlights: [
-        { startLine: 11, endLine: 28, color: '#f59e0b', label: 'Commands', explanation: '書き込み意図を表す不変のコマンドオブジェクト' },
-        { startLine: 50, endLine: 75, color: '#22c55e', label: 'Command Handler', explanation: 'コマンドを受け取り、Write Modelを更新し、Read Modelに投影' },
-        { startLine: 80, endLine: 100, color: '#a855f7', label: 'Read Model', explanation: '読み取り専用の最適化されたデータ構造' },
-        { startLine: 117, endLine: 139, color: '#3b82f6', label: 'Projector', explanation: 'Write→Read への変換・投影を担当' },
+        { startLine: 11, endLine: 26, color: '#f59e0b', label: 'Commands', explanation: '書き込み意図を表す不変のコマンドオブジェクト' },
+        { startLine: 48, endLine: 73, color: '#22c55e', label: 'Command Handler', explanation: 'コマンドを受け取り、Write Modelを更新し、Read Modelに投影' },
+        { startLine: 79, endLine: 101, color: '#a855f7', label: 'Read Model', explanation: '読み取り専用の最適化されたデータ構造' },
+        { startLine: 120, endLine: 145, color: '#3b82f6', label: 'Projector', explanation: 'Write→Read への変換・投影を担当' },
       ],
       keyPoints: [
         'Command（書き込み）とQuery（読み取り）を完全分離',
@@ -3028,10 +3028,10 @@ result = manager.process_pipeline(
 )
 print(f"\\n─── 加工結果 ───\\n{result}")`,
       highlights: [
-        { startLine: 10, endLine: 31, color: '#a855f7', label: 'Plugin Interface', explanation: 'info/process/on_load/on_unloadの統一インターフェース' },
-        { startLine: 36, endLine: 64, color: '#22c55e', label: 'Plugin Manager', explanation: '登録・解除・パイプライン実行を管理するコアエンジン' },
-        { startLine: 69, endLine: 110, color: '#3b82f6', label: '具体プラグイン群', explanation: '各プラグインは独立して開発・テスト可能' },
-        { startLine: 118, endLine: 130, color: '#ec4899', label: 'パイプライン実行', explanation: '複数プラグインを順序付きで適用' },
+        { startLine: 10, endLine: 30, color: '#a855f7', label: 'Plugin Interface', explanation: 'info/process/on_load/on_unloadの統一インターフェース' },
+        { startLine: 36, endLine: 65, color: '#22c55e', label: 'Plugin Manager', explanation: '登録・解除・パイプライン実行を管理するコアエンジン' },
+        { startLine: 71, endLine: 108, color: '#3b82f6', label: '具体プラグイン群', explanation: '各プラグインは独立して開発・テスト可能' },
+        { startLine: 114, endLine: 134, color: '#ec4899', label: 'パイプライン実行', explanation: '複数プラグインを順序付きで適用' },
       ],
       keyPoints: [
         '統一インターフェースで拡張ポイントを定義する',
@@ -3230,10 +3230,10 @@ pipeline = (
 result = pipeline.execute(raw_data)
 print(f"\\nメタデータ: {result.metadata}")`,
       highlights: [
-        { startLine: 13, endLine: 24, color: '#f59e0b', label: 'Context', explanation: 'ステージ間でデータとメタデータを受け渡す共有コンテキスト' },
-        { startLine: 26, endLine: 32, color: '#a855f7', label: 'Stage ABC', explanation: 'name と process を持つステージの基底クラス' },
-        { startLine: 34, endLine: 58, color: '#22c55e', label: 'Pipeline Engine', explanation: 'ステージを順次実行。エラー時はスキップ。経過時間計測' },
-        { startLine: 79, endLine: 155, color: '#3b82f6', label: 'ETL Stages', explanation: 'Extract→Validate→Transform→Aggregate→Load の各ステージ' },
+        { startLine: 13, endLine: 23, color: '#f59e0b', label: 'Context', explanation: 'ステージ間でデータとメタデータを受け渡す共有コンテキスト' },
+        { startLine: 25, endLine: 32, color: '#a855f7', label: 'Stage ABC', explanation: 'name と process を持つステージの基底クラス' },
+        { startLine: 34, endLine: 60, color: '#22c55e', label: 'Pipeline Engine', explanation: 'ステージを順次実行。エラー時はスキップ。経過時間計測' },
+        { startLine: 66, endLine: 160, color: '#3b82f6', label: 'ETL Stages', explanation: 'Extract→Validate→Transform→Aggregate→Load の各ステージ' },
       ],
       keyPoints: [
         'PipelineContext でステージ間のデータ受け渡し',
@@ -3378,10 +3378,10 @@ for i in range(10):
 
 print(f"\\n📊 統計: {breaker.get_stats()}")`,
       highlights: [
-        { startLine: 10, endLine: 14, color: '#f59e0b', label: '3状態', explanation: 'CLOSED=正常, OPEN=遮断, HALF_OPEN=試行の3状態' },
-        { startLine: 27, endLine: 42, color: '#22c55e', label: 'ブレーカー設定', explanation: '閾値・回復タイムアウト・試行上限を設定' },
-        { startLine: 56, endLine: 75, color: '#a855f7', label: 'call メソッド', explanation: '状態に応じてリクエストを通す/遮断する中核ロジック' },
-        { startLine: 77, endLine: 95, color: '#3b82f6', label: '状態遷移', explanation: '成功で回復、連続失敗で遮断、タイムアウト後に試行開始' },
+        { startLine: 10, endLine: 13, color: '#f59e0b', label: '3状態', explanation: 'CLOSED=正常, OPEN=遮断, HALF_OPEN=試行の3状態' },
+        { startLine: 26, endLine: 40, color: '#22c55e', label: 'ブレーカー設定', explanation: '閾値・回復タイムアウト・試行上限を設定' },
+        { startLine: 54, endLine: 74, color: '#a855f7', label: 'call メソッド', explanation: '状態に応じてリクエストを通す/遮断する中核ロジック' },
+        { startLine: 76, endLine: 97, color: '#3b82f6', label: '状態遷移', explanation: '成功で回復、連続失敗で遮断、タイムアウト後に試行開始' },
       ],
       keyPoints: [
         'CLOSED→OPEN→HALF_OPEN→CLOSED の状態遷移',
@@ -3540,10 +3540,10 @@ page = LoginPage(factory)
 print("\\n=== Light Theme ===")
 page.render()`,
       highlights: [
-        { startLine: 9, endLine: 21, color: '#a855f7', label: 'Product Interfaces', explanation: 'UI部品の抽象インターフェース' },
-        { startLine: 59, endLine: 80, color: '#22c55e', label: 'Abstract Factory', explanation: 'テーマごとに一貫したUI部品群を生成' },
-        { startLine: 86, endLine: 105, color: '#3b82f6', label: 'DI Container', explanation: 'インターフェース→実装のマッピングとシングルトン管理' },
-        { startLine: 111, endLine: 121, color: '#ec4899', label: 'Application', explanation: 'UIFactory を注入され、テーマを知らずにUIを構築' },
+        { startLine: 10, endLine: 20, color: '#a855f7', label: 'Product Interfaces', explanation: 'UI部品の抽象インターフェース' },
+        { startLine: 58, endLine: 80, color: '#22c55e', label: 'Abstract Factory', explanation: 'テーマごとに一貫したUI部品群を生成' },
+        { startLine: 86, endLine: 104, color: '#3b82f6', label: 'DI Container', explanation: 'インターフェース→実装のマッピングとシングルトン管理' },
+        { startLine: 110, endLine: 119, color: '#ec4899', label: 'Application', explanation: 'UIFactory を注入され、テーマを知らずにUIを構築' },
       ],
       keyPoints: [
         'Abstract Factory で関連オブジェクト群の一貫性を保証',
@@ -3676,8 +3676,8 @@ alice.show_history()
 room.show_log()`,
       highlights: [
         { startLine: 11, endLine: 17, color: '#a855f7', label: 'Mediator ABC', explanation: 'メッセージ送信・ユーザー管理のインターフェース' },
-        { startLine: 22, endLine: 44, color: '#f59e0b', label: 'Colleague', explanation: 'Mediator経由で通信するユーザー。他ユーザーを直接参照しない' },
-        { startLine: 50, endLine: 96, color: '#22c55e', label: 'Concrete Mediator', explanation: 'ChatRoomがユーザー管理・メッセージルーティング・ログを集約' },
+        { startLine: 23, endLine: 43, color: '#f59e0b', label: 'Colleague', explanation: 'Mediator経由で通信するユーザー。他ユーザーを直接参照しない' },
+        { startLine: 49, endLine: 96, color: '#22c55e', label: 'Concrete Mediator', explanation: 'ChatRoomがユーザー管理・メッセージルーティング・ログを集約' },
       ],
       keyPoints: [
         'Colleague同士の直接通信を排除し疎結合にする',
@@ -3859,11 +3859,11 @@ service = TaskService(repo, notifier)
 cli = TaskCLI(service)
 cli.run_demo()`,
       highlights: [
-        { startLine: 12, endLine: 34, color: '#f59e0b', label: 'Domain Model', explanation: 'ビジネスルールを持つ Entity。外部依存なし' },
-        { startLine: 37, endLine: 58, color: '#a855f7', label: 'Ports（ポート）', explanation: 'Primary Port=ユースケース入口, Secondary Port=外部依存の抽象' },
-        { startLine: 63, endLine: 92, color: '#22c55e', label: 'Application Service', explanation: 'ユースケースを実装。ポート経由で外部と通信' },
-        { startLine: 98, endLine: 124, color: '#3b82f6', label: 'Secondary Adapters', explanation: 'Repository/Notifier の具体的な実装（差し替え可能）' },
-        { startLine: 127, endLine: 147, color: '#ec4899', label: 'Primary Adapter + 組立', explanation: 'CLIアダプター。Composition Root で全体を組み立て' },
+        { startLine: 12, endLine: 33, color: '#f59e0b', label: 'Domain Model', explanation: 'ビジネスルールを持つ Entity。外部依存なし' },
+        { startLine: 36, endLine: 59, color: '#a855f7', label: 'Ports（ポート）', explanation: 'Primary Port=ユースケース入口, Secondary Port=外部依存の抽象' },
+        { startLine: 63, endLine: 95, color: '#22c55e', label: 'Application Service', explanation: 'ユースケースを実装。ポート経由で外部と通信' },
+        { startLine: 98, endLine: 129, color: '#3b82f6', label: 'Secondary Adapters', explanation: 'Repository/Notifier の具体的な実装（差し替え可能）' },
+        { startLine: 131, endLine: 164, color: '#ec4899', label: 'Primary Adapter + 組立', explanation: 'CLIアダプター。Composition Root で全体を組み立て' },
       ],
       keyPoints: [
         'ドメインコアは外部依存を一切持たない',

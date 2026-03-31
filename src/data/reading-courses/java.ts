@@ -51,8 +51,8 @@ public class OrderSummary {
 }`,
       highlights: [
         { startLine: 8, endLine: 11, color: '#22c55e', label: '明確なフィールド名', explanation: '型と名前だけで意味がわかるフィールド。コメント不要。' },
-        { startLine: 22, endLine: 25, color: '#3b82f6', label: '動詞+名詞のメソッド名', explanation: 'calculateDiscountedPrice — 何を計算するか一目瞭然。' },
-        { startLine: 27, endLine: 29, color: '#f59e0b', label: 'is接頭辞のboolean', explanation: 'isExpiredOrder — 真偽値を返すメソッドには is/has/can を使う。' },
+        { startLine: 21, endLine: 24, color: '#3b82f6', label: '動詞+名詞のメソッド名', explanation: 'calculateDiscountedPrice — 何を計算するか一目瞭然。' },
+        { startLine: 26, endLine: 28, color: '#f59e0b', label: 'is接頭辞のboolean', explanation: 'isExpiredOrder — 真偽値を返すメソッドには is/has/can を使う。' },
       ],
       keyPoints: [
         '変数名は「何を表すか」が一目でわかるように',
@@ -117,7 +117,7 @@ public class OrderSummary {
     }
 }`,
       highlights: [
-        { startLine: 17, endLine: 23, color: '#22c55e', label: 'オーケストレーション', explanation: 'register() は各ステップを呼び出すだけ。処理の流れが一目瞭然。' },
+        { startLine: 16, endLine: 23, color: '#22c55e', label: 'オーケストレーション', explanation: 'register() は各ステップを呼び出すだけ。処理の流れが一目瞭然。' },
         { startLine: 25, endLine: 35, color: '#ef4444', label: 'バリデーション専用', explanation: '入力検証だけを責務とする。他のことはしない。' },
         { startLine: 37, endLine: 41, color: '#3b82f6', label: '存在チェック専用', explanation: '重複確認の責務のみ。' },
         { startLine: 43, endLine: 46, color: '#f59e0b', label: 'オブジェクト生成専用', explanation: 'Userの生成ロジックを分離。' },
@@ -449,10 +449,10 @@ public class OrderService {
     }
 }`,
       highlights: [
-        { startLine: 2, endLine: 12, color: '#a855f7', label: '基底例外クラス', explanation: '全ドメイン例外の共通構造。errorCode でプログラム的にハンドリング可能。' },
+        { startLine: 2, endLine: 13, color: '#a855f7', label: '基底例外クラス', explanation: '全ドメイン例外の共通構造。errorCode でプログラム的にハンドリング可能。' },
         { startLine: 16, endLine: 21, color: '#ef4444', label: 'Not Found 例外', explanation: 'エンティティ名 + ID を含む明確なメッセージ。' },
         { startLine: 23, endLine: 27, color: '#ef4444', label: 'ビジネスルール違反', explanation: 'ドメインルールのバリデーション用。' },
-        { startLine: 37, endLine: 50, color: '#22c55e', label: '例外の活用', explanation: '適切な例外を投げることで、呼び出し側が意味のあるハンドリングを行える。' },
+        { startLine: 37, endLine: 53, color: '#22c55e', label: '例外の活用', explanation: '適切な例外を投げることで、呼び出し側が意味のあるハンドリングを行える。' },
       ],
       keyPoints: [
         'ドメイン固有の例外階層を設計する',
@@ -516,10 +516,10 @@ public class OrderAnalyzer {
     }
 }`,
       highlights: [
-        { startLine: 8, endLine: 12, color: '#22c55e', label: 'filter + map + sum', explanation: '基本のStream チェーン。フィルタ → 変換 → 集約。' },
+        { startLine: 8, endLine: 13, color: '#22c55e', label: 'filter + map + sum', explanation: '基本のStream チェーン。フィルタ → 変換 → 集約。' },
         { startLine: 16, endLine: 19, color: '#3b82f6', label: 'groupingBy', explanation: 'Collectors.groupingBy で自動グルーピング。' },
-        { startLine: 23, endLine: 31, color: '#a855f7', label: '複合チェーン', explanation: 'filter → map → distinct → sorted の組み合わせ。' },
-        { startLine: 34, endLine: 45, color: '#f59e0b', label: 'summaryStatistics', explanation: '一度の走査でcount, sum, average, max を取得。' },
+        { startLine: 22, endLine: 31, color: '#a855f7', label: '複合チェーン', explanation: 'filter → map → distinct → sorted の組み合わせ。' },
+        { startLine: 34, endLine: 46, color: '#f59e0b', label: 'summaryStatistics', explanation: '一度の走査でcount, sum, average, max を取得。' },
       ],
       keyPoints: [
         'for ループの代わりに Stream で宣言的に書く',
@@ -615,7 +615,7 @@ public class SeniorDeveloper implements Coder, Tester, Deployer {
         { startLine: 16, endLine: 19, color: '#a855f7', label: 'Tester IF', explanation: 'テストに関する操作のみ。' },
         { startLine: 21, endLine: 24, color: '#a855f7', label: 'Deployer IF', explanation: 'デプロイに関する操作のみ。' },
         { startLine: 32, endLine: 42, color: '#22c55e', label: '最小実装', explanation: 'JuniorDeveloper は Coder のみ実装。不要な deploy() などに依存しない。' },
-        { startLine: 44, endLine: 71, color: '#3b82f6', label: '複数IF実装', explanation: 'SeniorDeveloper は必要な全インターフェースを実装。' },
+        { startLine: 44, endLine: 74, color: '#3b82f6', label: '複数IF実装', explanation: 'SeniorDeveloper は必要な全インターフェースを実装。' },
       ],
       keyPoints: [
         'クライアントに不要なメソッドを強制しない',
@@ -702,9 +702,9 @@ public class SeniorDeveloper implements Coder, Tester, Deployer {
 //     .timeout(5000)
 //     .build();`,
       highlights: [
-        { startLine: 2, endLine: 8, color: '#f59e0b', label: '不変フィールド', explanation: 'final で不変。Builderからのみ設定される。' },
+        { startLine: 3, endLine: 8, color: '#f59e0b', label: '不変フィールド', explanation: 'final で不変。Builderからのみ設定される。' },
         { startLine: 10, endLine: 17, color: '#22c55e', label: 'プライベートコンストラクタ', explanation: 'Builderからのみ生成可能。不正な状態を防止。' },
-        { startLine: 21, endLine: 55, color: '#3b82f6', label: 'Builder内部クラス', explanation: '必須/オプションを分け、メソッドチェーンで構築。' },
+        { startLine: 21, endLine: 60, color: '#3b82f6', label: 'Builder内部クラス', explanation: '必須/オプションを分け、メソッドチェーンで構築。' },
         { startLine: 57, endLine: 59, color: '#ec4899', label: 'buildメソッド', explanation: '最後に build() で不変オブジェクトを生成。' },
       ],
       keyPoints: [
@@ -874,8 +874,8 @@ public class PricingStrategyFactory {
         { startLine: 2, endLine: 5, color: '#a855f7', label: '戦略インターフェース', explanation: '@FunctionalInterface で単一メソッド。ラムダでも使える。' },
         { startLine: 8, endLine: 13, color: '#3b82f6', label: '通常価格戦略', explanation: '最もシンプルな実装。' },
         { startLine: 16, endLine: 29, color: '#3b82f6', label: '会員割引戦略', explanation: '割引率をコンストラクタで注入。' },
-        { startLine: 52, endLine: 66, color: '#22c55e', label: 'コンテキスト', explanation: 'CheckoutService は戦略に依存するが、具象クラスを知らない。' },
-        { startLine: 69, endLine: 80, color: '#ec4899', label: '戦略ファクトリ', explanation: '顧客の属性に基づいて適切な戦略を生成。' },
+        { startLine: 52, endLine: 70, color: '#22c55e', label: 'コンテキスト', explanation: 'CheckoutService は戦略に依存するが、具象クラスを知らない。' },
+        { startLine: 72, endLine: 83, color: '#ec4899', label: '戦略ファクトリ', explanation: '顧客の属性に基づいて適切な戦略を生成。' },
       ],
       keyPoints: [
         'アルゴリズムをインターフェースで抽象化',
@@ -992,9 +992,9 @@ public class AuditLogger implements OrderEventListener {
       highlights: [
         { startLine: 5, endLine: 17, color: '#f59e0b', label: 'イベントデータ', explanation: 'record でイベントを不変データとして定義。ファクトリメソッドで生成。' },
         { startLine: 20, endLine: 23, color: '#a855f7', label: 'リスナーIF', explanation: '@FunctionalInterface で柔軟に。ラムダでもクラスでもOK。' },
-        { startLine: 26, endLine: 60, color: '#22c55e', label: 'Subject', explanation: 'OrderService がリスナーの登録・通知を管理。ドメインロジックとは分離。' },
-        { startLine: 63, endLine: 70, color: '#3b82f6', label: 'メール通知', explanation: '注文作成時にメール送信。' },
-        { startLine: 72, endLine: 87, color: '#3b82f6', label: '在庫管理', explanation: 'イベントに応じて在庫を確保/解放。' },
+        { startLine: 26, endLine: 61, color: '#22c55e', label: 'Subject', explanation: 'OrderService がリスナーの登録・通知を管理。ドメインロジックとは分離。' },
+        { startLine: 63, endLine: 71, color: '#3b82f6', label: 'メール通知', explanation: '注文作成時にメール送信。' },
+        { startLine: 73, endLine: 89, color: '#3b82f6', label: '在庫管理', explanation: 'イベントに応じて在庫を確保/解放。' },
       ],
       keyPoints: [
         'Subject と Observer が疎結合',
@@ -1090,8 +1090,8 @@ public class InMemoryUserRepository implements UserRepository {
       highlights: [
         { startLine: 4, endLine: 12, color: '#a855f7', label: 'リポジトリIF', explanation: 'ドメイン層に属するインターフェース。永続化技術に依存しない。' },
         { startLine: 15, endLine: 24, color: '#f59e0b', label: '仕様パターン', explanation: '検索条件をオブジェクトとしてカプセル化。' },
-        { startLine: 27, endLine: 72, color: '#22c55e', label: 'インメモリ実装', explanation: 'テスト用の実装。本番では JPA 等に差し替える。' },
-        { startLine: 51, endLine: 56, color: '#3b82f6', label: 'save の ID 自動採番', explanation: '新規の場合は ID を自動発番してから保存。' },
+        { startLine: 27, endLine: 76, color: '#22c55e', label: 'インメモリ実装', explanation: 'テスト用の実装。本番では JPA 等に差し替える。' },
+        { startLine: 51, endLine: 57, color: '#3b82f6', label: 'save の ID 自動採番', explanation: '新規の場合は ID を自動発番してから保存。' },
       ],
       keyPoints: [
         'インターフェースはドメイン層、実装はインフラ層',
@@ -1207,8 +1207,8 @@ public class CommandHistory {
       highlights: [
         { startLine: 2, endLine: 6, color: '#a855f7', label: 'Command IF', explanation: 'execute + undo で操作の実行と取り消しを定義。' },
         { startLine: 9, endLine: 34, color: '#3b82f6', label: '挿入コマンド', explanation: '挿入位置とテキストを保持。undo で削除。' },
-        { startLine: 37, endLine: 61, color: '#3b82f6', label: '削除コマンド', explanation: '削除前のテキストを保存。undo で再挿入。' },
-        { startLine: 64, endLine: 93, color: '#22c55e', label: '履歴管理', explanation: 'undo/redo スタックでコマンド履歴を管理。' },
+        { startLine: 37, endLine: 64, color: '#3b82f6', label: '削除コマンド', explanation: '削除前のテキストを保存。undo で再挿入。' },
+        { startLine: 66, endLine: 96, color: '#22c55e', label: '履歴管理', explanation: 'undo/redo スタックでコマンド履歴を管理。' },
       ],
       keyPoints: [
         '操作をオブジェクトに变え、undo/redo を実現',
@@ -1335,10 +1335,10 @@ public class JsonOrderExporter extends DataExporter<Order> {
     }
 }`,
       highlights: [
-        { startLine: 5, endLine: 17, color: '#22c55e', label: 'テンプレートメソッド', explanation: 'final で処理の流れを固定。各ステップを順に呼び出す。' },
+        { startLine: 5, endLine: 18, color: '#22c55e', label: 'テンプレートメソッド', explanation: 'final で処理の流れを固定。各ステップを順に呼び出す。' },
         { startLine: 20, endLine: 22, color: '#a855f7', label: '抽象メソッド', explanation: 'サブクラスが必ず実装する。' },
         { startLine: 25, endLine: 31, color: '#3b82f6', label: 'フックメソッド', explanation: 'デフォルト実装あり。必要な場合のみオーバーライド。' },
-        { startLine: 39, endLine: 75, color: '#f59e0b', label: 'CSV実装', explanation: 'fetch + sort + format を CSV 用に実装。' },
+        { startLine: 40, endLine: 78, color: '#f59e0b', label: 'CSV実装', explanation: 'fetch + sort + format を CSV 用に実装。' },
       ],
       keyPoints: [
         'テンプレートメソッドは final で骨格を固定',
@@ -1442,8 +1442,8 @@ public class AlertService {
       highlights: [
         { startLine: 2, endLine: 5, color: '#a855f7', label: '通知IF', explanation: '具象実装に依存しないインターフェース。' },
         { startLine: 8, endLine: 24, color: '#3b82f6', label: 'メール実装', explanation: 'SmtpClient を DI で受け取る。' },
-        { startLine: 44, endLine: 67, color: '#22c55e', label: 'DI活用サービス', explanation: 'List<NotificationSender> をコンストラクタで注入。具象を知らない。' },
-        { startLine: 70, endLine: 81, color: '#ec4899', label: 'テスト例', explanation: 'Fake/Mock を注入してユニットテスト。外部依存なし。' },
+        { startLine: 45, endLine: 70, color: '#22c55e', label: 'DI活用サービス', explanation: 'List<NotificationSender> をコンストラクタで注入。具象を知らない。' },
+        { startLine: 72, endLine: 84, color: '#ec4899', label: 'テスト例', explanation: 'Fake/Mock を注入してユニットテスト。外部依存なし。' },
       ],
       keyPoints: [
         '依存はコンストラクタで注入する',
@@ -1555,10 +1555,10 @@ public class FilteredLogger extends LoggerDecorator {
 // → フィルタOK → タイムスタンプ追加 → ファイル書込 + コンソール出力`,
       highlights: [
         { startLine: 2, endLine: 4, color: '#a855f7', label: '基本IF', explanation: '全てのLoggerが実装するインターフェース。' },
-        { startLine: 15, endLine: 22, color: '#22c55e', label: 'デコレータ基底', explanation: 'wrapped フィールドで次のLoggerを保持。' },
+        { startLine: 15, endLine: 21, color: '#22c55e', label: 'デコレータ基底', explanation: 'wrapped フィールドで次のLoggerを保持。' },
         { startLine: 24, endLine: 34, color: '#3b82f6', label: 'タイムスタンプ', explanation: 'メッセージにタイムスタンプを付与してから委譲。' },
-        { startLine: 37, endLine: 59, color: '#3b82f6', label: 'ファイル出力', explanation: 'コンソール出力に加えてファイルにも書く。' },
-        { startLine: 80, endLine: 90, color: '#ec4899', label: '組み合わせ例', explanation: 'ネストして機能を重ね掛け。実行時に柔軟に組み合わせ。' },
+        { startLine: 37, endLine: 63, color: '#3b82f6', label: 'ファイル出力', explanation: 'コンソール出力に加えてファイルにも書く。' },
+        { startLine: 82, endLine: 93, color: '#ec4899', label: '組み合わせ例', explanation: 'ネストして機能を重ね掛け。実行時に柔軟に組み合わせ。' },
       ],
       keyPoints: [
         '継承ではなく委譲で機能を動的に追加',
@@ -1647,8 +1647,8 @@ public class NotificationService {
       highlights: [
         { startLine: 2, endLine: 7, color: '#a855f7', label: 'sealed Notification', explanation: 'sealed で型を限定。ファクトリが全パターンを網羅していることを保証。' },
         { startLine: 10, endLine: 38, color: '#f59e0b', label: '具象プロダクト', explanation: 'record で不変データとして定義。send() で送信。' },
-        { startLine: 42, endLine: 56, color: '#22c55e', label: 'ファクトリ', explanation: 'switch 式で適切な Notification を生成。sealed なので網羅性が保証される。' },
-        { startLine: 59, endLine: 68, color: '#ec4899', label: '利用側', explanation: '具象 Notification を知らない。ファクトリが隠蔽。' },
+        { startLine: 41, endLine: 56, color: '#22c55e', label: 'ファクトリ', explanation: 'switch 式で適切な Notification を生成。sealed なので網羅性が保証される。' },
+        { startLine: 59, endLine: 69, color: '#ec4899', label: '利用側', explanation: '具象 Notification を知らない。ファクトリが隠蔽。' },
       ],
       keyPoints: [
         '生成ロジックをファクトリに集約',
@@ -1756,7 +1756,7 @@ public class RequestPipeline {
       highlights: [
         { startLine: 2, endLine: 4, color: '#a855f7', label: 'ハンドラIF', explanation: 'Optional<Response>: 空なら次へ、値があればチェーン中断。' },
         { startLine: 7, endLine: 26, color: '#ef4444', label: '認証ハンドラ', explanation: 'トークン検証。無効ならレスポンスを返して中断。' },
-        { startLine: 29, endLine: 43, color: '#f59e0b', label: 'レートリミット', explanation: 'IPベースのレート制限。' },
+        { startLine: 29, endLine: 44, color: '#f59e0b', label: 'レートリミット', explanation: 'IPベースのレート制限。' },
         { startLine: 57, endLine: 79, color: '#22c55e', label: 'パイプライン', explanation: 'ハンドラを順に実行。途中で中断か全通過で最終処理。' },
       ],
       keyPoints: [
@@ -1840,7 +1840,7 @@ public class UserService {
         { startLine: 9, endLine: 14, color: '#22c55e', label: 'map', explanation: '成功値を変換。失敗時はそのまま伝播。' },
         { startLine: 16, endLine: 21, color: '#22c55e', label: 'flatMap', explanation: 'ネストした Result を平坦化。チェーン可能。' },
         { startLine: 37, endLine: 43, color: '#3b82f6', label: 'of ファクトリ', explanation: '例外を自動的に Failure に変換するユーティリティ。' },
-        { startLine: 47, endLine: 59, color: '#ec4899', label: '利用例', explanation: 'map/flatMap チェーンでエラーハンドリングを宣言的に。' },
+        { startLine: 47, endLine: 62, color: '#ec4899', label: '利用例', explanation: 'map/flatMap チェーンでエラーハンドリングを宣言的に。' },
       ],
       keyPoints: [
         'sealed interface + record でResult型を実現',
@@ -1941,9 +1941,9 @@ class PricingServiceTest {
 }`,
       highlights: [
         { startLine: 2, endLine: 26, color: '#f59e0b', label: 'テスト対象', explanation: 'DI でテスト容易。依存をコンストラクタで注入。' },
-        { startLine: 32, endLine: 37, color: '#3b82f6', label: 'テストダブル', explanation: 'Fake 実装で外部依存を排除。' },
+        { startLine: 32, endLine: 36, color: '#3b82f6', label: 'テストダブル', explanation: 'Fake 実装で外部依存を排除。' },
         { startLine: 40, endLine: 52, color: '#22c55e', label: 'AAA パターン', explanation: 'Arrange（準備）→ Act（実行）→ Assert（検証）の3ステップ。' },
-        { startLine: 54, endLine: 66, color: '#22c55e', label: 'クーポン適用テスト', explanation: '境界条件のテスト。期待値を明確にコメント。' },
+        { startLine: 54, endLine: 67, color: '#22c55e', label: 'クーポン適用テスト', explanation: '境界条件のテスト。期待値を明確にコメント。' },
       ],
       keyPoints: [
         'AAA パターン: Arrange → Act → Assert',
@@ -2120,11 +2120,11 @@ public class ProductController {
     }
 }`,
       highlights: [
-        { startLine: 3, endLine: 52, color: '#f59e0b', label: 'Domain Layer', explanation: 'Value Object + Entity + Domain Exception。外部依存ゼロ。' },
-        { startLine: 61, endLine: 65, color: '#a855f7', label: 'Port (IF)', explanation: 'ドメイン層がインフラに求めるインターフェース。' },
-        { startLine: 75, endLine: 99, color: '#22c55e', label: 'Use Case', explanation: 'ビジネスルールのオーケストレーション。' },
-        { startLine: 103, endLine: 127, color: '#3b82f6', label: 'Infrastructure', explanation: 'JPA実装。ドメインオブジェクトとDBエンティティをマッピング。' },
-        { startLine: 131, endLine: 150, color: '#ec4899', label: 'Controller', explanation: 'HTTPリクエストをコマンドに変換、結果をレスポンスに。' },
+        { startLine: 3, endLine: 60, color: '#f59e0b', label: 'Domain Layer', explanation: 'Value Object + Entity + Domain Exception。外部依存ゼロ。' },
+        { startLine: 62, endLine: 67, color: '#a855f7', label: 'Port (IF)', explanation: 'ドメイン層がインフラに求めるインターフェース。' },
+        { startLine: 77, endLine: 102, color: '#22c55e', label: 'Use Case', explanation: 'ビジネスルールのオーケストレーション。' },
+        { startLine: 104, endLine: 133, color: '#3b82f6', label: 'Infrastructure', explanation: 'JPA実装。ドメインオブジェクトとDBエンティティをマッピング。' },
+        { startLine: 135, endLine: 157, color: '#ec4899', label: 'Controller', explanation: 'HTTPリクエストをコマンドに変換、結果をレスポンスに。' },
       ],
       keyPoints: [
         '依存の方向は外→内。ドメイン層は何にも依存しない',
@@ -2306,10 +2306,10 @@ public class OrderDomainService {
 }`,
       highlights: [
         { startLine: 3, endLine: 27, color: '#f59e0b', label: 'Value Objects', explanation: '不変・自己検証・等値比較。ドメインの基本構成要素。' },
-        { startLine: 31, endLine: 50, color: '#3b82f6', label: '子Entity', explanation: 'OrderItem は Order を通じてのみアクセスされる。' },
-        { startLine: 54, endLine: 115, color: '#22c55e', label: 'Aggregate Root', explanation: 'Order が整合性境界。ドメインルールとイベント発行の責務を持つ。' },
-        { startLine: 119, endLine: 128, color: '#a855f7', label: 'Domain Events', explanation: 'sealed interface + record で不変のイベントを型安全に定義。' },
-        { startLine: 132, endLine: 148, color: '#ec4899', label: 'Domain Service', explanation: '複数Aggregate をまたぐロジック。Entity に収まらない処理。' },
+        { startLine: 31, endLine: 51, color: '#3b82f6', label: '子Entity', explanation: 'OrderItem は Order を通じてのみアクセスされる。' },
+        { startLine: 55, endLine: 128, color: '#22c55e', label: 'Aggregate Root', explanation: 'Order が整合性境界。ドメインルールとイベント発行の責務を持つ。' },
+        { startLine: 130, endLine: 140, color: '#a855f7', label: 'Domain Events', explanation: 'sealed interface + record で不変のイベントを型安全に定義。' },
+        { startLine: 142, endLine: 162, color: '#ec4899', label: 'Domain Service', explanation: '複数Aggregate をまたぐロジック。Entity に収まらない処理。' },
       ],
       keyPoints: [
         'Value Object は不変・自己検証・record で表現',
@@ -2481,10 +2481,10 @@ public class AccountService {
 }`,
       highlights: [
         { startLine: 3, endLine: 18, color: '#f59e0b', label: 'Event定義', explanation: 'sealed interface + record で型安全なイベント。不変データ。' },
-        { startLine: 22, endLine: 37, color: '#22c55e', label: 'イベントリプレイ', explanation: 'fromHistory で過去のイベントを順に適用し、現在の状態を復元。' },
-        { startLine: 70, endLine: 82, color: '#a855f7', label: 'apply（状態変更）', explanation: 'switch式で各イベントを処理。状態変更はここだけ。' },
-        { startLine: 100, endLine: 116, color: '#3b82f6', label: 'Event Store', explanation: '楽観的ロック付きのイベント保存。並行書き込みを検出。' },
-        { startLine: 120, endLine: 143, color: '#ec4899', label: 'Application Service', explanation: 'イベントをロード→リプレイ→コマンド実行→イベント保存。' },
+        { startLine: 22, endLine: 38, color: '#22c55e', label: 'イベントリプレイ', explanation: 'fromHistory で過去のイベントを順に適用し、現在の状態を復元。' },
+        { startLine: 70, endLine: 83, color: '#a855f7', label: 'apply（状態変更）', explanation: 'switch式で各イベントを処理。状態変更はここだけ。' },
+        { startLine: 103, endLine: 123, color: '#3b82f6', label: 'Event Store', explanation: '楽観的ロック付きのイベント保存。並行書き込みを検出。' },
+        { startLine: 125, endLine: 153, color: '#ec4899', label: 'Application Service', explanation: 'イベントをロード→リプレイ→コマンド実行→イベント保存。' },
       ],
       keyPoints: [
         '状態を保存せず、イベントの列を保存する',
@@ -2657,7 +2657,7 @@ public class OrderProjection {
         { startLine: 12, endLine: 48, color: '#22c55e', label: 'Command Handler', explanation: '書き込み側。ドメインロジックを実行しイベント発行。' },
         { startLine: 52, endLine: 63, color: '#3b82f6', label: 'Read Model', explanation: '読み取り用に最適化された非正規化ビュー。' },
         { startLine: 66, endLine: 71, color: '#a855f7', label: 'Query IF', explanation: '読み取り専用のインターフェース。' },
-        { startLine: 113, endLine: 140, color: '#ec4899', label: 'Projection', explanation: 'イベントを受信してRead Modelを更新。' },
+        { startLine: 121, endLine: 151, color: '#ec4899', label: 'Projection', explanation: 'イベントを受信してRead Modelを更新。' },
       ],
       keyPoints: [
         'Command（書き込み）と Query（読み取り）を完全分離',
@@ -2818,9 +2818,9 @@ public class PluginRegistry {
 }`,
       highlights: [
         { startLine: 4, endLine: 10, color: '#a855f7', label: 'Plugin SPI', explanation: 'プラグインが実装すべきインターフェース。' },
-        { startLine: 20, endLine: 25, color: '#a855f7', label: 'ライフサイクル', explanation: 'load/enable/disable/unload のフック。' },
-        { startLine: 51, endLine: 85, color: '#3b82f6', label: 'Stripe実装', explanation: '具象プラグイン。設定 → 初期化 → 処理 を実装。' },
-        { startLine: 89, endLine: 128, color: '#22c55e', label: 'Plugin Registry', explanation: 'ServiceLoader でプラグインを自動検出。設定注入 → ライフサイクル管理。' },
+        { startLine: 18, endLine: 24, color: '#a855f7', label: 'ライフサイクル', explanation: 'load/enable/disable/unload のフック。' },
+        { startLine: 50, endLine: 84, color: '#3b82f6', label: 'Stripe実装', explanation: '具象プラグイン。設定 → 初期化 → 処理 を実装。' },
+        { startLine: 86, endLine: 141, color: '#22c55e', label: 'Plugin Registry', explanation: 'ServiceLoader でプラグインを自動検出。設定注入 → ライフサイクル管理。' },
       ],
       keyPoints: [
         'SPI + ServiceLoader で実行時にプラグインを自動検出',
@@ -2975,11 +2975,11 @@ public class ImageService {
     }
 }`,
       highlights: [
-        { startLine: 6, endLine: 12, color: '#a855f7', label: 'Stage IF', explanation: '@FunctionalInterface で andThen 合成をサポート。' },
-        { startLine: 15, endLine: 33, color: '#22c55e', label: 'Pipeline Core', explanation: 'start → pipe → execute のフルーエントAPI。型安全なチェーン。' },
-        { startLine: 37, endLine: 55, color: '#f59e0b', label: 'ImageData (不変)', explanation: 'with系メソッドで新インスタンスを返す不変データ。' },
-        { startLine: 58, endLine: 82, color: '#3b82f6', label: 'リサイズStage', explanation: '具象ステージ。入力を受けて変換して返す。' },
-        { startLine: 115, endLine: 131, color: '#ec4899', label: '組み立て', explanation: '用途ごとに異なるパイプラインを簡潔に構築。' },
+        { startLine: 6, endLine: 13, color: '#a855f7', label: 'Stage IF', explanation: '@FunctionalInterface で andThen 合成をサポート。' },
+        { startLine: 15, endLine: 34, color: '#22c55e', label: 'Pipeline Core', explanation: 'start → pipe → execute のフルーエントAPI。型安全なチェーン。' },
+        { startLine: 38, endLine: 56, color: '#f59e0b', label: 'ImageData (不変)', explanation: 'with系メソッドで新インスタンスを返す不変データ。' },
+        { startLine: 58, endLine: 83, color: '#3b82f6', label: 'リサイズStage', explanation: '具象ステージ。入力を受けて変換して返す。' },
+        { startLine: 117, endLine: 136, color: '#ec4899', label: '組み立て', explanation: '用途ごとに異なるパイプラインを簡潔に構築。' },
       ],
       keyPoints: [
         'Stage の合成で処理パイプラインを構築',
@@ -3143,10 +3143,10 @@ public class CircuitOpenException extends RuntimeException {
 // }`,
       highlights: [
         { startLine: 8, endLine: 12, color: '#f59e0b', label: '3つの状態', explanation: 'CLOSED（正常）→ OPEN（遮断）→ HALF_OPEN（試行）の状態遷移。' },
-        { startLine: 48, endLine: 62, color: '#22c55e', label: 'execute', explanation: '実行可否を判定し、成功/失敗に応じて状態遷移。' },
+        { startLine: 46, endLine: 62, color: '#22c55e', label: 'execute', explanation: '実行可否を判定し、成功/失敗に応じて状態遷移。' },
         { startLine: 64, endLine: 78, color: '#3b82f6', label: '実行可否判定', explanation: 'CAS操作で安全に OPEN → HALF_OPEN に遷移。' },
-        { startLine: 90, endLine: 99, color: '#ef4444', label: '失敗処理', explanation: '閾値超えで OPEN に。HALF_OPEN 中の失敗で即 OPEN に戻る。' },
-        { startLine: 118, endLine: 124, color: '#a855f7', label: 'CircuitOpenException', explanation: 'retryAfter 情報付きの例外。呼び出し側がフォールバック可能。' },
+        { startLine: 91, endLine: 101, color: '#ef4444', label: '失敗処理', explanation: '閾値超えで OPEN に。HALF_OPEN 中の失敗で即 OPEN に戻る。' },
+        { startLine: 125, endLine: 136, color: '#a855f7', label: 'CircuitOpenException', explanation: 'retryAfter 情報付きの例外。呼び出し側がフォールバック可能。' },
       ],
       keyPoints: [
         'CLOSED → OPEN → HALF_OPEN の3状態で障害を管理',
@@ -3377,11 +3377,11 @@ public class StripePaymentAdapter implements PaymentGateway {
     }
 }`,
       highlights: [
-        { startLine: 3, endLine: 51, color: '#f59e0b', label: 'Domain Core', explanation: 'ビジネスルールの中心。一切の外部依存なし。' },
-        { startLine: 55, endLine: 81, color: '#a855f7', label: 'Ports (入出力)', explanation: 'Inbound = 外部→ドメイン、Outbound = ドメイン→外部のインターフェース。' },
-        { startLine: 85, endLine: 147, color: '#22c55e', label: 'Application Service', explanation: 'Inbound Port を実装。ドメインとPort を組み合わせてユースケースを実現。' },
-        { startLine: 151, endLine: 164, color: '#ec4899', label: 'Inbound Adapter', explanation: 'REST Controller。HTTPをドメイン操作に変換。' },
-        { startLine: 167, endLine: 195, color: '#3b82f6', label: 'Outbound Adapter', explanation: 'DB・決済API等の外部技術をドメインのPortに適合。' },
+        { startLine: 3, endLine: 52, color: '#f59e0b', label: 'Domain Core', explanation: 'ビジネスルールの中心。一切の外部依存なし。' },
+        { startLine: 54, endLine: 82, color: '#a855f7', label: 'Ports (入出力)', explanation: 'Inbound = 外部→ドメイン、Outbound = ドメイン→外部のインターフェース。' },
+        { startLine: 84, endLine: 155, color: '#22c55e', label: 'Application Service', explanation: 'Inbound Port を実装。ドメインとPort を組み合わせてユースケースを実現。' },
+        { startLine: 159, endLine: 171, color: '#ec4899', label: 'Inbound Adapter', explanation: 'REST Controller。HTTPをドメイン操作に変換。' },
+        { startLine: 173, endLine: 212, color: '#3b82f6', label: 'Outbound Adapter', explanation: 'DB・決済API等の外部技術をドメインのPortに適合。' },
       ],
       keyPoints: [
         'ドメインが Port（IF）を定義し、Adapter が実装',
@@ -3577,10 +3577,10 @@ public class OrderSagaRunner {
 }`,
       highlights: [
         { startLine: 5, endLine: 9, color: '#a855f7', label: 'SagaStep IF', explanation: 'execute（正常処理）と compensate（補償処理）のペア。' },
-        { startLine: 13, endLine: 52, color: '#22c55e', label: 'Orchestrator', explanation: 'ステップを順に実行。失敗時は完了済みを逆順に補償。' },
-        { startLine: 71, endLine: 93, color: '#3b82f6', label: '在庫確保Step', explanation: 'execute: 在庫確保、compensate: 在庫解放。' },
-        { startLine: 96, endLine: 113, color: '#3b82f6', label: '決済Step', explanation: 'execute: 課金、compensate: 返金。' },
-        { startLine: 155, endLine: 164, color: '#ec4899', label: 'Saga 実行', explanation: '4ステップを連鎖。どこで失敗しても自動補償。' },
+        { startLine: 13, endLine: 53, color: '#22c55e', label: 'Orchestrator', explanation: 'ステップを順に実行。失敗時は完了済みを逆順に補償。' },
+        { startLine: 73, endLine: 96, color: '#3b82f6', label: '在庫確保Step', explanation: 'execute: 在庫確保、compensate: 在庫解放。' },
+        { startLine: 98, endLine: 119, color: '#3b82f6', label: '決済Step', explanation: 'execute: 課金、compensate: 返金。' },
+        { startLine: 165, endLine: 177, color: '#ec4899', label: 'Saga 実行', explanation: '4ステップを連鎖。どこで失敗しても自動補償。' },
       ],
       keyPoints: [
         '各ステップに execute（正常処理）と compensate（補償処理）を定義',
@@ -3745,8 +3745,8 @@ public class OrderStateMachine {
       highlights: [
         { startLine: 6, endLine: 12, color: '#f59e0b', label: 'StateMachine 本体', explanation: 'ジェネリクスで状態とイベントの型を型パラメータに。' },
         { startLine: 28, endLine: 39, color: '#22c55e', label: '遷移定義', explanation: 'permit/permitIf でフルーエントに遷移ルールを定義。' },
-        { startLine: 57, endLine: 83, color: '#a855f7', label: 'fire (遷移実行)', explanation: '遷移可否チェック → exit → 状態更新 → entry → 通知。' },
-        { startLine: 106, endLine: 134, color: '#ec4899', label: '注文SM定義', explanation: '注文の状態フローを宣言的に定義。アクションとリスナー付き。' },
+        { startLine: 57, endLine: 86, color: '#a855f7', label: 'fire (遷移実行)', explanation: '遷移可否チェック → exit → 状態更新 → entry → 通知。' },
+        { startLine: 104, endLine: 137, color: '#ec4899', label: '注文SM定義', explanation: '注文の状態フローを宣言的に定義。アクションとリスナー付き。' },
       ],
       keyPoints: [
         'permit で許可された遷移のみ実行可能',
@@ -3923,11 +3923,11 @@ public class Application {
 // 本番: new Application(new ProductionFactory(prodConfig)).start();
 // テスト: new Application(new TestFactory()).start();`,
       highlights: [
-        { startLine: 3, endLine: 20, color: '#a855f7', label: '抽象プロダクト群', explanation: 'DB・Cache・MQ のインターフェース。実装技術に依存しない。' },
-        { startLine: 24, endLine: 29, color: '#22c55e', label: '抽象ファクトリーIF', explanation: '関連するオブジェクト群の生成を一括定義。' },
-        { startLine: 33, endLine: 56, color: '#3b82f6', label: '本番ファクトリー', explanation: 'Postgres + Redis + Kafka の本番構成。' },
-        { startLine: 60, endLine: 77, color: '#f59e0b', label: 'テストファクトリー', explanation: 'すべてインメモリ。外部依存ゼロでテスト可能。' },
-        { startLine: 127, endLine: 148, color: '#ec4899', label: 'DI で注入', explanation: 'Application はファクトリーIF に依存。環境ごとに差し替え。' },
+        { startLine: 3, endLine: 18, color: '#a855f7', label: '抽象プロダクト群', explanation: 'DB・Cache・MQ のインターフェース。実装技術に依存しない。' },
+        { startLine: 22, endLine: 27, color: '#22c55e', label: '抽象ファクトリーIF', explanation: '関連するオブジェクト群の生成を一括定義。' },
+        { startLine: 31, endLine: 57, color: '#3b82f6', label: '本番ファクトリー', explanation: 'Postgres + Redis + Kafka の本番構成。' },
+        { startLine: 61, endLine: 79, color: '#f59e0b', label: 'テストファクトリー', explanation: 'すべてインメモリ。外部依存ゼロでテスト可能。' },
+        { startLine: 128, endLine: 154, color: '#ec4899', label: 'DI で注入', explanation: 'Application はファクトリーIF に依存。環境ごとに差し替え。' },
       ],
       keyPoints: [
         '関連するオブジェクト群を一貫して生成',

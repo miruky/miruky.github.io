@@ -46,9 +46,9 @@ function getFeatureFlag(key: keyof typeof config.features): boolean {
 const isDarkMode = getFeatureFlag('darkMode');    // OK
 // getFeatureFlag('unknown');  // コンパイルエラー`,
       highlights: [
-        { startLine: 6, endLine: 11, color: '#f59e0b', label: '型定義', explanation: 'AppConfig interfaceで設定の構造を明確に定義' },
-        { startLine: 13, endLine: 22, color: '#22c55e', label: 'as const satisfies', explanation: 'as constでリテラル型推論、satisfiesで型チェックを両立' },
-        { startLine: 28, endLine: 30, color: '#3b82f6', label: '型安全なアクセサ', explanation: 'keyofで存在するキーのみ受け付ける関数' },
+        { startLine: 5, endLine: 10, color: '#f59e0b', label: '型定義', explanation: 'AppConfig interfaceで設定の構造を明確に定義' },
+        { startLine: 12, endLine: 21, color: '#22c55e', label: 'as const satisfies', explanation: 'as constでリテラル型推論、satisfiesで型チェックを両立' },
+        { startLine: 27, endLine: 29, color: '#3b82f6', label: '型安全なアクセサ', explanation: 'keyofで存在するキーのみ受け付ける関数' },
       ],
       keyPoints: [
         'as constでオブジェクトをリテラル型として凍結できる',
@@ -115,9 +115,9 @@ const state: AsyncState<string[]> = {
 console.log(renderState(state));`,
       highlights: [
         { startLine: 4, endLine: 20, color: '#f59e0b', label: '状態型定義', explanation: 'typeプロパティをタグとして各状態を定義' },
-        { startLine: 22, endLine: 22, color: '#a855f7', label: 'ユニオン型', explanation: '3つの状態を1つの型に統合' },
-        { startLine: 25, endLine: 27, color: '#ef4444', label: '網羅性チェック', explanation: 'never型で全ケース処理を強制' },
-        { startLine: 29, endLine: 41, color: '#22c55e', label: '型の絞り込み', explanation: 'switch文で各分岐内の型が自動推論される' },
+        { startLine: 20, endLine: 20, color: '#a855f7', label: 'ユニオン型', explanation: '3つの状態を1つの型に統合' },
+        { startLine: 23, endLine: 25, color: '#ef4444', label: '網羅性チェック', explanation: 'never型で全ケース処理を強制' },
+        { startLine: 27, endLine: 39, color: '#22c55e', label: '型の絞り込み', explanation: 'switch文で各分岐内の型が自動推論される' },
       ],
       keyPoints: [
         'type プロパティをタグとして型を判別する',
@@ -188,7 +188,7 @@ const name = getProperty(users[0], 'name');
         { startLine: 5, endLine: 7, color: '#22c55e', label: 'keyof制約', explanation: 'K extends keyof Tでオブジェクトに存在するキーのみ指定可能' },
         { startLine: 10, endLine: 20, color: '#3b82f6', label: 'groupBy', explanation: 'ジェネリクスで入力型を保持したグルーピング' },
         { startLine: 23, endLine: 25, color: '#22c55e', label: '型ガード', explanation: 'item is T というユーザー定義型ガードでnullを除外' },
-        { startLine: 28, endLine: 31, color: '#a855f7', label: 'オーバーロード', explanation: '関数オーバーロードで型安全なパイプラインを実現' },
+        { startLine: 28, endLine: 32, color: '#a855f7', label: 'オーバーロード', explanation: '関数オーバーロードで型安全なパイプラインを実現' },
       ],
       keyPoints: [
         'extends keyof で型パラメータに制約を付ける',
@@ -321,8 +321,8 @@ type UserGetters = Getters<User>;`,
       highlights: [
         { startLine: 13, endLine: 15, color: '#3b82f6', label: 'マップ型', explanation: '[K in keyof T]で型のプロパティを変換' },
         { startLine: 18, endLine: 18, color: '#22c55e', label: '交差型ユーティリティ', explanation: 'Required + Pickの組合せで部分必須型を作る' },
-        { startLine: 23, endLine: 28, color: '#a855f7', label: 'テンプレートリテラル型', explanation: 'as句とCapitalizeでプロパティ名を動的生成' },
-        { startLine: 39, endLine: 41, color: '#22c55e', label: 'Getter型生成', explanation: '同じパターンでGetter関数の型を自動導出' },
+        { startLine: 23, endLine: 27, color: '#a855f7', label: 'テンプレートリテラル型', explanation: 'as句とCapitalizeでプロパティ名を動的生成' },
+        { startLine: 38, endLine: 40, color: '#22c55e', label: 'Getter型生成', explanation: '同じパターンでGetter関数の型を自動導出' },
       ],
       keyPoints: [
         'マップ型 [K in keyof T] で型を変換できる',
@@ -464,7 +464,7 @@ getOrder(orderId); // OK
         { startLine: 5, endLine: 6, color: '#a855f7', label: 'ブランド型定義', explanation: 'unique symbolで他と区別可能な型タグを付与' },
         { startLine: 9, endLine: 11, color: '#f59e0b', label: '型エイリアス', explanation: '同じstringでも意味の異なるID型を作る' },
         { startLine: 14, endLine: 19, color: '#22c55e', label: 'ファクトリ関数', explanation: 'バリデーション付きでブランド型を安全に生成' },
-        { startLine: 30, endLine: 35, color: '#3b82f6', label: '型安全な使用', explanation: '異なるID型の混同をコンパイル時に防止' },
+        { startLine: 29, endLine: 35, color: '#3b82f6', label: '型安全な使用', explanation: '異なるID型の混同をコンパイル時に防止' },
       ],
       keyPoints: [
         'ブランド型で同じプリミティブ型を区別する',
@@ -555,8 +555,8 @@ console.log(email);`,
       highlights: [
         { startLine: 4, endLine: 11, color: '#f59e0b', label: 'データ型', explanation: '最終成果物の型を明確に定義' },
         { startLine: 21, endLine: 24, color: '#22c55e', label: 'Fluent Method', explanation: 'thisを返すことでメソッドチェーンを実現' },
-        { startLine: 53, endLine: 58, color: '#ef4444', label: 'バリデーション', explanation: 'build時に必須プロパティの検証を行う' },
-        { startLine: 62, endLine: 68, color: '#ec4899', label: '使用例', explanation: 'チェーンで宣言的にメールを構築' },
+        { startLine: 55, endLine: 60, color: '#ef4444', label: 'バリデーション', explanation: 'build時に必須プロパティの検証を行う' },
+        { startLine: 63, endLine: 70, color: '#ec4899', label: '使用例', explanation: 'チェーンで宣言的にメールを構築' },
       ],
       keyPoints: [
         'thisを返してメソッドチェーンを実現する',
@@ -637,7 +637,7 @@ function interact(animal: Animal): string {
         { startLine: 4, endLine: 22, color: '#f59e0b', label: '型定義', explanation: 'kindプロパティで区別可能なAnimal型階層' },
         { startLine: 25, endLine: 31, color: '#22c55e', label: '型ガード関数', explanation: 'animal is Typeで戻り値に型情報を付与' },
         { startLine: 34, endLine: 36, color: '#a855f7', label: '複合型ガード', explanation: '複数の型にマッチする型ガードも定義可能' },
-        { startLine: 39, endLine: 45, color: '#ef4444', label: 'unknown型ガード', explanation: '未知の値を安全にAnimal型に絞り込む' },
+        { startLine: 39, endLine: 46, color: '#ef4444', label: 'unknown型ガード', explanation: '未知の値を安全にAnimal型に絞り込む' },
       ],
       keyPoints: [
         'is キーワードで型ガードの戻り値型を宣言する',
@@ -711,7 +711,7 @@ const updated = updatePort(config, 3000);  // OK: 新しいオブジェクト`,
       highlights: [
         { startLine: 5, endLine: 9, color: '#a855f7', label: 'DeepReadonly型', explanation: '再帰的に全プロパティをreadonlyにする条件型' },
         { startLine: 24, endLine: 25, color: '#ef4444', label: '浅いReadonly', explanation: '組み込みReadonlyは1段階しか保護しない' },
-        { startLine: 31, endLine: 41, color: '#22c55e', label: '不変更新パターン', explanation: 'スプレッド演算子で新しいオブジェクトを生成して返す' },
+        { startLine: 31, endLine: 42, color: '#22c55e', label: '不変更新パターン', explanation: 'スプレッド演算子で新しいオブジェクトを生成して返す' },
       ],
       keyPoints: [
         '組み込みReadonlyは浅い（1段階）ことに注意',
@@ -780,8 +780,8 @@ console.log(\`Total logs: \${logs.length}\`);`,
       highlights: [
         { startLine: 4, endLine: 10, color: '#a855f7', label: '公開インターフェース', explanation: '外部に公開するAPIの型を明確に定義' },
         { startLine: 20, endLine: 21, color: '#f59e0b', label: 'プライベート状態', explanation: 'クロージャ内でのみアクセス可能な変数' },
-        { startLine: 23, endLine: 32, color: '#3b82f6', label: '内部関数', explanation: '共通ロジックをプライベート関数に集約' },
-        { startLine: 35, endLine: 41, color: '#22c55e', label: '公開API', explanation: '安全な操作のみ外部に公開する' },
+        { startLine: 22, endLine: 31, color: '#3b82f6', label: '内部関数', explanation: '共通ロジックをプライベート関数に集約' },
+        { startLine: 34, endLine: 41, color: '#22c55e', label: '公開API', explanation: '安全な操作のみ外部に公開する' },
       ],
       keyPoints: [
         'クロージャで内部状態をカプセル化する',
@@ -881,7 +881,7 @@ console.log(sorter.getHistory());`,
         { startLine: 4, endLine: 7, color: '#a855f7', label: 'Strategy Interface', explanation: '全戦略が実装すべき共通インターフェース' },
         { startLine: 10, endLine: 23, color: '#3b82f6', label: 'BubbleSort戦略', explanation: '具体的なソートアルゴリズム実装' },
         { startLine: 26, endLine: 36, color: '#3b82f6', label: 'QuickSort戦略', explanation: '別のアルゴリズムを同じインターフェースで実装' },
-        { startLine: 39, endLine: 63, color: '#22c55e', label: 'コンテキスト', explanation: '戦略を保持し実行するクラス。戦略の切替が可能' },
+        { startLine: 39, endLine: 66, color: '#22c55e', label: 'コンテキスト', explanation: '戦略を保持し実行するクラス。戦略の切替が可能' },
       ],
       keyPoints: [
         '共通インターフェースでアルゴリズムを抽象化する',
@@ -1087,8 +1087,8 @@ const service = new UserService(repo);`,
       highlights: [
         { startLine: 4, endLine: 14, color: '#f59e0b', label: 'エンティティ型', explanation: '共通のEntity基底型とUserエンティティ' },
         { startLine: 17, endLine: 23, color: '#a855f7', label: 'Repository Interface', explanation: 'CRUD操作の共通インターフェース' },
-        { startLine: 26, endLine: 66, color: '#3b82f6', label: 'インメモリ実装', explanation: 'テスト用のMapベース実装' },
-        { startLine: 69, endLine: 82, color: '#22c55e', label: 'ビジネスロジック', explanation: '具体的な実装に依存しないサービス層' },
+        { startLine: 26, endLine: 69, color: '#3b82f6', label: 'インメモリ実装', explanation: 'テスト用のMapベース実装' },
+        { startLine: 72, endLine: 85, color: '#22c55e', label: 'ビジネスロジック', explanation: '具体的な実装に依存しないサービス層' },
       ],
       keyPoints: [
         'Repository Interface でデータアクセスの契約を定義',
@@ -1192,9 +1192,9 @@ container.register<IUserService>(TOKENS.UserService, (c) =>
 const service = container.resolve<IUserService>(TOKENS.UserService);
 service.getUser('1').then(console.log);`,
       highlights: [
-        { startLine: 4, endLine: 8, color: '#f59e0b', label: 'トークン定義', explanation: 'Symbolでサービスを一意に識別するキーを定義' },
+        { startLine: 4, endLine: 9, color: '#f59e0b', label: 'トークン定義', explanation: 'Symbolでサービスを一意に識別するキーを定義' },
         { startLine: 28, endLine: 50, color: '#22c55e', label: 'DIコンテナ', explanation: 'ファクトリ関数の登録と依存解決を行うコンテナ' },
-        { startLine: 62, endLine: 74, color: '#3b82f6', label: 'サービス実装', explanation: 'コンストラクタでインターフェースを受け取る' },
+        { startLine: 63, endLine: 74, color: '#3b82f6', label: 'サービス実装', explanation: 'コンストラクタでインターフェースを受け取る' },
         { startLine: 77, endLine: 82, color: '#ec4899', label: 'コンテナ構成', explanation: '依存関係のワイヤリングを1箇所に集約' },
       ],
       keyPoints: [
@@ -1301,9 +1301,9 @@ order.ship('warehouse_1');
 order.deliver('courier_1');
 console.log(order.getHistory());`,
       highlights: [
-        { startLine: 7, endLine: 15, color: '#f59e0b', label: '遷移マップ型', explanation: '各状態から遷移可能な状態をマップ型で定義' },
-        { startLine: 31, endLine: 40, color: '#22c55e', label: 'transition メソッド', explanation: '型制約で不正な遷移をコンパイル時にブロック' },
-        { startLine: 42, endLine: 77, color: '#3b82f6', label: '具体的遷移メソッド', explanation: '各ビジネスアクションに対応する遷移操作' },
+        { startLine: 7, endLine: 14, color: '#f59e0b', label: '遷移マップ型', explanation: '各状態から遷移可能な状態をマップ型で定義' },
+        { startLine: 30, endLine: 40, color: '#22c55e', label: 'transition メソッド', explanation: '型制約で不正な遷移をコンパイル時にブロック' },
+        { startLine: 42, endLine: 76, color: '#3b82f6', label: '具体的遷移メソッド', explanation: '各ビジネスアクションに対応する遷移操作' },
       ],
       keyPoints: [
         'TransitionMapで許可される状態遷移を型として定義',
@@ -1415,7 +1415,7 @@ console.log(doc.getContent());  // "Hello World"`,
         { startLine: 4, endLine: 8, color: '#a855f7', label: 'Command Interface', explanation: 'execute/undo/describeの3つの操作を定義' },
         { startLine: 25, endLine: 34, color: '#3b82f6', label: 'InsertCommand', explanation: '挿入操作をカプセル化。undoで逆操作を実行' },
         { startLine: 37, endLine: 47, color: '#3b82f6', label: 'DeleteCommand', explanation: '削除したテキストを保持しundoで復元' },
-        { startLine: 50, endLine: 73, color: '#22c55e', label: 'CommandManager', explanation: 'スタック2本でundo/redo履歴を管理' },
+        { startLine: 50, endLine: 77, color: '#22c55e', label: 'CommandManager', explanation: 'スタック2本でundo/redo履歴を管理' },
       ],
       keyPoints: [
         'Commandインターフェースでexecute/undoを対にする',
@@ -1518,9 +1518,9 @@ const ctx: Context = {
 app.execute(ctx).then(() => console.log(ctx.response));`,
       highlights: [
         { startLine: 4, endLine: 17, color: '#f59e0b', label: 'Context型', explanation: 'リクエスト/レスポンス/状態を保持するコンテキスト' },
-        { startLine: 23, endLine: 38, color: '#22c55e', label: 'Pipeline', explanation: '再帰的dispatchでミドルウェアを順次実行' },
-        { startLine: 41, endLine: 68, color: '#3b82f6', label: 'ミドルウェア群', explanation: 'logger/auth/errorHandler/handler の各レイヤー' },
-        { startLine: 73, endLine: 73, color: '#ec4899', label: 'チェーン構築', explanation: 'use()のメソッドチェーンでパイプライン組立' },
+        { startLine: 22, endLine: 39, color: '#22c55e', label: 'Pipeline', explanation: '再帰的dispatchでミドルウェアを順次実行' },
+        { startLine: 41, endLine: 73, color: '#3b82f6', label: 'ミドルウェア群', explanation: 'logger/auth/errorHandler/handler の各レイヤー' },
+        { startLine: 77, endLine: 77, color: '#ec4899', label: 'チェーン構築', explanation: 'use()のメソッドチェーンでパイプライン組立' },
       ],
       keyPoints: [
         'ミドルウェアは (ctx, next) => Promise<void> のシグネチャ',
@@ -1624,9 +1624,9 @@ const client: HttpClient = new CachingHttpClient(
       highlights: [
         { startLine: 4, endLine: 6, color: '#a855f7', label: 'HttpClient Interface', explanation: '全デコレータが実装する共通インターフェース' },
         { startLine: 16, endLine: 26, color: '#3b82f6', label: 'Loggingデコレータ', explanation: 'リクエストの前後にログを追加' },
-        { startLine: 29, endLine: 48, color: '#ef4444', label: 'Retryデコレータ', explanation: '失敗時に指数バックオフでリトライ' },
-        { startLine: 51, endLine: 67, color: '#22c55e', label: 'Cacheデコレータ', explanation: 'GETリクエストの結果をTTL付きでキャッシュ' },
-        { startLine: 70, endLine: 79, color: '#ec4899', label: 'デコレータ合成', explanation: 'ネストにより処理レイヤーを積み重ねる' },
+        { startLine: 29, endLine: 50, color: '#ef4444', label: 'Retryデコレータ', explanation: '失敗時に指数バックオフでリトライ' },
+        { startLine: 53, endLine: 72, color: '#22c55e', label: 'Cacheデコレータ', explanation: 'GETリクエストの結果をTTL付きでキャッシュ' },
+        { startLine: 74, endLine: 83, color: '#ec4899', label: 'デコレータ合成', explanation: 'ネストにより処理レイヤーを積み重ねる' },
       ],
       keyPoints: [
         '全デコレータが同じHttpClientインターフェースを実装する',
@@ -1727,9 +1727,9 @@ bus.publish('user.created', { userId: 'u1', email: 'alice@example.com' });
 bus.publish('order.placed', { orderId: 'o1', userId: 'u1', total: 99.99 });`,
       highlights: [
         { startLine: 3, endLine: 9, color: '#f59e0b', label: 'メッセージ型マップ', explanation: 'トピック名とペイロード型の対応を定義' },
-        { startLine: 24, endLine: 48, color: '#22c55e', label: 'MessageBus', explanation: '型安全なpublish/subscribeメカニズム' },
-        { startLine: 51, endLine: 63, color: '#3b82f6', label: 'EmailNotifier', explanation: 'メッセージを受けてメール送信を行うサブスクライバー' },
-        { startLine: 65, endLine: 74, color: '#3b82f6', label: 'AnalyticsTracker', explanation: '同じイベントの別ハンドラー' },
+        { startLine: 22, endLine: 48, color: '#22c55e', label: 'MessageBus', explanation: '型安全なpublish/subscribeメカニズム' },
+        { startLine: 51, endLine: 64, color: '#3b82f6', label: 'EmailNotifier', explanation: 'メッセージを受けてメール送信を行うサブスクライバー' },
+        { startLine: 66, endLine: 75, color: '#3b82f6', label: 'AnalyticsTracker', explanation: '同じイベントの別ハンドラー' },
       ],
       keyPoints: [
         'MessageTypesでトピックとペイロード型を紐付ける',
@@ -1819,7 +1819,7 @@ console.log(getUserCity({ id: '2' })); // "Unknown"`,
         { startLine: 4, endLine: 5, color: '#a855f7', label: 'Option型', explanation: 'null許容値をラップするコンテナ型' },
         { startLine: 27, endLine: 33, color: '#22c55e', label: 'map/flatMap', explanation: '値が存在する場合のみ変換を適用するチェーン操作' },
         { startLine: 49, endLine: 51, color: '#3b82f6', label: 'matchメソッド', explanation: 'some/noneの両ケースを明示的にハンドリング' },
-        { startLine: 59, endLine: 64, color: '#ec4899', label: 'チェーン使用例', explanation: 'ネストしたnullチェックをフラットなチェーンに変換' },
+        { startLine: 59, endLine: 65, color: '#ec4899', label: 'チェーン使用例', explanation: 'ネストしたnullチェックをフラットなチェーンに変換' },
       ],
       keyPoints: [
         'Option型でnull/undefinedを安全にラップする',
@@ -1919,9 +1919,9 @@ const api: UserApi = new CacheProxy(
 );`,
       highlights: [
         { startLine: 4, endLine: 8, color: '#a855f7', label: 'UserApi Interface', explanation: '本体とプロキシが共有するインターフェース' },
-        { startLine: 26, endLine: 47, color: '#ef4444', label: '認証プロキシ', explanation: '権限チェックを透過的に追加するプロキシ' },
-        { startLine: 50, endLine: 74, color: '#22c55e', label: 'キャッシュプロキシ', explanation: 'TTL付きキャッシュで読み取り性能を改善' },
-        { startLine: 77, endLine: 79, color: '#ec4899', label: 'プロキシ合成', explanation: '複数のプロキシを重ねて多層防御を実現' },
+        { startLine: 24, endLine: 48, color: '#ef4444', label: '認証プロキシ', explanation: '権限チェックを透過的に追加するプロキシ' },
+        { startLine: 50, endLine: 77, color: '#22c55e', label: 'キャッシュプロキシ', explanation: 'TTL付きキャッシュで読み取り性能を改善' },
+        { startLine: 79, endLine: 82, color: '#ec4899', label: 'プロキシ合成', explanation: '複数のプロキシを重ねて多層防御を実現' },
       ],
       keyPoints: [
         'プロキシは本体と同じインターフェースを実装する',
@@ -2136,10 +2136,10 @@ placeOrder.execute({
 }).then(result => console.log('Order placed:', result));`,
       highlights: [
         { startLine: 7, endLine: 27, color: '#f59e0b', label: 'Value Object', explanation: 'Moneyは不変で等価性で比較。ビジネスルールを内包' },
-        { startLine: 30, endLine: 72, color: '#22c55e', label: 'Entity', explanation: 'OrderはIDで識別。状態遷移のルールを自己保持' },
-        { startLine: 75, endLine: 84, color: '#a855f7', label: 'Port（インターフェース）', explanation: 'ドメイン層が定義するインターフェース' },
-        { startLine: 103, endLine: 140, color: '#3b82f6', label: 'Use Case', explanation: 'ビジネスフローをオーケストレーション' },
-        { startLine: 144, endLine: 166, color: '#ec4899', label: 'Infrastructure', explanation: 'Port実装。交換可能な外部アダプター' },
+        { startLine: 30, endLine: 74, color: '#22c55e', label: 'Entity', explanation: 'OrderはIDで識別。状態遷移のルールを自己保持' },
+        { startLine: 76, endLine: 89, color: '#a855f7', label: 'Port（インターフェース）', explanation: 'ドメイン層が定義するインターフェース' },
+        { startLine: 103, endLine: 147, color: '#3b82f6', label: 'Use Case', explanation: 'ビジネスフローをオーケストレーション' },
+        { startLine: 149, endLine: 179, color: '#ec4899', label: 'Infrastructure', explanation: 'Port実装。交換可能な外部アダプター' },
       ],
       keyPoints: [
         '依存方向は外側→内側（インフラ→ドメイン）',
@@ -2333,9 +2333,9 @@ class CustomerService {
 }`,
       highlights: [
         { startLine: 4, endLine: 42, color: '#f59e0b', label: 'Value Objects', explanation: 'Email/PhoneNumber/Addressは不変で自己検証する値オブジェクト' },
-        { startLine: 45, endLine: 76, color: '#3b82f6', label: 'Domain Events', explanation: 'ドメインの重要な出来事をイベントとして表現' },
-        { startLine: 81, endLine: 131, color: '#22c55e', label: 'Aggregate Root', explanation: 'Customerが整合性境界を管理しイベントを発行' },
-        { startLine: 140, endLine: 163, color: '#a855f7', label: 'Application Service', explanation: 'ユースケースのオーケストレーションとイベント発行' },
+        { startLine: 44, endLine: 77, color: '#3b82f6', label: 'Domain Events', explanation: 'ドメインの重要な出来事をイベントとして表現' },
+        { startLine: 79, endLine: 138, color: '#22c55e', label: 'Aggregate Root', explanation: 'Customerが整合性境界を管理しイベントを発行' },
+        { startLine: 146, endLine: 174, color: '#a855f7', label: 'Application Service', explanation: 'ユースケースのオーケストレーションとイベント発行' },
       ],
       keyPoints: [
         'Value Objectは不変・自己検証・等価性で比較する',
@@ -2548,9 +2548,9 @@ console.log(\`Balance: \${restored.balance}\`);  // 12000
 console.log(\`Version: \${restored.version}\`);   // 3`,
       highlights: [
         { startLine: 5, endLine: 36, color: '#f59e0b', label: 'イベント定義', explanation: '口座の全状態変更をイベント型で表現' },
-        { startLine: 40, endLine: 55, color: '#a855f7', label: '状態モデル', explanation: 'イベントから導出される現在の口座状態' },
-        { startLine: 57, endLine: 151, color: '#22c55e', label: 'Aggregate', explanation: 'イベントの生成・適用とビジネスルール検証' },
-        { startLine: 154, endLine: 169, color: '#3b82f6', label: 'Event Store', explanation: '楽観的並行制御付きのイベント永続化' },
+        { startLine: 38, endLine: 44, color: '#a855f7', label: '状態モデル', explanation: 'イベントから導出される現在の口座状態' },
+        { startLine: 46, endLine: 162, color: '#22c55e', label: 'Aggregate', explanation: 'イベントの生成・適用とビジネスルール検証' },
+        { startLine: 164, endLine: 179, color: '#3b82f6', label: 'Event Store', explanation: '楽観的並行制御付きのイベント永続化' },
       ],
       keyPoints: [
         '状態はイベントの履歴から常に再構築可能（真のソースはイベント）',
@@ -2780,9 +2780,9 @@ main();`,
       highlights: [
         { startLine: 6, endLine: 27, color: '#f59e0b', label: 'Command定義', explanation: 'Create/Complete/Assignの3つの変更操作' },
         { startLine: 30, endLine: 58, color: '#22c55e', label: 'Write Model', explanation: 'ビジネスルールを持つTodoエンティティ' },
-        { startLine: 61, endLine: 96, color: '#3b82f6', label: 'Command Handler', explanation: 'コマンドを受けてWrite Modelを操作しProjectorに通知' },
-        { startLine: 100, endLine: 147, color: '#a855f7', label: 'Read Model', explanation: 'クエリに最適化されたビューモデル' },
-        { startLine: 150, endLine: 170, color: '#ec4899', label: 'Projector', explanation: 'Write側の変更をRead側のモデルに同期するプロジェクター' },
+        { startLine: 61, endLine: 101, color: '#3b82f6', label: 'Command Handler', explanation: 'コマンドを受けてWrite Modelを操作しProjectorに通知' },
+        { startLine: 103, endLine: 156, color: '#a855f7', label: 'Read Model', explanation: 'クエリに最適化されたビューモデル' },
+        { startLine: 158, endLine: 179, color: '#ec4899', label: 'Projector', explanation: 'Write側の変更をRead側のモデルに同期するプロジェクター' },
       ],
       keyPoints: [
         'Command（書き込み）とQuery（読み取り）のモデルを分離する',
@@ -2951,9 +2951,9 @@ async function main() {
 main();`,
       highlights: [
         { startLine: 5, endLine: 13, color: '#a855f7', label: 'Plugin Context API', explanation: 'プラグインに提供するAPI（フック・コマンド・サービス登録）' },
-        { startLine: 15, endLine: 22, color: '#f59e0b', label: 'Plugin Interface', explanation: '全プラグインが実装するインターフェース' },
-        { startLine: 37, endLine: 95, color: '#22c55e', label: 'Plugin Manager', explanation: '依存解決・フック実行・コマンドディスパッチを管理' },
-        { startLine: 98, endLine: 126, color: '#3b82f6', label: 'プラグイン実装例', explanation: 'logging/metricsプラグインが独立して機能を追加' },
+        { startLine: 14, endLine: 20, color: '#f59e0b', label: 'Plugin Interface', explanation: '全プラグインが実装するインターフェース' },
+        { startLine: 33, endLine: 98, color: '#22c55e', label: 'Plugin Manager', explanation: '依存解決・フック実行・コマンドディスパッチを管理' },
+        { startLine: 100, endLine: 134, color: '#3b82f6', label: 'プラグイン実装例', explanation: 'logging/metricsプラグインが独立して機能を追加' },
       ],
       keyPoints: [
         'PluginContextで安全なAPI境界を提供しコア内部を隠蔽',
@@ -3127,9 +3127,9 @@ etlPipeline.execute(sampleData).then(result => {
 });`,
       highlights: [
         { startLine: 5, endLine: 8, color: '#a855f7', label: 'PipelineStep', explanation: 'TIn→TOutの変換ステップを定義するインターフェース' },
-        { startLine: 10, endLine: 39, color: '#22c55e', label: 'Pipeline', explanation: '型安全なpipe()でステップを連鎖。各ステップの入出力型が連結' },
-        { startLine: 79, endLine: 118, color: '#3b82f6', label: '変換ステップ群', explanation: 'Validate→Enrich→Filter→Aggregateの各ステップ' },
-        { startLine: 130, endLine: 134, color: '#ec4899', label: 'パイプライン構築', explanation: 'メソッドチェーンでETLワークフローを宣言的に構築' },
+        { startLine: 10, endLine: 41, color: '#22c55e', label: 'Pipeline', explanation: '型安全なpipe()でステップを連鎖。各ステップの入出力型が連結' },
+        { startLine: 78, endLine: 134, color: '#3b82f6', label: '変換ステップ群', explanation: 'Validate→Enrich→Filter→Aggregateの各ステップ' },
+        { startLine: 137, endLine: 141, color: '#ec4899', label: 'パイプライン構築', explanation: 'メソッドチェーンでETLワークフローを宣言的に構築' },
       ],
       keyPoints: [
         'PipelineStepのTIn/TOutでステップ間の型が自動チェックされる',
@@ -3317,9 +3317,9 @@ const dbBreaker = registry.getOrCreate('database', { failureThreshold: 5, succes
 console.log(registry.getAllStats());`,
       highlights: [
         { startLine: 4, endLine: 20, color: '#f59e0b', label: '型定義', explanation: '三状態（Closed/Open/Half-Open）と設定/統計の型' },
-        { startLine: 22, endLine: 102, color: '#22c55e', label: 'CircuitBreaker本体', explanation: '状態遷移ロジックとfailure/successカウンタ管理' },
-        { startLine: 106, endLine: 134, color: '#3b82f6', label: '使用例', explanation: 'fetch呼び出しをCircuit Breakerで保護' },
-        { startLine: 137, endLine: 155, color: '#a855f7', label: 'Registry', explanation: '複数のCircuit Breakerを名前で管理する登録簿' },
+        { startLine: 22, endLine: 113, color: '#22c55e', label: 'CircuitBreaker本体', explanation: '状態遷移ロジックとfailure/successカウンタ管理' },
+        { startLine: 115, endLine: 143, color: '#3b82f6', label: '使用例', explanation: 'fetch呼び出しをCircuit Breakerで保護' },
+        { startLine: 145, endLine: 163, color: '#a855f7', label: 'Registry', explanation: '複数のCircuit Breakerを名前で管理する登録簿' },
       ],
       keyPoints: [
         'Closed→Open: 連続失敗がthreshold到達で遮断',
@@ -3490,9 +3490,9 @@ console.log(minimalForm.render());`,
       highlights: [
         { startLine: 4, endLine: 24, color: '#a855f7', label: '製品インターフェース', explanation: 'UIコンポーネントの共通契約を定義' },
         { startLine: 27, endLine: 33, color: '#22c55e', label: '抽象ファクトリー', explanation: 'コンポーネント群の生成メソッドを束ねる' },
-        { startLine: 36, endLine: 66, color: '#3b82f6', label: 'Material実装', explanation: 'Material Designテーマのコンポーネントセット' },
-        { startLine: 99, endLine: 112, color: '#f59e0b', label: 'テーマレジストリ', explanation: 'テーマ名でファクトリーを登録・取得' },
-        { startLine: 116, endLine: 131, color: '#ec4899', label: 'アプリケーション使用', explanation: 'LoginFormはUIFactoryのみに依存し具体テーマを知らない' },
+        { startLine: 34, endLine: 67, color: '#3b82f6', label: 'Material実装', explanation: 'Material Designテーマのコンポーネントセット' },
+        { startLine: 102, endLine: 119, color: '#f59e0b', label: 'テーマレジストリ', explanation: 'テーマ名でファクトリーを登録・取得' },
+        { startLine: 121, endLine: 137, color: '#ec4899', label: 'アプリケーション使用', explanation: 'LoginFormはUIFactoryのみに依存し具体テーマを知らない' },
       ],
       keyPoints: [
         '抽象ファクトリーで関連する製品群をセットで生成する',
@@ -3657,9 +3657,9 @@ password.setValue('MyStr0ngP@ss!');
 submit.click();`,
       highlights: [
         { startLine: 5, endLine: 15, color: '#a855f7', label: 'Mediator + Component基底', explanation: 'メディエータを通じて通信する基底クラス' },
-        { startLine: 18, endLine: 75, color: '#3b82f6', label: 'フォームコンポーネント群', explanation: '各コンポーネントはmediator.notifyで変更を通知' },
-        { startLine: 82, endLine: 123, color: '#22c55e', label: 'FormMediator', explanation: 'コンポーネント間の相互作用ルールを一元管理' },
-        { startLine: 130, endLine: 140, color: '#ec4899', label: '使用例', explanation: 'コンポーネントは互いを知らずメディエータ経由で連携' },
+        { startLine: 18, endLine: 80, color: '#3b82f6', label: 'フォームコンポーネント群', explanation: '各コンポーネントはmediator.notifyで変更を通知' },
+        { startLine: 82, endLine: 133, color: '#22c55e', label: 'FormMediator', explanation: 'コンポーネント間の相互作用ルールを一元管理' },
+        { startLine: 135, endLine: 146, color: '#ec4899', label: '使用例', explanation: 'コンポーネントは互いを知らずメディエータ経由で連携' },
       ],
       keyPoints: [
         'コンポーネントは他のコンポーネントを直接参照しない',
@@ -3872,11 +3872,11 @@ async function demo() {
 }
 demo();`,
       highlights: [
-        { startLine: 7, endLine: 55, color: '#f59e0b', label: 'Domain Core', explanation: 'Value Object + Entity。外部依存ゼロ' },
-        { startLine: 59, endLine: 82, color: '#a855f7', label: 'Ports（契約）', explanation: 'Driving Port（提供API）とDriven Port（要求API）' },
-        { startLine: 86, endLine: 120, color: '#22c55e', label: 'Application Service', explanation: 'ポートを通じて外部と連携するビジネスフロー' },
-        { startLine: 124, endLine: 152, color: '#3b82f6', label: 'Driven Adapters', explanation: '外部システムのアダプター実装（交換可能）' },
-        { startLine: 155, endLine: 168, color: '#ec4899', label: 'Driving Adapter', explanation: 'REST APIコントローラという入力アダプター' },
+        { startLine: 7, endLine: 58, color: '#f59e0b', label: 'Domain Core', explanation: 'Value Object + Entity。外部依存ゼロ' },
+        { startLine: 60, endLine: 84, color: '#a855f7', label: 'Ports（契約）', explanation: 'Driving Port（提供API）とDriven Port（要求API）' },
+        { startLine: 86, endLine: 126, color: '#22c55e', label: 'Application Service', explanation: 'ポートを通じて外部と連携するビジネスフロー' },
+        { startLine: 128, endLine: 158, color: '#3b82f6', label: 'Driven Adapters', explanation: '外部システムのアダプター実装（交換可能）' },
+        { startLine: 160, endLine: 178, color: '#ec4899', label: 'Driving Adapter', explanation: 'REST APIコントローラという入力アダプター' },
       ],
       keyPoints: [
         'ドメインコアは外部依存ゼロ（Pure Domain）',
@@ -4044,10 +4044,10 @@ const dynamic = buildSearchSpec({ department: 'Engineering', skill: 'TypeScript'
 console.log('Dynamic search:', dynamic.filter(employees).map(e => e.name));`,
       highlights: [
         { startLine: 5, endLine: 24, color: '#a855f7', label: 'Specification基底', explanation: 'and/or/notで合成可能な仕様の抽象クラス' },
-        { startLine: 26, endLine: 44, color: '#3b82f6', label: '合成仕様クラス', explanation: 'And/Or/Notで複合条件を構築' },
-        { startLine: 60, endLine: 84, color: '#22c55e', label: '具体的仕様', explanation: '部門、給与、経験等の個別ビジネスルール' },
-        { startLine: 88, endLine: 100, color: '#f59e0b', label: 'ビジネスルール合成', explanation: 'and/orの連鎖で複雑な条件を宣言的に構築' },
-        { startLine: 120, endLine: 138, color: '#ec4899', label: '動的検索', explanation: '実行時に条件を組み立てる動的Specification' },
+        { startLine: 25, endLine: 44, color: '#3b82f6', label: '合成仕様クラス', explanation: 'And/Or/Notで複合条件を構築' },
+        { startLine: 58, endLine: 86, color: '#22c55e', label: '具体的仕様', explanation: '部門、給与、経験等の個別ビジネスルール' },
+        { startLine: 88, endLine: 105, color: '#f59e0b', label: 'ビジネスルール合成', explanation: 'and/orの連鎖で複雑な条件を宣言的に構築' },
+        { startLine: 125, endLine: 148, color: '#ec4899', label: '動的検索', explanation: '実行時に条件を組み立てる動的Specification' },
       ],
       keyPoints: [
         'ビジネスルールをオブジェクトとして分離・再利用可能にする',

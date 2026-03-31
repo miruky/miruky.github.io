@@ -4,6 +4,7 @@ import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import type { ReadingLesson, ReadingLangId, CodeHighlight } from '@/data/reading-courses/types';
+import { tokenizeCode, type SyntaxToken } from '@/lib/syntax-highlight';
 
 interface Props {
   lesson: ReadingLesson;
@@ -45,6 +46,7 @@ export default function ReadingViewer({
   const lineNumRef = useRef<HTMLDivElement>(null);
 
   const lines = useMemo(() => lesson.code.split('\n'), [lesson.code]);
+  const tokenizedLines = useMemo(() => tokenizeCode(lesson.code, langId), [lesson.code, langId]);
 
   useEffect(() => {
     setActiveHighlight(null);
@@ -118,7 +120,10 @@ export default function ReadingViewer({
             <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-accent-purple/20 text-accent-purple border border-accent-purple/30">READING</span>
             <span className="w-2 h-2 rounded-full shrink-0" style={{ background: langColor }} />
             <span className="text-white font-semibold text-sm truncate">
-              Lesson {lesson.id}: {lesson.title}
+              Lesson {lesson.id}: {lesson.titleJa}
+            </span>
+            <span className="text-slate-500 text-[11px] truncate">
+              {lesson.title}
             </span>
             <span
               className="px-1.5 py-0.5 rounded text-[10px] font-bold shrink-0"
@@ -186,8 +191,8 @@ export default function ReadingViewer({
             {/* Line Numbers */}
             <div
               ref={lineNumRef}
-              className="w-12 shrink-0 overflow-hidden text-right pr-3 pt-3 select-none border-r border-slate-800/50"
-              style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '13px', lineHeight: '1.7' }}
+              className="w-14 shrink-0 overflow-hidden text-right pr-3 pt-3 select-none border-r border-slate-800/50"
+              style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '14px', lineHeight: '1.7' }}
             >
               {lines.map((_, i) => {
                 const hl = getLineHighlight(i + 1);
@@ -208,7 +213,7 @@ export default function ReadingViewer({
               ref={codeRef}
               className="flex-1 overflow-auto pt-3 pb-3"
               onScroll={handleScroll}
-              style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '13px', lineHeight: '1.7' }}
+              style={{ fontFamily: "'JetBrains Mono', monospace", fontSize: '14px', lineHeight: '1.7' }}
             >
               {lines.map((line, i) => {
                 const lineNum = i + 1;
@@ -247,8 +252,16 @@ export default function ReadingViewer({
                         {activeHl.label}
                       </span>
                     )}
-                    <span className={`whitespace-pre ${hl ? 'text-slate-200' : 'text-slate-400'}`}>
-                      {line || ' '}
+                    <span className="whitespace-pre">
+                      {(tokenizedLines[i] || [{ text: line || ' ', color: '' }]).map((tok: SyntaxToken, j: number) => (
+                        <span
+                          key={j}
+                          style={tok.color ? { color: tok.color } : undefined}
+                          className={!tok.color ? (hl ? 'text-slate-200' : 'text-slate-400') : undefined}
+                        >
+                          {tok.text}
+                        </span>
+                      ))}
                     </span>
                   </div>
                 );
