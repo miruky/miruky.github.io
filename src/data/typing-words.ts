@@ -1,15 +1,18 @@
 /**
- * タイピングゲーム用ワードデータ
- * 難易度別に日本語ワードを定義
+ * タイピングゲーム用ワードデータ v2
+ * 4難易度: easy / normal / hard / nightmare
+ * 各難易度に大量のバリエーション
  */
 
-export type Difficulty = 'easy' | 'normal' | 'hard';
+export type Difficulty = 'easy' | 'normal' | 'hard' | 'nightmare';
+export type TimeLimit = 60 | 180 | 300; // seconds
 
 export interface TypingWord {
-  display: string;  // 表示テキスト（漢字・カタカナ可）
-  reading: string;  // ひらがな読み（タイピング対象）
+  display: string;
+  reading: string;
 }
 
+// ── Easy: 基本のひらがな・短い単語 ──
 const EASY_POOL: TypingWord[] = [
   { display: '桜', reading: 'さくら' },
   { display: '猫', reading: 'ねこ' },
@@ -36,8 +39,44 @@ const EASY_POOL: TypingWord[] = [
   { display: '色', reading: 'いろ' },
   { display: '音', reading: 'おと' },
   { display: '顔', reading: 'かお' },
+  { display: '春', reading: 'はる' },
+  { display: '夏', reading: 'なつ' },
+  { display: '秋', reading: 'あき' },
+  { display: '冬', reading: 'ふゆ' },
+  { display: '鳥', reading: 'とり' },
+  { display: '魚', reading: 'さかな' },
+  { display: '草', reading: 'くさ' },
+  { display: '岩', reading: 'いわ' },
+  { display: '石', reading: 'いし' },
+  { display: '紙', reading: 'かみ' },
+  { display: '本', reading: 'ほん' },
+  { display: '窓', reading: 'まど' },
+  { display: '道', reading: 'みち' },
+  { display: '町', reading: 'まち' },
+  { display: '村', reading: 'むら' },
+  { display: '橋', reading: 'はし' },
+  { display: '船', reading: 'ふね' },
+  { display: '竹', reading: 'たけ' },
+  { display: '米', reading: 'こめ' },
+  { display: '塩', reading: 'しお' },
+  { display: '酒', reading: 'さけ' },
+  { display: '茶', reading: 'ちゃ' },
+  { display: '歌', reading: 'うた' },
+  { display: '手', reading: 'て' },
+  { display: '目', reading: 'め' },
+  { display: '耳', reading: 'みみ' },
+  { display: '口', reading: 'くち' },
+  { display: '足', reading: 'あし' },
+  { display: '頭', reading: 'あたま' },
+  { display: '鼻', reading: 'はな' },
+  { display: '国', reading: 'くに' },
+  { display: '里', reading: 'さと' },
+  { display: '雪', reading: 'ゆき' },
+  { display: '波', reading: 'なみ' },
+  { display: '島', reading: 'しま' },
 ];
 
+// ── Normal: 拗音や促音含む ──
 const NORMAL_POOL: TypingWord[] = [
   { display: '学校', reading: 'がっこう' },
   { display: '電車', reading: 'でんしゃ' },
@@ -64,8 +103,44 @@ const NORMAL_POOL: TypingWord[] = [
   { display: '未来', reading: 'みらい' },
   { display: '挑戦', reading: 'ちょうせん' },
   { display: '発明', reading: 'はつめい' },
+  { display: '地下鉄', reading: 'ちかてつ' },
+  { display: '高速道路', reading: 'こうそくどうろ' },
+  { display: '百貨店', reading: 'ひゃっかてん' },
+  { display: '美術館', reading: 'びじゅつかん' },
+  { display: '水族館', reading: 'すいぞくかん' },
+  { display: '動物園', reading: 'どうぶつえん' },
+  { display: '遊園地', reading: 'ゆうえんち' },
+  { display: '文房具', reading: 'ぶんぼうぐ' },
+  { display: '消しゴム', reading: 'けしごむ' },
+  { display: '下敷き', reading: 'したじき' },
+  { display: '運動会', reading: 'うんどうかい' },
+  { display: '修学旅行', reading: 'しゅうがくりょこう' },
+  { display: '卒業式', reading: 'そつぎょうしき' },
+  { display: '入学式', reading: 'にゅうがくしき' },
+  { display: '体育館', reading: 'たいいくかん' },
+  { display: '化学実験', reading: 'かがくじっけん' },
+  { display: '社会見学', reading: 'しゃかいけんがく' },
+  { display: '日曜日', reading: 'にちようび' },
+  { display: '交差点', reading: 'こうさてん' },
+  { display: '信号機', reading: 'しんごうき' },
+  { display: '横断歩道', reading: 'おうだんほどう' },
+  { display: '自動販売機', reading: 'じどうはんばいき' },
+  { display: '回転寿司', reading: 'かいてんずし' },
+  { display: '花火大会', reading: 'はなびたいかい' },
+  { display: '温泉旅館', reading: 'おんせんりょかん' },
+  { display: '紅葉狩り', reading: 'もみじがり' },
+  { display: '台風情報', reading: 'たいふうじょうほう' },
+  { display: '健康診断', reading: 'けんこうしんだん' },
+  { display: '予防接種', reading: 'よぼうせっしゅ' },
+  { display: '卓球部', reading: 'たっきゅうぶ' },
+  { display: '合唱団', reading: 'がっしょうだん' },
+  { display: '吹奏楽', reading: 'すいそうがく' },
+  { display: '柔道着', reading: 'じゅうどうぎ' },
+  { display: '選手権', reading: 'せんしゅけん' },
+  { display: '応援団', reading: 'おうえんだん' },
 ];
 
+// ── Hard: IT用語・長い語句 ──
 const HARD_POOL: TypingWord[] = [
   { display: 'プログラミング', reading: 'ぷろぐらみんぐ' },
   { display: 'アルゴリズム', reading: 'あるごりずむ' },
@@ -92,15 +167,104 @@ const HARD_POOL: TypingWord[] = [
   { display: 'マイクロサービス', reading: 'まいくろさーびす' },
   { display: '冗長構成', reading: 'じょうちょうこうせい' },
   { display: '証明書', reading: 'しょうめいしょ' },
+  { display: 'ブロックチェーン', reading: 'ぶろっくちぇーん' },
+  { display: 'サーバーレス', reading: 'さーばーれす' },
+  { display: 'ロードバランサー', reading: 'ろーどばらんさー' },
+  { display: 'ファイアウォール', reading: 'ふぁいあうぉーる' },
+  { display: 'リファクタリング', reading: 'りふぁくたりんぐ' },
+  { display: '継続的インテグレーション', reading: 'けいぞくてきいんてぐれーしょん' },
+  { display: '可用性設計', reading: 'かようせいせっけい' },
+  { display: '非同期処理', reading: 'ひどうきしょり' },
+  { display: 'スケーラビリティ', reading: 'すけーらびりてぃ' },
+  { display: 'コードレビュー', reading: 'こーどれびゅー' },
+  { display: 'バージョン管理', reading: 'ばーじょんかんり' },
+  { display: 'エンドポイント', reading: 'えんどぽいんと' },
+  { display: 'ミドルウェア', reading: 'みどるうぇあ' },
+  { display: 'オブジェクト指向', reading: 'おぶじぇくとしこう' },
+  { display: '関数型プログラミング', reading: 'かんすうがたぷろぐらみんぐ' },
+  { display: 'テスト駆動開発', reading: 'てすとくどうかいはつ' },
+  { display: '要件定義書', reading: 'ようけんていぎしょ' },
+  { display: '基本設計書', reading: 'きほんせっけいしょ' },
+  { display: '詳細設計書', reading: 'しょうさいせっけいしょ' },
+  { display: '死活監視', reading: 'しかつかんし' },
+  { display: '障害対応', reading: 'しょうがいたいおう' },
+  { display: '例外処理', reading: 'れいがいしょり' },
+  { display: 'キャッシュ戦略', reading: 'きゃっしゅせんりゃく' },
+  { display: '分散システム', reading: 'ぶんさんしすてむ' },
+  { display: '暗号化通信', reading: 'あんごうかつうしん' },
+  { display: '多要素認証', reading: 'たようそにんしょう' },
+  { display: '権限管理', reading: 'けんげんかんり' },
+  { display: '自動化', reading: 'じどうか' },
+  { display: '仮想化技術', reading: 'かそうかぎじゅつ' },
+  { display: '冪等性', reading: 'べきとうせい' },
+  { display: 'ログ分析', reading: 'ろぐぶんせき' },
+  { display: 'トラブルシューティング', reading: 'とらぶるしゅーてぃんぐ' },
+  { display: '疎結合', reading: 'そけつごう' },
+  { display: 'メッセージキュー', reading: 'めっせーじきゅー' },
+  { display: '設定管理', reading: 'せっていかんり' },
 ];
 
-const WORD_COUNTS: Record<Difficulty, number> = {
-  easy: 10,
-  normal: 15,
-  hard: 20,
+// ── Nightmare: 超長文・難読語・特殊拗音 ──
+const NIGHTMARE_POOL: TypingWord[] = [
+  { display: 'インフラストラクチャー', reading: 'いんふらすとらくちゃー' },
+  { display: 'ディザスターリカバリー', reading: 'でぃざすたーりかばりー' },
+  { display: '継続的デリバリー', reading: 'けいぞくてきでりばりー' },
+  { display: 'マイクロサービスアーキテクチャ', reading: 'まいくろさーびすあーきてくちゃ' },
+  { display: 'コンテナオーケストレーション', reading: 'こんてなおーけすとれーしょん' },
+  { display: 'サーバーレスコンピューティング', reading: 'さーばーれすこんぴゅーてぃんぐ' },
+  { display: 'ゼロトラストセキュリティ', reading: 'ぜろとらすとせきゅりてぃ' },
+  { display: 'イベントドリブンアーキテクチャ', reading: 'いべんとどりぶんあーきてくちゃ' },
+  { display: 'アジャイルソフトウェア開発', reading: 'あじゃいるそふとうぇあかいはつ' },
+  { display: 'ドメイン駆動設計', reading: 'どめいんくどうせっけい' },
+  { display: 'クラウドネイティブ', reading: 'くらうどねいてぃぶ' },
+  { display: 'オブザーバビリティ', reading: 'おぶざーばびりてぃ' },
+  { display: 'データレイクハウス', reading: 'でーたれいくはうす' },
+  { display: 'ステートレスアプリケーション', reading: 'すてーとれすあぷりけーしょん' },
+  { display: '責任共有モデル', reading: 'せきにんきょうゆうもでる' },
+  { display: '高可用性アーキテクチャ', reading: 'こうかようせいあーきてくちゃ' },
+  { display: 'マルチアカウント戦略', reading: 'まるちあかうんとせんりゃく' },
+  { display: 'ペネトレーションテスト', reading: 'ぺねとれーしょんてすと' },
+  { display: 'リアルタイムストリーミング', reading: 'りあるたいむすとりーみんぐ' },
+  { display: 'バッチ処理パイプライン', reading: 'ばっちしょりぱいぷらいん' },
+  { display: 'プロビジョニング自動化', reading: 'ぷろびじょにんぐじどうか' },
+  { display: 'キャパシティプランニング', reading: 'きゃぱしてぃぷらんにんぐ' },
+  { display: 'レイテンシー最適化', reading: 'れいてんしーさいてきか' },
+  { display: '宣言的インフラストラクチャ', reading: 'せんげんてきいんふらすとらくちゃ' },
+  { display: '脆弱性スキャニング', reading: 'ぜいじゃくせいすきゃにんぐ' },
+  { display: '暗号化キーローテーション', reading: 'あんごうかきーろーてーしょん' },
+  { display: 'ブルーグリーンデプロイメント', reading: 'ぶるーぐりーんでぷろいめんと' },
+  { display: 'カナリアリリース', reading: 'かなりありりーす' },
+  { display: 'シフトレフトセキュリティ', reading: 'しふとれふとせきゅりてぃ' },
+  { display: 'メトリクスダッシュボード', reading: 'めとりくすだっしゅぼーど' },
+  { display: '構成ドリフト検知', reading: 'こうせいどりふとけんち' },
+  { display: '最小権限の原則', reading: 'さいしょうけんげんのげんそく' },
+  { display: 'ネットワーク分離', reading: 'ねっとわーくぶんり' },
+  { display: 'サービスメッシュ', reading: 'さーびすめっしゅ' },
+  { display: 'グラフデータベース', reading: 'ぐらふでーたべーす' },
+  { display: 'イミュータブルインフラ', reading: 'いみゅーたぶるいんふら' },
+  { display: '分散トレーシング', reading: 'ぶんさんとれーしんぐ' },
+  { display: '秘密情報管理', reading: 'ひみつじょうほうかんり' },
+  { display: 'コンプライアンス監査', reading: 'こんぷらいあんすかんさ' },
+  { display: 'データパイプライン', reading: 'でーたぱいぷらいん' },
+  { display: '自然言語処理', reading: 'しぜんげんごしょり' },
+  { display: '強化学習アルゴリズム', reading: 'きょうかがくしゅうあるごりずむ' },
+  { display: '大規模言語モデル', reading: 'だいきぼげんごもでる' },
+  { display: '量子コンピューティング', reading: 'りょうしこんぴゅーてぃんぐ' },
+  { display: 'エッジコンピューティング', reading: 'えっじこんぴゅーてぃんぐ' },
+  { display: '機密性完全性可用性', reading: 'きみつせいかんぜんせいかようせい' },
+  { display: '多層防御アーキテクチャ', reading: 'たそうぼうぎょあーきてくちゃ' },
+  { display: '深層学習ニューラルネットワーク', reading: 'しんそうがくしゅうにゅーらるねっとわーく' },
+  { display: '生成系人工知能', reading: 'せいせいけいじんこうちのう' },
+  { display: 'トランスフォーマーモデル', reading: 'とらんすふぉーまーもでる' },
+];
+
+const POOLS: Record<Difficulty, TypingWord[]> = {
+  easy: EASY_POOL,
+  normal: NORMAL_POOL,
+  hard: HARD_POOL,
+  nightmare: NIGHTMARE_POOL,
 };
 
-/** Fisher-Yates シャッフル */
 function shuffle<T>(arr: T[]): T[] {
   const result = [...arr];
   for (let i = result.length - 1; i > 0; i--) {
@@ -111,16 +275,17 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 /**
- * 難易度に応じたワード配列を返す（ランダム選択）
+ * 時間制モードでは制限なく出題するためプールを大量シャッフル
  */
-export function getWords(difficulty: Difficulty): TypingWord[] {
-  const pool = difficulty === 'easy' ? EASY_POOL
-    : difficulty === 'normal' ? NORMAL_POOL
-    : HARD_POOL;
-  const count = WORD_COUNTS[difficulty];
-  return shuffle(pool).slice(0, count);
+export function getWords(difficulty: Difficulty, count?: number): TypingWord[] {
+  const pool = POOLS[difficulty];
+  const shuffled = shuffle(pool);
+  if (count) return shuffled.slice(0, Math.min(count, pool.length));
+  // 時間制: プールを複数回コピーしてシャッフル（十分な量）
+  const big = shuffle([...pool, ...pool, ...pool]);
+  return big;
 }
 
 export function getWordCount(difficulty: Difficulty): number {
-  return WORD_COUNTS[difficulty];
+  return POOLS[difficulty].length;
 }
