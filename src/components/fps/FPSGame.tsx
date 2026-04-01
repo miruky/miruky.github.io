@@ -575,14 +575,6 @@ function EnemyMesh({ enemy }: { enemy: Enemy }) {
             <meshBasicMaterial color={hpColor} />
           </mesh>
           {/* HP number - sprite */}
-          <sprite position={[0, 0.12, 0]} scale={[0.6, 0.2, 1]}>
-            <spriteMaterial
-              transparent
-              depthWrite={false}
-              color="#ffffff"
-              opacity={0.9}
-            />
-          </sprite>
         </group>
       )}
     </group>
@@ -610,11 +602,11 @@ function BulletTracer({ bullet }: { bullet: Bullet }) {
    ═══════════════════════════════════════════════════════════ */
 function GrenadeVisual({ grenade }: { grenade: Grenade }) {
   const meshRef = useRef<THREE.Mesh>(null);
-  useFrame(() => {
+  useFrame((_, delta) => {
     if (meshRef.current) {
       meshRef.current.position.copy(grenade.pos);
-      meshRef.current.rotation.x += 0.1;
-      meshRef.current.rotation.z += 0.05;
+      meshRef.current.rotation.x += 5 * Math.min(delta, 0.05);
+      meshRef.current.rotation.z += 2.5 * Math.min(delta, 0.05);
     }
   });
   const urgent = grenade.timer < 1;
@@ -712,6 +704,10 @@ function DamageNumberSprite({ dn }: { dn: DamageNumber }) {
     return tex;
   }, [dn.damage, dn.headshot]);
 
+  useEffect(() => {
+    return () => { texture.dispose(); };
+  }, [texture]);
+
   useFrame(() => {
     if (!ref.current) return;
     const elapsed = Date.now() / 1000 - dn.time;
@@ -792,6 +788,7 @@ function GameLoop({
   const scoreMultiplierRef = useRef(1);
   const armorActiveRef = useRef(false);
   const streakRewardsGiven = useRef<Set<number>>(new Set());
+  const playedTimeRef = useRef(0);
 
   const weaponGroupRef = useRef<THREE.Group>(null);
 
@@ -881,6 +878,7 @@ function GameLoop({
       weaponReserve.current[weaponIdx.current] = gameState.current.reserve;
       gameState.current.isReloading = false;
       reloadTimer.current = 0;
+      mouseJustPressed.current = false;
       isSwitchingRef.current = true;
       switchTimer.current = WEAPON_SWITCH_TIME;
       gameState.current.isSwitching = true;
@@ -941,6 +939,7 @@ function GameLoop({
     const w = WEAPONS[weaponIdx.current];
     gameState.current.isReloading = true;
     reloadTimer.current = w.reloadTime;
+    mouseJustPressed.current = false;
     setGameState((s) => ({ ...s, isReloading: true, reloadProgress: 0 }));
   }, [gameState, setGameState]);
 
@@ -1016,10 +1015,10 @@ function GameLoop({
     const isCrouch = isCrouchingRef.current;
     const newKills: KillFeed[] = [];
 
-    // ── Time & Wave ──
-    const elapsed = (Date.now() - matchStart.current) / 1000;
-    const timeLeft = Math.max(0, MATCH_TIME - elapsed);
-    const wave = Math.floor(elapsed / WAVE_INTERVAL) + 1;
+    // ── Time & Wave (dt-based, pauses correctly) ──
+    playedTimeRef.current += dt;
+    const timeLeft = Math.max(0, MATCH_TIME - playedTimeRef.current);
+    const wave = Math.floor(playedTimeRef.current / WAVE_INTERVAL) + 1;
 
     if (wave > lastWave.current) {
       lastWave.current = wave;
@@ -1228,7 +1227,9 @@ function GameLoop({
       }
       if (collidesWithBuildings(g.pos, 0.12)) {
         g.vel.multiplyScalar(-0.3);
-        g.pos.add(g.vel.clone().normalize().multiplyScalar(0.3));
+        if (g.vel.lengthSq() > 0.01) {
+          g.pos.add(g.vel.clone().normalize().multiplyScalar(0.3));
+        }
       }
       if (g.timer <= 0) {
         explodeGrenade(g.pos, now);
@@ -1252,11 +1253,16 @@ function GameLoop({
       if (e.hp <= 0) {
         e.state = 'dead';
         e.deathTime = now;
-        const score = Math.round((100 + gs.streakCount * 25) * scoreMultiplierRef.current);
+        // Multi-kill tracking for grenade kills
+        const timeSinceLastKill = now - lastKillTime.current;
+        lastKillTime.current = now;
+        if (timeSinceLastKill < 3) { multiKillCount.current++; } else { multiKillCount.current = 1; }
+        const multiLabel = multiKillCount.current >= 4 ? 'MEGA KILL! ' : multiKillCount.current === 3 ? 'トリプルキル! ' : multiKillCount.current === 2 ? 'ダブルキル! ' : '';
+        const score = Math.round((100 + gs.streakCount * 25 + (multiKillCount.current - 1) * 50) * scoreMultiplierRef.current);
         gs.kills++;
         gs.score += score;
         gs.streakCount++;
-        newKills.push({ id: bulletId.current++, text: `グレネードキル +${score}`, time: now });
+        newKills.push({ id: bulletId.current++, text: `${multiLabel}グレネードキル +${score}`, time: now });
         spawnPickup(e.pos.clone());
         continue;
       }
@@ -1422,7 +1428,7 @@ function GameLoop({
           gs.streakCount = 0;
           streakRewardsGiven.current.clear();
           screenShakeRef.current = Math.max(screenShakeRef.current, 0.02);
-          const ddir = new THREE.Vector2(b.vel.x, b.vel.z);
+          const ddir = new THREE.Vector2(-b.vel.x, -b.vel.z);
           const pdir = new THREE.Vector2(-Math.sin(yaw.current), -Math.cos(yaw.current));
           gs.damageDir = Math.atan2(ddir.cross(pdir), ddir.dot(pdir));
           if (gs.hp <= 0) {
@@ -1473,18 +1479,29 @@ function GameLoop({
     }
     if (gs.streakCount >= 10 && !streakRewardsGiven.current.has(10)) {
       streakRewardsGiven.current.add(10);
+      let nukeKills = 0;
       for (const e of enemies.current) {
-        if (e.state !== 'dead') e.hp -= 200;
+        if (e.state !== 'dead') {
+          e.hp -= 200;
+          if (e.hp <= 0) {
+            e.state = 'dead';
+            e.deathTime = now;
+            nukeKills++;
+            gs.kills++;
+            gs.score += 200;
+          }
+        }
       }
       screenShakeRef.current = 0.1;
-      newKills.push({ id: bulletId.current++, text: 'NUKE発動！全敵に大ダメージ！', time: now });
+      newKills.push({ id: bulletId.current++, text: `NUKE発動！${nukeKills}体撃破！`, time: now });
     }
 
     if (killstreakTimerRef.current > 0) {
       killstreakTimerRef.current -= dt;
       if (killstreakTimerRef.current <= 0) {
-        if (killstreakActiveRef.current === 'DOUBLE SCORE') scoreMultiplierRef.current = 1;
-        if (killstreakActiveRef.current === 'ARMOR') armorActiveRef.current = false;
+        // Reset all killstreak effects on timer expiry
+        scoreMultiplierRef.current = 1;
+        armorActiveRef.current = false;
         killstreakActiveRef.current = null;
       }
     }
