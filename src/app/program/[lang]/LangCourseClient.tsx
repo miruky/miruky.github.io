@@ -54,8 +54,8 @@ export default function LangCoursePage() {
       <div className="min-h-screen bg-hero-gradient dark-context flex items-center justify-center">
         <div className="text-center">
           <p className="text-slate-400 mb-4">コースが見つかりません</p>
-          <Link href="/program/" className="text-accent-cyan hover:underline">
-            ← 言語一覧に戻る
+          <Link href="/program/" className="inline-flex items-center gap-1 px-4 py-2 rounded-lg text-xs font-medium border border-slate-600/50 text-slate-400 hover:border-accent-cyan/40 hover:text-accent-cyan transition-all">
+            &larr; 言語一覧に戻る
           </Link>
         </div>
       </div>

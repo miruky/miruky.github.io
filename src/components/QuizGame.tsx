@@ -206,7 +206,7 @@ export default function QuizGame({ onBack }: { onBack?: () => void }) {
 
         <p className="text-slate-600 text-[10px] mt-6">1～4キーで選択、Enter/Spaceで次へ</p>
         {onBack && (
-          <button onClick={onBack} className="mt-3 text-xs text-slate-500 hover:text-accent-cyan transition-colors">
+          <button onClick={onBack} className="mt-3 px-4 py-2 rounded-lg text-xs font-medium border border-slate-600/50 text-slate-400 hover:border-accent-cyan/40 hover:text-accent-cyan transition-all">
             &larr; ゲーム選択に戻る
           </button>
         )}

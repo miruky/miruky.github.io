@@ -143,8 +143,8 @@ export default function AdminLoginPage() {
 
           {/* Back link */}
           <div className="text-center">
-            <a href="/" className="text-sm text-slate-500 hover:text-accent-cyan transition">
-              サイトに戻る
+            <a href="/" className="inline-flex items-center gap-1 px-4 py-2 rounded-lg text-xs font-medium border border-slate-600/50 text-slate-400 hover:border-accent-cyan/40 hover:text-accent-cyan transition-all">
+              &larr; サイトに戻る
             </a>
           </div>
         </form>

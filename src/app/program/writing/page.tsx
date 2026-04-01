@@ -46,12 +46,9 @@ export default function WritingPage() {
         >
           <Link
             href="/program/"
-            className="inline-flex items-center gap-1 text-sm text-slate-500 hover:text-accent-cyan transition-colors mb-4"
+            className="inline-flex items-center gap-1 px-4 py-2 rounded-lg text-xs font-medium border border-slate-600/50 text-slate-400 hover:border-accent-cyan/40 hover:text-accent-cyan transition-all mb-6"
           >
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            モード選択に戻る
+            &larr; モード選択に戻る
           </Link>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">
             miruky <span className="gradient-text">Writing</span>

@@ -50,9 +50,9 @@ export default function ReadingLessonClient() {
           <p className="text-slate-400 mb-4">レッスンが見つかりません</p>
           <a
             href={`/program/reading/${langId}/`}
-            className="text-accent-purple hover:underline text-sm"
+            className="inline-flex items-center gap-1 px-4 py-2 rounded-lg text-xs font-medium border border-slate-600/50 text-slate-400 hover:border-accent-cyan/40 hover:text-accent-cyan transition-all"
           >
-            ← コース一覧に戻る
+            &larr; コース一覧に戻る
           </a>
         </div>
       </div>
