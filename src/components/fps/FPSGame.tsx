@@ -85,9 +85,8 @@ export const WEAPONS: WeaponDef[] = [
 ];
 
 /* ═══════════════════════════════════════════════════════════
-   GLB preloads (Draco compressed)
+   GLB preloads (meshopt compressed – no external decoder needed)
    ═══════════════════════════════════════════════════════════ */
-const DRACO_CDN = 'https://www.gstatic.com/draco/versioned/decoders/1.5.7/';
 const MODEL_PATHS = {
   ar: '/models/fps/ar.glb',
   smg: '/models/fps/smg.glb',
@@ -97,13 +96,13 @@ const MODEL_PATHS = {
   crate: '/models/fps/crate.glb',
   barricade: '/models/fps/barricade.glb',
 };
-Object.values(MODEL_PATHS).forEach((p) => useGLTF.preload(p, DRACO_CDN));
+Object.values(MODEL_PATHS).forEach((p) => useGLTF.preload(p));
 
 /* ═══════════════════════════════════════════════════════════
    GLB model helpers
    ═══════════════════════════════════════════════════════════ */
 function useClonedGLTF(path: string, targetSize: number) {
-  const gltf = useGLTF(path, DRACO_CDN);
+  const gltf = useGLTF(path);
   return useMemo(() => {
     const clone = gltf.scene.clone(true);
     clone.traverse((child) => {
@@ -310,15 +309,19 @@ function GameMap() {
           <meshStandardMaterial map={wallTex} roughness={0.7} />
         </mesh>
       ))}
-      {/* 3D crate models */}
-      {BUILDINGS.filter((b) => b.color === '#92400e').map((b, i) => (
-        <CrateModel key={`crate-${i}`} position={b.pos} />
-      ))}
+      {/* 3D crate models (each in Suspense so map renders even while loading) */}
+      <Suspense fallback={null}>
+        {BUILDINGS.filter((b) => b.color === '#92400e').map((b, i) => (
+          <CrateModel key={`crate-${i}`} position={b.pos} />
+        ))}
+      </Suspense>
       {/* 3D barricade models */}
-      <BarricadeModel position={[8, 0, 15]} rotation={0} />
-      <BarricadeModel position={[-8, 0, -15]} rotation={Math.PI} />
-      <BarricadeModel position={[15, 0, 8]} rotation={Math.PI / 2} />
-      <BarricadeModel position={[-15, 0, -8]} rotation={-Math.PI / 2} />
+      <Suspense fallback={null}>
+        <BarricadeModel position={[8, 0, 15]} rotation={0} />
+        <BarricadeModel position={[-8, 0, -15]} rotation={Math.PI} />
+        <BarricadeModel position={[15, 0, 8]} rotation={Math.PI / 2} />
+        <BarricadeModel position={[-15, 0, -8]} rotation={-Math.PI / 2} />
+      </Suspense>
     </group>
   );
 }
@@ -1188,7 +1191,9 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
           <fog attach="fog" args={['#78716c', 60, 120]} />
           <SkyDome />
           <GameMap />
-          <GameLoop gameState={gsRef} setGameState={setGs} />
+          <Suspense fallback={null}>
+            <GameLoop gameState={gsRef} setGameState={setGs} />
+          </Suspense>
         </Suspense>
       </Canvas>
 
