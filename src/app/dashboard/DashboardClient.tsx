@@ -326,7 +326,7 @@ export default function DashboardClient() {
             icon={
               <FaCode className="w-4 h-4" style={{ color: C.writing }} />
             }
-            label="写経モード"
+            label="ライティングモード"
             sublabel="Writing Mode"
             value={totalWriting}
             max={totalWritingMax}
@@ -337,7 +337,7 @@ export default function DashboardClient() {
             icon={
               <FaBook className="w-4 h-4" style={{ color: C.reading }} />
             }
-            label="読解モード"
+            label="リーディングモード"
             sublabel="Reading Mode"
             value={totalReading}
             max={totalReadingMax}
@@ -381,7 +381,7 @@ export default function DashboardClient() {
               </div>
               <div>
                 <h2 className="text-base font-bold text-slate-900 dark:text-white">
-                  写経モード
+                  ライティングモード
                 </h2>
                 <p className="text-xs text-slate-400 dark:text-slate-500">
                   Writing Mode ― 9言語 × 30問
@@ -426,7 +426,7 @@ export default function DashboardClient() {
               </div>
               <div>
                 <h2 className="text-base font-bold text-slate-900 dark:text-white">
-                  読解モード
+                  リーディングモード
                 </h2>
                 <p className="text-xs text-slate-400 dark:text-slate-500">
                   Reading Mode ― 3言語 × 33〜34問
