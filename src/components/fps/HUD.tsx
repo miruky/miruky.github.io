@@ -24,13 +24,7 @@ export function HUD({ gs }: { gs: GameState }) {
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full border border-red-400/90" />
           </div>
         ) : (
-          <div className="relative w-6 h-6">
-            <div className="absolute left-1/2 top-0 w-[2px] h-2 bg-white/80 -translate-x-1/2" />
-            <div className="absolute left-1/2 bottom-0 w-[2px] h-2 bg-white/80 -translate-x-1/2" />
-            <div className="absolute top-1/2 left-0 h-[2px] w-2 bg-white/80 -translate-y-1/2" />
-            <div className="absolute top-1/2 right-0 h-[2px] w-2 bg-white/80 -translate-y-1/2" />
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-0.5 h-0.5 bg-white/60 rounded-full" />
-          </div>
+          <img src="/images/fps/crosshair.png" alt="" className="w-8 h-8 opacity-80" style={{ mixBlendMode: 'screen' }} />
         )}
       </div>
 
@@ -180,7 +174,10 @@ export function HUD({ gs }: { gs: GameState }) {
 
       {/* ── Low HP damage overlay ── */}
       {gs.hp < 40 && (
-        <div className="absolute inset-0 border-[4px] border-red-500/30 pointer-events-none animate-pulse" />
+        <div className="absolute inset-0 pointer-events-none animate-pulse">
+          <img src="/images/fps/blood.png" alt="" className="absolute inset-0 w-full h-full object-cover opacity-20" style={{ mixBlendMode: 'screen' }} />
+          <div className="absolute inset-0 border-[4px] border-red-500/30" />
+        </div>
       )}
 
       {/* ── Damage direction indicator ── */}

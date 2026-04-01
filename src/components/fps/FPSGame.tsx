@@ -1,8 +1,7 @@
 'use client';
 
 import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Sky, Stars } from '@react-three/drei';
+import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import { HUD } from './HUD';
 import { Minimap } from './Minimap';
@@ -227,11 +226,19 @@ function clampToMap(v: THREE.Vector3) {
    Map component
    ═══════════════════════════════════════════════════════════ */
 function GameMap() {
+  const groundTex = useLoader(THREE.TextureLoader, '/images/fps/ground.png');
+  const wallTex = useLoader(THREE.TextureLoader, '/images/fps/wall.png');
+  const crateTex = useLoader(THREE.TextureLoader, '/images/fps/crate.png');
+  groundTex.wrapS = groundTex.wrapT = THREE.RepeatWrapping;
+  groundTex.repeat.set(20, 20);
+  wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
+  wallTex.repeat.set(4, 4);
+
   return (
     <group>
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[MAP_SIZE * 2, MAP_SIZE * 2]} />
-        <meshStandardMaterial color="#44403c" roughness={0.9} />
+        <meshStandardMaterial map={groundTex} roughness={0.9} />
       </mesh>
       {([
         { p: [0, 2, -MAP_SIZE] as [number, number, number], s: [MAP_SIZE * 2, 4, 0.5] as [number, number, number] },
@@ -241,16 +248,37 @@ function GameMap() {
       ]).map((w, i) => (
         <mesh key={`wall-${i}`} position={w.p} castShadow receiveShadow>
           <boxGeometry args={w.s} />
-          <meshStandardMaterial color="#292524" roughness={0.8} />
+          <meshStandardMaterial map={wallTex} roughness={0.8} />
         </mesh>
       ))}
-      {BUILDINGS.map((b, i) => (
+      {BUILDINGS.filter((b) => b.color !== '#92400e').map((b, i) => (
         <mesh key={`bld-${i}`} position={b.pos} castShadow receiveShadow>
           <boxGeometry args={b.size} />
-          <meshStandardMaterial color={b.color} roughness={0.7} />
+          <meshStandardMaterial map={wallTex} roughness={0.7} />
+        </mesh>
+      ))}
+      {BUILDINGS.filter((b) => b.color === '#92400e').map((b, i) => (
+        <mesh key={`crate-${i}`} position={b.pos} castShadow receiveShadow>
+          <boxGeometry args={b.size} />
+          <meshStandardMaterial map={crateTex} roughness={0.7} />
         </mesh>
       ))}
     </group>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Sky dome
+   ═══════════════════════════════════════════════════════════ */
+function SkyDome() {
+  const tex = useLoader(THREE.TextureLoader, '/images/fps/sky.png');
+  // Preload enemy texture to avoid Suspense trigger during gameplay
+  useLoader(THREE.TextureLoader, '/images/fps/enemy.png');
+  return (
+    <mesh>
+      <sphereGeometry args={[300, 64, 32]} />
+      <meshBasicMaterial map={tex} side={THREE.BackSide} />
+    </mesh>
   );
 }
 
@@ -276,6 +304,7 @@ function WeaponModel({
   const bobTime = useRef(0);
   const recoilRef = useRef(0);
   const switchOffsetRef = useRef(0);
+  const muzzleTex = useLoader(THREE.TextureLoader, '/images/fps/muzzle.png');
 
   useFrame((_, delta) => {
     if (!groupRef.current) return;
@@ -313,16 +342,16 @@ function WeaponModel({
 
   return (
     <group ref={groupRef} position={[0.28, -0.23, -0.55]}>
-      {weaponIndex === 0 && <ARModel isFiring={isFiring} />}
-      {weaponIndex === 1 && <SMGModel isFiring={isFiring} />}
-      {weaponIndex === 2 && <ShotgunModel isFiring={isFiring} />}
-      {weaponIndex === 3 && <SniperModel isFiring={isFiring} />}
+      {weaponIndex === 0 && <ARModel isFiring={isFiring} muzzleTex={muzzleTex} />}
+      {weaponIndex === 1 && <SMGModel isFiring={isFiring} muzzleTex={muzzleTex} />}
+      {weaponIndex === 2 && <ShotgunModel isFiring={isFiring} muzzleTex={muzzleTex} />}
+      {weaponIndex === 3 && <SniperModel isFiring={isFiring} muzzleTex={muzzleTex} />}
     </group>
   );
 }
 
 /* ─── Assault Rifle ─── */
-function ARModel({ isFiring }: { isFiring: boolean }) {
+function ARModel({ isFiring, muzzleTex }: { isFiring: boolean; muzzleTex: THREE.Texture }) {
   return (
     <group>
       {/* Receiver / body */}
@@ -362,20 +391,20 @@ function ARModel({ isFiring }: { isFiring: boolean }) {
       </mesh>
       {/* Muzzle flash */}
       {isFiring && (
-        <pointLight position={[0, 0.01, -0.42]} color="#fbbf24" intensity={8} distance={3} />
-      )}
-      {isFiring && (
-        <mesh position={[0, 0.01, -0.42]}>
-          <sphereGeometry args={[0.04, 6, 6]} />
-          <meshBasicMaterial color="#fbbf24" transparent opacity={0.85} />
-        </mesh>
+        <>
+          <pointLight position={[0, 0.01, -0.42]} color="#fbbf24" intensity={8} distance={3} />
+          <mesh position={[0, 0.01, -0.42]}>
+            <planeGeometry args={[0.12, 0.12]} />
+            <meshBasicMaterial map={muzzleTex} transparent blending={THREE.AdditiveBlending} depthWrite={false} />
+          </mesh>
+        </>
       )}
     </group>
   );
 }
 
 /* ─── SMG ─── */
-function SMGModel({ isFiring }: { isFiring: boolean }) {
+function SMGModel({ isFiring, muzzleTex }: { isFiring: boolean; muzzleTex: THREE.Texture }) {
   return (
     <group>
       <mesh>
@@ -406,20 +435,20 @@ function SMGModel({ isFiring }: { isFiring: boolean }) {
         <meshStandardMaterial color="#334155" metalness={0.8} roughness={0.2} />
       </mesh>
       {isFiring && (
-        <pointLight position={[0, 0.005, -0.32]} color="#fbbf24" intensity={6} distance={2.5} />
-      )}
-      {isFiring && (
-        <mesh position={[0, 0.005, -0.32]}>
-          <sphereGeometry args={[0.03, 6, 6]} />
-          <meshBasicMaterial color="#fbbf24" transparent opacity={0.8} />
-        </mesh>
+        <>
+          <pointLight position={[0, 0.005, -0.32]} color="#fbbf24" intensity={6} distance={2.5} />
+          <mesh position={[0, 0.005, -0.32]}>
+            <planeGeometry args={[0.1, 0.1]} />
+            <meshBasicMaterial map={muzzleTex} transparent blending={THREE.AdditiveBlending} depthWrite={false} />
+          </mesh>
+        </>
       )}
     </group>
   );
 }
 
 /* ─── Shotgun ─── */
-function ShotgunModel({ isFiring }: { isFiring: boolean }) {
+function ShotgunModel({ isFiring, muzzleTex }: { isFiring: boolean; muzzleTex: THREE.Texture }) {
   return (
     <group>
       <mesh>
@@ -447,20 +476,20 @@ function ShotgunModel({ isFiring }: { isFiring: boolean }) {
         <meshStandardMaterial color="#78350f" metalness={0.3} roughness={0.7} />
       </mesh>
       {isFiring && (
-        <pointLight position={[0, 0.015, -0.46]} color="#ff8c00" intensity={12} distance={4} />
-      )}
-      {isFiring && (
-        <mesh position={[0, 0.015, -0.46]}>
-          <sphereGeometry args={[0.06, 6, 6]} />
-          <meshBasicMaterial color="#ff8c00" transparent opacity={0.9} />
-        </mesh>
+        <>
+          <pointLight position={[0, 0.015, -0.46]} color="#ff8c00" intensity={12} distance={4} />
+          <mesh position={[0, 0.015, -0.46]}>
+            <planeGeometry args={[0.18, 0.18]} />
+            <meshBasicMaterial map={muzzleTex} transparent blending={THREE.AdditiveBlending} depthWrite={false} />
+          </mesh>
+        </>
       )}
     </group>
   );
 }
 
 /* ─── Sniper Rifle ─── */
-function SniperModel({ isFiring }: { isFiring: boolean }) {
+function SniperModel({ isFiring, muzzleTex }: { isFiring: boolean; muzzleTex: THREE.Texture }) {
   return (
     <group>
       <mesh>
@@ -503,13 +532,13 @@ function SniperModel({ isFiring }: { isFiring: boolean }) {
         <meshStandardMaterial color="#1c1917" metalness={0.7} roughness={0.3} />
       </mesh>
       {isFiring && (
-        <pointLight position={[0, 0.01, -0.55]} color="#fbbf24" intensity={10} distance={3.5} />
-      )}
-      {isFiring && (
-        <mesh position={[0, 0.01, -0.55]}>
-          <sphereGeometry args={[0.045, 6, 6]} />
-          <meshBasicMaterial color="#fbbf24" transparent opacity={0.85} />
-        </mesh>
+        <>
+          <pointLight position={[0, 0.01, -0.55]} color="#fbbf24" intensity={10} distance={3.5} />
+          <mesh position={[0, 0.01, -0.55]}>
+            <planeGeometry args={[0.14, 0.14]} />
+            <meshBasicMaterial map={muzzleTex} transparent blending={THREE.AdditiveBlending} depthWrite={false} />
+          </mesh>
+        </>
       )}
     </group>
   );
@@ -520,13 +549,11 @@ function SniperModel({ isFiring }: { isFiring: boolean }) {
    ═══════════════════════════════════════════════════════════ */
 function EnemyMesh({ enemy }: { enemy: Enemy }) {
   const groupRef = useRef<THREE.Group>(null);
+  const enemyTex = useLoader(THREE.TextureLoader, '/images/fps/enemy.png');
 
   useFrame(() => {
     if (!groupRef.current) return;
     groupRef.current.position.copy(enemy.pos);
-    if (enemy.lookDir.lengthSq() > 0.01) {
-      groupRef.current.rotation.y = Math.atan2(enemy.lookDir.x, enemy.lookDir.z);
-    }
     if (enemy.state === 'dead') {
       groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -Math.PI / 2, 0.1);
       groupRef.current.position.y = Math.max(0.2, groupRef.current.position.y - 0.05);
@@ -541,32 +568,13 @@ function EnemyMesh({ enemy }: { enemy: Enemy }) {
 
   return (
     <group ref={groupRef}>
-      <mesh position={[0, 0.7, 0]} castShadow>
-        <boxGeometry args={[0.5, 0.8, 0.3]} />
-        <meshStandardMaterial color="#991b1b" transparent opacity={op} roughness={0.6} />
-      </mesh>
-      <mesh position={[0, 1.3, 0]} castShadow>
-        <sphereGeometry args={[0.18, 8, 8]} />
-        <meshStandardMaterial color="#fca5a5" transparent opacity={op} roughness={0.5} />
-      </mesh>
-      <mesh position={[-0.12, 0.2, 0]} castShadow>
-        <boxGeometry args={[0.15, 0.4, 0.15]} />
-        <meshStandardMaterial color="#78350f" transparent opacity={op} roughness={0.7} />
-      </mesh>
-      <mesh position={[0.12, 0.2, 0]} castShadow>
-        <boxGeometry args={[0.15, 0.4, 0.15]} />
-        <meshStandardMaterial color="#78350f" transparent opacity={op} roughness={0.7} />
-      </mesh>
-      <mesh position={[-0.35, 0.7, 0]} castShadow>
-        <boxGeometry args={[0.12, 0.6, 0.12]} />
-        <meshStandardMaterial color="#991b1b" transparent opacity={op} roughness={0.6} />
-      </mesh>
-      <mesh position={[0.35, 0.7, 0]} castShadow>
-        <boxGeometry args={[0.12, 0.6, 0.12]} />
-        <meshStandardMaterial color="#991b1b" transparent opacity={op} roughness={0.6} />
-      </mesh>
+      {/* Billboard enemy sprite */}
+      <sprite position={[0, 0.9, 0]} scale={[1.0, 1.8, 1]}>
+        <spriteMaterial map={enemyTex} transparent alphaTest={0.1} opacity={op} />
+      </sprite>
+      {/* HP bar */}
       {enemy.state !== 'dead' && enemy.hp < enemy.maxHp && (
-        <group position={[0, 1.7, 0]}>
+        <group position={[0, 1.95, 0]}>
           <mesh>
             <planeGeometry args={[0.6, 0.06]} />
             <meshBasicMaterial color="#1c1917" transparent opacity={0.7} />
@@ -1176,10 +1184,9 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
   /* ─── Menu ─── */
   if (gs.phase === 'menu') {
     return (
-      <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#0a0e27] to-[#1a1f4e] text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute w-full h-full bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-accent-cyan/20 via-transparent to-transparent" />
-        </div>
+      <div className="w-full h-screen flex flex-col items-center justify-center text-white relative overflow-hidden">
+        <img src="/images/fps/menu-bg.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0e27]/85 to-[#1a1f4e]/85" />
         <div className="relative z-10 text-center">
           <h1 className="text-5xl md:text-7xl font-black mb-2 tracking-tighter">
             <span className="bg-gradient-to-r from-red-500 via-orange-400 to-yellow-300 bg-clip-text text-transparent">
@@ -1215,7 +1222,9 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
   if (gs.phase === 'gameover') {
     const kd = gs.deaths > 0 ? (gs.kills / gs.deaths).toFixed(2) : gs.kills.toString();
     return (
-      <div className="w-full h-screen flex flex-col items-center justify-center bg-gradient-to-b from-[#0a0e27] to-[#1a1f4e] text-white relative overflow-hidden">
+      <div className="w-full h-screen flex flex-col items-center justify-center text-white relative overflow-hidden">
+        <img src="/images/fps/menu-bg.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0e27]/85 to-[#1a1f4e]/85" />
         <div className="relative z-10 text-center">
           <h1 className="text-4xl md:text-6xl font-black mb-2">MISSION COMPLETE</h1>
           <p className="text-slate-400 mb-8">ミッション終了</p>
@@ -1277,8 +1286,7 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
           />
           <hemisphereLight args={['#87ceeb', '#44403c', 0.3]} />
           <fog attach="fog" args={['#78716c', 60, 120]} />
-          <Sky sunPosition={[100, 50, 100]} />
-          <Stars radius={200} depth={50} count={1000} factor={4} saturation={0} />
+          <SkyDome />
           <GameMap />
           <GameLoop gameState={gsRef} setGameState={setGs} />
         </Suspense>
