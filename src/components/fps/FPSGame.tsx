@@ -98,9 +98,8 @@ export const WEAPONS: WeaponDef[] = [
 ];
 
 /* ═══════════════════════════════════════════════════════════
-   GLB preloads (Draco compressed – decoded via Google CDN)
+   GLB preloads (KHR_mesh_quantization – natively supported)
    ═══════════════════════════════════════════════════════════ */
-const DRACO_CDN = 'https://www.gstatic.com/draco/versioned/decoders/1.5.7/';
 const MODEL_PATHS = {
   ar: '/models/fps/ar.glb',
   smg: '/models/fps/smg.glb',
@@ -110,13 +109,13 @@ const MODEL_PATHS = {
   crate: '/models/fps/crate.glb',
   barricade: '/models/fps/barricade.glb',
 };
-Object.values(MODEL_PATHS).forEach((p) => useGLTF.preload(p, DRACO_CDN));
+Object.values(MODEL_PATHS).forEach((p) => useGLTF.preload(p));
 
 /* ═══════════════════════════════════════════════════════════
    GLB model helpers
    ═══════════════════════════════════════════════════════════ */
 function useClonedGLTF(path: string, targetSize: number) {
-  const gltf = useGLTF(path, DRACO_CDN);
+  const gltf = useGLTF(path);
   return useMemo(() => {
     const clone = gltf.scene.clone(true);
     clone.traverse((child) => {
@@ -1055,7 +1054,18 @@ function GameLoop({
 /* ═══════════════════════════════════════════════════════════
    Main export
    ═══════════════════════════════════════════════════════════ */
+/* Key cap component for control hints */
+function KeyCap({ children, wide }: { children: React.ReactNode; wide?: boolean }) {
+  return (
+    <span className={`inline-flex items-center justify-center ${wide ? 'px-3' : 'min-w-[2rem]'} h-7 rounded-md bg-slate-700/90 border border-slate-500/60 text-xs font-bold text-white shadow-[0_2px_0_0_rgba(0,0,0,0.4)] mx-0.5`}>
+      {children}
+    </span>
+  );
+}
+
 export default function FPSGame({ onBack }: { onBack: () => void }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const makeInitialState = (): GameState => ({
     phase: 'menu',
     kills: 0,
@@ -1085,30 +1095,81 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
   const gsRef = useRef<GameState>(gs);
   gsRef.current = gs;
 
+  /* ── Fullscreen helpers ── */
+  const enterFullscreen = useCallback(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+  }, []);
+
+  const exitFullscreen = useCallback(() => {
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  }, []);
+
+  // Exit fullscreen when leaving FPS game
+  useEffect(() => {
+    return () => { exitFullscreen(); };
+  }, [exitFullscreen]);
+
+  // Listen for Escape in fullscreen → pause instead of exiting fullscreen
+  useEffect(() => {
+    const onFullscreenChange = () => {
+      if (!document.fullscreenElement && gsRef.current.phase === 'playing') {
+        gsRef.current.phase = 'paused';
+        setGs((s) => ({ ...s, phase: 'paused' }));
+      }
+    };
+    document.addEventListener('fullscreenchange', onFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', onFullscreenChange);
+  }, []);
+
   const startGame = useCallback(() => {
     const s = makeInitialState();
     s.phase = 'playing';
     gsRef.current = s;
     setGs(s);
+    // Enter fullscreen on game start
+    setTimeout(() => {
+      const el = containerRef.current;
+      if (el && !document.fullscreenElement) {
+        el.requestFullscreen().catch(() => {});
+      }
+    }, 100);
   }, []);
 
   const resumeGame = useCallback(() => {
     gsRef.current.phase = 'playing';
     setGs((s) => ({ ...s, phase: 'playing' }));
-    // Re-request pointer lock (must be from user gesture — button click qualifies)
+    // Re-enter fullscreen + pointer lock
     setTimeout(() => {
-      const canvas = document.querySelector('canvas');
-      if (canvas) canvas.requestPointerLock();
+      const el = containerRef.current;
+      if (el && !document.fullscreenElement) {
+        el.requestFullscreen().then(() => {
+          const canvas = document.querySelector('canvas');
+          if (canvas) canvas.requestPointerLock();
+        }).catch(() => {
+          const canvas = document.querySelector('canvas');
+          if (canvas) canvas.requestPointerLock();
+        });
+      } else {
+        const canvas = document.querySelector('canvas');
+        if (canvas) canvas.requestPointerLock();
+      }
     }, 50);
   }, []);
+
+  const handleBack = useCallback(() => {
+    exitFullscreen();
+    onBack();
+  }, [exitFullscreen, onBack]);
 
   /* ─── Menu ─── */
   if (gs.phase === 'menu') {
     return (
-      <div className="w-full h-screen flex flex-col items-center justify-center text-white relative overflow-hidden">
+      <div ref={containerRef} className="w-full h-screen flex flex-col items-center justify-center text-white relative overflow-hidden">
         <img src="/images/fps/menu-bg.png" alt="" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0e27]/85 to-[#1a1f4e]/85" />
-        <div className="relative z-10 text-center">
+        <div className="relative z-10 text-center max-w-xl mx-auto px-4">
           <h1 className="text-5xl md:text-7xl font-black mb-2 tracking-tighter">
             <span className="bg-gradient-to-r from-red-500 via-orange-400 to-yellow-300 bg-clip-text text-transparent">
               TACTICAL
@@ -1125,13 +1186,54 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
             START MISSION
           </button>
 
-          <div className="mt-8 text-sm text-slate-500 space-y-1">
-            <p>WASD：移動 ｜ マウス：エイム ｜ 左クリック：射撃</p>
-            <p>右クリック：ADS ｜ R：リロード ｜ Space：ジャンプ ｜ Shift：ダッシュ</p>
-            <p>1〜4 / スクロール：武器切替 ｜ Esc：ポーズ</p>
+          {/* Visual control guide */}
+          <div className="mt-8 bg-black/40 backdrop-blur-sm rounded-xl p-5 border border-white/10 text-left">
+            <p className="text-xs text-slate-400 uppercase tracking-widest mb-3 text-center">操作ガイド</p>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="flex gap-0.5">
+                  <KeyCap>W</KeyCap><KeyCap>A</KeyCap><KeyCap>S</KeyCap><KeyCap>D</KeyCap>
+                </div>
+                <span className="text-slate-300">移動</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400 text-xs">🖱 マウス</span>
+                <span className="text-slate-300">エイム</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400 text-xs">🖱 左クリック</span>
+                <span className="text-slate-300">射撃</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400 text-xs">🖱 右クリック</span>
+                <span className="text-slate-300">ADS（スコープ）</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <KeyCap>R</KeyCap>
+                <span className="text-slate-300">リロード</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <KeyCap wide>Space</KeyCap>
+                <span className="text-slate-300">ジャンプ</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <KeyCap wide>Shift</KeyCap>
+                <span className="text-slate-300">ダッシュ</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="flex gap-0.5">
+                  <KeyCap>1</KeyCap><KeyCap>2</KeyCap><KeyCap>3</KeyCap><KeyCap>4</KeyCap>
+                </div>
+                <span className="text-slate-300">武器切替</span>
+              </div>
+              <div className="flex items-center gap-2 col-span-2 justify-center mt-1 pt-2 border-t border-white/10">
+                <KeyCap wide>Esc</KeyCap>
+                <span className="text-slate-300">ポーズ / フルスクリーン終了</span>
+              </div>
+            </div>
           </div>
 
-          <button onClick={onBack} className="mt-6 text-xs text-slate-600 hover:text-slate-400 transition-colors">
+          <button onClick={handleBack} className="mt-6 text-xs text-slate-600 hover:text-slate-400 transition-colors">
             ← ゲーム選択に戻る
           </button>
         </div>
@@ -1141,6 +1243,7 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
 
   /* ─── Game Over ─── */
   if (gs.phase === 'gameover') {
+    exitFullscreen();
     const kd = gs.deaths > 0 ? (gs.kills / gs.deaths).toFixed(2) : gs.kills.toString();
     return (
       <div className="w-full h-screen flex flex-col items-center justify-center text-white relative overflow-hidden">
@@ -1170,7 +1273,7 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
             >
               RETRY
             </button>
-            <button onClick={onBack} className="px-8 py-3 border border-slate-600 rounded-xl font-bold hover:bg-slate-800 transition-colors">
+            <button onClick={handleBack} className="px-8 py-3 border border-slate-600 rounded-xl font-bold hover:bg-slate-800 transition-colors">
               ゲーム選択
             </button>
           </div>
@@ -1182,6 +1285,7 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
   /* ─── Playing + Paused (Canvas stays rendered) ─── */
   return (
     <div
+      ref={containerRef}
       className="w-full h-screen relative overflow-hidden bg-black select-none"
       style={{ cursor: gs.phase === 'paused' ? 'default' : 'none' }}
     >
@@ -1189,7 +1293,7 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
         <div className="absolute inset-0 flex items-center justify-center text-white">
           <div className="text-center">
             <p className="text-xl mb-4">3Dモデルの読み込みに失敗しました</p>
-            <button onClick={onBack} className="px-6 py-2 bg-red-600 rounded-lg">戻る</button>
+            <button onClick={handleBack} className="px-6 py-2 bg-red-600 rounded-lg">戻る</button>
           </div>
         </div>
       }>
@@ -1244,7 +1348,7 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
                 RESUME
               </button>
               <button
-                onClick={onBack}
+                onClick={handleBack}
                 className="w-full py-3 border border-slate-600 rounded-xl text-lg font-bold text-white hover:bg-slate-800 transition-colors"
               >
                 QUIT TO MENU

@@ -15,18 +15,29 @@ export function HUD({ gs }: { gs: GameState }) {
 
   return (
     <div className="absolute inset-0 pointer-events-none z-40 text-white" style={{ fontFamily: "'Rajdhani', 'Orbitron', monospace" }}>
-      {/* ── Crosshair ── */}
-      <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-        {gs.isADS ? (
-          <div className="relative w-8 h-8">
-            <div className="absolute left-1/2 top-0 w-[1px] h-full bg-red-400/90 -translate-x-1/2" />
-            <div className="absolute top-1/2 left-0 h-[1px] w-full bg-red-400/90 -translate-y-1/2" />
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full border border-red-400/90" />
-          </div>
-        ) : (
-          <img src="/images/fps/crosshair.png" alt="" className="w-8 h-8 opacity-80" style={{ mixBlendMode: 'screen' }} />
-        )}
-      </div>
+      {/* ── Crosshair / Scope ── */}
+      {gs.isADS && gs.weaponIndex === 3 ? (
+        /* Sniper scope overlay */
+        <div className="absolute inset-0 z-50">
+          <img src="/images/fps/scope.png" alt="" className="w-full h-full object-contain" style={{ mixBlendMode: 'screen' }} />
+          {/* Black vignette around scope */}
+          <div className="absolute inset-0" style={{
+            background: 'radial-gradient(circle at 50% 50%, transparent 28%, rgba(0,0,0,0.97) 42%)'
+          }} />
+        </div>
+      ) : (
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          {gs.isADS ? (
+            <div className="relative w-8 h-8">
+              <div className="absolute left-1/2 top-0 w-[1px] h-full bg-red-400/90 -translate-x-1/2" />
+              <div className="absolute top-1/2 left-0 h-[1px] w-full bg-red-400/90 -translate-y-1/2" />
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full border border-red-400/90" />
+            </div>
+          ) : (
+            <img src="/images/fps/crosshair.png" alt="" className="w-8 h-8 opacity-80" style={{ mixBlendMode: 'screen' }} />
+          )}
+        </div>
+      )}
 
       {/* ── Hit markers ── */}
       {gs.hitMarkers.map((hm) => (
@@ -192,9 +203,25 @@ export function HUD({ gs }: { gs: GameState }) {
         </div>
       )}
 
-      {/* ── Controls hint ── */}
-      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] text-slate-600">
-        WASD:移動 ｜ Mouse:エイム ｜ LMB:射撃 ｜ RMB:ADS ｜ R:リロード ｜ Space:ジャンプ ｜ 1-4:武器 ｜ Esc:ポーズ
+      {/* ── Controls hint (in-game) ── */}
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-3 text-xs">
+        {[
+          ['WASD', '移動'],
+          ['Mouse', 'エイム'],
+          ['LMB', '射撃'],
+          ['RMB', 'ADS'],
+          ['R', 'リロード'],
+          ['Space', 'ジャンプ'],
+          ['1-4', '武器'],
+          ['Esc', 'ポーズ'],
+        ].map(([key, label]) => (
+          <div key={key} className="flex items-center gap-1">
+            <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-white/10 border border-white/20 text-[10px] font-bold text-white/70 min-w-[1.5rem] text-center">
+              {key}
+            </span>
+            <span className="text-slate-500 text-[10px]">{label}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
