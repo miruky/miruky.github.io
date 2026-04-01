@@ -169,12 +169,12 @@ function GameMap() {
         <meshStandardMaterial color="#44403c" roughness={0.9} />
       </mesh>
       {/* Boundary walls */}
-      {[
-        { p: [0, 2, -MAP_SIZE] as const, s: [MAP_SIZE * 2, 4, 0.5] as const },
-        { p: [0, 2, MAP_SIZE] as const, s: [MAP_SIZE * 2, 4, 0.5] as const },
-        { p: [-MAP_SIZE, 2, 0] as const, s: [0.5, 4, MAP_SIZE * 2] as const },
-        { p: [MAP_SIZE, 2, 0] as const, s: [0.5, 4, MAP_SIZE * 2] as const },
-      ].map((w, i) => (
+      {([
+        { p: [0, 2, -MAP_SIZE] as [number, number, number], s: [MAP_SIZE * 2, 4, 0.5] as [number, number, number] },
+        { p: [0, 2, MAP_SIZE] as [number, number, number], s: [MAP_SIZE * 2, 4, 0.5] as [number, number, number] },
+        { p: [-MAP_SIZE, 2, 0] as [number, number, number], s: [0.5, 4, MAP_SIZE * 2] as [number, number, number] },
+        { p: [MAP_SIZE, 2, 0] as [number, number, number], s: [0.5, 4, MAP_SIZE * 2] as [number, number, number] },
+      ]).map((w, i) => (
         <mesh key={`wall-${i}`} position={w.p} castShadow receiveShadow>
           <boxGeometry args={w.s} />
           <meshStandardMaterial color="#292524" roughness={0.8} />
