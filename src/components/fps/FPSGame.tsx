@@ -1,7 +1,8 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
+import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { HUD } from './HUD';
 import { Minimap } from './Minimap';
@@ -82,6 +83,49 @@ export const WEAPONS: WeaponDef[] = [
     auto: false,
   },
 ];
+
+/* ═══════════════════════════════════════════════════════════
+   GLB preloads (Draco compressed)
+   ═══════════════════════════════════════════════════════════ */
+const DRACO_CDN = 'https://www.gstatic.com/draco/versioned/decoders/1.5.7/';
+const MODEL_PATHS = {
+  ar: '/models/fps/ar.glb',
+  smg: '/models/fps/smg.glb',
+  shotgun: '/models/fps/shotgun.glb',
+  sniper: '/models/fps/sniper.glb',
+  enemy: '/models/fps/enemy.glb',
+  crate: '/models/fps/crate.glb',
+  barricade: '/models/fps/barricade.glb',
+};
+Object.values(MODEL_PATHS).forEach((p) => useGLTF.preload(p, DRACO_CDN));
+
+/* ═══════════════════════════════════════════════════════════
+   GLB model helpers
+   ═══════════════════════════════════════════════════════════ */
+function useClonedGLTF(path: string, targetSize: number) {
+  const gltf = useGLTF(path, DRACO_CDN);
+  return useMemo(() => {
+    const clone = gltf.scene.clone(true);
+    clone.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        if (Array.isArray(mesh.material)) {
+          mesh.material = mesh.material.map((m) => m.clone());
+        } else {
+          mesh.material = mesh.material.clone();
+        }
+      }
+    });
+    const box = new THREE.Box3().setFromObject(clone);
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    if (maxDim > 0) clone.scale.multiplyScalar(targetSize / maxDim);
+    const box2 = new THREE.Box3().setFromObject(clone);
+    const center = box2.getCenter(new THREE.Vector3());
+    clone.position.set(-center.x, -box2.min.y, -center.z);
+    return clone;
+  }, [gltf.scene, targetSize]);
+}
 
 /* ═══════════════════════════════════════════════════════════
    Constants
@@ -225,10 +269,19 @@ function clampToMap(v: THREE.Vector3) {
 /* ═══════════════════════════════════════════════════════════
    Map component
    ═══════════════════════════════════════════════════════════ */
+function CrateModel({ position }: { position: [number, number, number] }) {
+  const model = useClonedGLTF(MODEL_PATHS.crate, 1.2);
+  return <primitive object={model} position={position} castShadow receiveShadow />;
+}
+
+function BarricadeModel({ position, rotation = 0 }: { position: [number, number, number]; rotation?: number }) {
+  const model = useClonedGLTF(MODEL_PATHS.barricade, 2.0);
+  return <primitive object={model} position={position} rotation={[0, rotation, 0]} castShadow receiveShadow />;
+}
+
 function GameMap() {
   const groundTex = useLoader(THREE.TextureLoader, '/images/fps/ground.png');
   const wallTex = useLoader(THREE.TextureLoader, '/images/fps/wall.png');
-  const crateTex = useLoader(THREE.TextureLoader, '/images/fps/crate.png');
   groundTex.wrapS = groundTex.wrapT = THREE.RepeatWrapping;
   groundTex.repeat.set(20, 20);
   wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
@@ -257,12 +310,15 @@ function GameMap() {
           <meshStandardMaterial map={wallTex} roughness={0.7} />
         </mesh>
       ))}
+      {/* 3D crate models */}
       {BUILDINGS.filter((b) => b.color === '#92400e').map((b, i) => (
-        <mesh key={`crate-${i}`} position={b.pos} castShadow receiveShadow>
-          <boxGeometry args={b.size} />
-          <meshStandardMaterial map={crateTex} roughness={0.7} />
-        </mesh>
+        <CrateModel key={`crate-${i}`} position={b.pos} />
       ))}
+      {/* 3D barricade models */}
+      <BarricadeModel position={[8, 0, 15]} rotation={0} />
+      <BarricadeModel position={[-8, 0, -15]} rotation={Math.PI} />
+      <BarricadeModel position={[15, 0, 8]} rotation={Math.PI / 2} />
+      <BarricadeModel position={[-15, 0, -8]} rotation={-Math.PI / 2} />
     </group>
   );
 }
@@ -272,8 +328,6 @@ function GameMap() {
    ═══════════════════════════════════════════════════════════ */
 function SkyDome() {
   const tex = useLoader(THREE.TextureLoader, '/images/fps/sky.png');
-  // Preload enemy texture to avoid Suspense trigger during gameplay
-  useLoader(THREE.TextureLoader, '/images/fps/enemy.png');
   return (
     <mesh>
       <sphereGeometry args={[300, 64, 32]} />
@@ -342,200 +396,37 @@ function WeaponModel({
 
   return (
     <group ref={groupRef} position={[0.28, -0.23, -0.55]}>
-      {weaponIndex === 0 && <ARModel isFiring={isFiring} muzzleTex={muzzleTex} />}
-      {weaponIndex === 1 && <SMGModel isFiring={isFiring} muzzleTex={muzzleTex} />}
-      {weaponIndex === 2 && <ShotgunModel isFiring={isFiring} muzzleTex={muzzleTex} />}
-      {weaponIndex === 3 && <SniperModel isFiring={isFiring} muzzleTex={muzzleTex} />}
+      {weaponIndex === 0 && <GLBWeapon path={MODEL_PATHS.ar} isFiring={isFiring} muzzleTex={muzzleTex} muzzlePos={[0, 0.01, -0.3]} />}
+      {weaponIndex === 1 && <GLBWeapon path={MODEL_PATHS.smg} isFiring={isFiring} muzzleTex={muzzleTex} muzzlePos={[0, 0.005, -0.25]} />}
+      {weaponIndex === 2 && <GLBWeapon path={MODEL_PATHS.shotgun} isFiring={isFiring} muzzleTex={muzzleTex} muzzlePos={[0, 0.015, -0.35]} flashSize={0.18} />}
+      {weaponIndex === 3 && <GLBWeapon path={MODEL_PATHS.sniper} isFiring={isFiring} muzzleTex={muzzleTex} muzzlePos={[0, 0.01, -0.38]} />}
     </group>
   );
 }
 
-/* ─── Assault Rifle ─── */
-function ARModel({ isFiring, muzzleTex }: { isFiring: boolean; muzzleTex: THREE.Texture }) {
+/* ─── GLB weapon component ─── */
+function GLBWeapon({
+  path,
+  isFiring,
+  muzzleTex,
+  muzzlePos = [0, 0.01, -0.3],
+  flashSize = 0.12,
+}: {
+  path: string;
+  isFiring: boolean;
+  muzzleTex: THREE.Texture;
+  muzzlePos?: [number, number, number];
+  flashSize?: number;
+}) {
+  const model = useClonedGLTF(path, 0.5);
   return (
     <group>
-      {/* Receiver / body */}
-      <mesh>
-        <boxGeometry args={[0.07, 0.065, 0.42]} />
-        <meshStandardMaterial color="#1c1917" metalness={0.85} roughness={0.15} />
-      </mesh>
-      {/* Barrel */}
-      <mesh position={[0, 0.01, -0.28]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.016, 0.016, 0.22, 8]} />
-        <meshStandardMaterial color="#292524" metalness={0.9} roughness={0.1} />
-      </mesh>
-      {/* Handguard */}
-      <mesh position={[0, 0, -0.15]}>
-        <boxGeometry args={[0.065, 0.055, 0.18]} />
-        <meshStandardMaterial color="#292524" metalness={0.7} roughness={0.3} />
-      </mesh>
-      {/* Magazine */}
-      <mesh position={[0, -0.07, 0.04]} rotation={[0.08, 0, 0]}>
-        <boxGeometry args={[0.042, 0.1, 0.03]} />
-        <meshStandardMaterial color="#1c1917" metalness={0.7} roughness={0.3} />
-      </mesh>
-      {/* Rail */}
-      <mesh position={[0, 0.045, -0.04]}>
-        <boxGeometry args={[0.028, 0.012, 0.22]} />
-        <meshStandardMaterial color="#44403c" metalness={0.6} roughness={0.35} />
-      </mesh>
-      {/* Grip */}
-      <mesh position={[0, -0.065, -0.08]} rotation={[0.25, 0, 0]}>
-        <boxGeometry args={[0.032, 0.06, 0.028]} />
-        <meshStandardMaterial color="#292524" metalness={0.5} roughness={0.5} />
-      </mesh>
-      {/* Stock */}
-      <mesh position={[0, -0.005, 0.24]}>
-        <boxGeometry args={[0.055, 0.075, 0.11]} />
-        <meshStandardMaterial color="#1c1917" metalness={0.6} roughness={0.4} />
-      </mesh>
-      {/* Muzzle flash */}
+      <primitive object={model} position={[0, -0.06, 0]} rotation={[0, Math.PI, 0]} />
       {isFiring && (
         <>
-          <pointLight position={[0, 0.01, -0.42]} color="#fbbf24" intensity={8} distance={3} />
-          <mesh position={[0, 0.01, -0.42]}>
-            <planeGeometry args={[0.12, 0.12]} />
-            <meshBasicMaterial map={muzzleTex} transparent blending={THREE.AdditiveBlending} depthWrite={false} />
-          </mesh>
-        </>
-      )}
-    </group>
-  );
-}
-
-/* ─── SMG ─── */
-function SMGModel({ isFiring, muzzleTex }: { isFiring: boolean; muzzleTex: THREE.Texture }) {
-  return (
-    <group>
-      <mesh>
-        <boxGeometry args={[0.065, 0.055, 0.3]} />
-        <meshStandardMaterial color="#1e293b" metalness={0.85} roughness={0.15} />
-      </mesh>
-      <mesh position={[0, 0.005, -0.19]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.013, 0.013, 0.12, 8]} />
-        <meshStandardMaterial color="#334155" metalness={0.9} roughness={0.1} />
-      </mesh>
-      {/* Curved mag */}
-      <mesh position={[0, -0.075, 0.02]} rotation={[0.12, 0, 0]}>
-        <boxGeometry args={[0.038, 0.11, 0.022]} />
-        <meshStandardMaterial color="#1e293b" metalness={0.7} roughness={0.3} />
-      </mesh>
-      {/* Compact stock */}
-      <mesh position={[0, -0.01, 0.17]}>
-        <boxGeometry args={[0.045, 0.04, 0.07]} />
-        <meshStandardMaterial color="#334155" metalness={0.6} roughness={0.4} />
-      </mesh>
-      <mesh position={[0, -0.055, -0.05]} rotation={[0.2, 0, 0]}>
-        <boxGeometry args={[0.028, 0.05, 0.022]} />
-        <meshStandardMaterial color="#1e293b" metalness={0.5} roughness={0.5} />
-      </mesh>
-      {/* Suppressor-like muzzle */}
-      <mesh position={[0, 0.005, -0.27]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.018, 0.018, 0.06, 8]} />
-        <meshStandardMaterial color="#334155" metalness={0.8} roughness={0.2} />
-      </mesh>
-      {isFiring && (
-        <>
-          <pointLight position={[0, 0.005, -0.32]} color="#fbbf24" intensity={6} distance={2.5} />
-          <mesh position={[0, 0.005, -0.32]}>
-            <planeGeometry args={[0.1, 0.1]} />
-            <meshBasicMaterial map={muzzleTex} transparent blending={THREE.AdditiveBlending} depthWrite={false} />
-          </mesh>
-        </>
-      )}
-    </group>
-  );
-}
-
-/* ─── Shotgun ─── */
-function ShotgunModel({ isFiring, muzzleTex }: { isFiring: boolean; muzzleTex: THREE.Texture }) {
-  return (
-    <group>
-      <mesh>
-        <boxGeometry args={[0.055, 0.055, 0.48]} />
-        <meshStandardMaterial color="#1c1917" metalness={0.8} roughness={0.2} />
-      </mesh>
-      {/* Thick barrel */}
-      <mesh position={[0, 0.015, -0.28]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.024, 0.024, 0.3, 8]} />
-        <meshStandardMaterial color="#292524" metalness={0.85} roughness={0.15} />
-      </mesh>
-      {/* Pump forearm */}
-      <mesh position={[0, -0.005, -0.13]}>
-        <boxGeometry args={[0.048, 0.045, 0.1]} />
-        <meshStandardMaterial color="#78350f" metalness={0.3} roughness={0.7} />
-      </mesh>
-      {/* Wooden stock */}
-      <mesh position={[0, -0.01, 0.3]}>
-        <boxGeometry args={[0.05, 0.09, 0.16]} />
-        <meshStandardMaterial color="#92400e" metalness={0.2} roughness={0.8} />
-      </mesh>
-      {/* Grip */}
-      <mesh position={[0, -0.06, 0.12]} rotation={[0.3, 0, 0]}>
-        <boxGeometry args={[0.03, 0.055, 0.025]} />
-        <meshStandardMaterial color="#78350f" metalness={0.3} roughness={0.7} />
-      </mesh>
-      {isFiring && (
-        <>
-          <pointLight position={[0, 0.015, -0.46]} color="#ff8c00" intensity={12} distance={4} />
-          <mesh position={[0, 0.015, -0.46]}>
-            <planeGeometry args={[0.18, 0.18]} />
-            <meshBasicMaterial map={muzzleTex} transparent blending={THREE.AdditiveBlending} depthWrite={false} />
-          </mesh>
-        </>
-      )}
-    </group>
-  );
-}
-
-/* ─── Sniper Rifle ─── */
-function SniperModel({ isFiring, muzzleTex }: { isFiring: boolean; muzzleTex: THREE.Texture }) {
-  return (
-    <group>
-      <mesh>
-        <boxGeometry args={[0.05, 0.05, 0.55]} />
-        <meshStandardMaterial color="#1a2e05" metalness={0.8} roughness={0.2} />
-      </mesh>
-      {/* Long barrel */}
-      <mesh position={[0, 0.01, -0.35]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.014, 0.014, 0.35, 8]} />
-        <meshStandardMaterial color="#292524" metalness={0.9} roughness={0.1} />
-      </mesh>
-      {/* Scope */}
-      <mesh position={[0, 0.058, -0.04]} rotation={[Math.PI / 2, 0, 0]}>
-        <cylinderGeometry args={[0.02, 0.02, 0.14, 8]} />
-        <meshStandardMaterial color="#1c1917" metalness={0.85} roughness={0.15} />
-      </mesh>
-      {/* Scope lens front */}
-      <mesh position={[0, 0.058, -0.11]}>
-        <circleGeometry args={[0.018, 12]} />
-        <meshStandardMaterial color="#1e40af" metalness={0.9} roughness={0.1} transparent opacity={0.6} />
-      </mesh>
-      {/* Bolt handle */}
-      <mesh position={[0.04, 0.01, 0.02]}>
-        <boxGeometry args={[0.02, 0.018, 0.055]} />
-        <meshStandardMaterial color="#292524" metalness={0.8} roughness={0.2} />
-      </mesh>
-      {/* Large stock */}
-      <mesh position={[0, -0.01, 0.32]}>
-        <boxGeometry args={[0.05, 0.085, 0.18]} />
-        <meshStandardMaterial color="#374a1a" metalness={0.3} roughness={0.7} />
-      </mesh>
-      {/* Grip */}
-      <mesh position={[0, -0.055, 0.05]} rotation={[0.25, 0, 0]}>
-        <boxGeometry args={[0.03, 0.05, 0.025]} />
-        <meshStandardMaterial color="#1a2e05" metalness={0.5} roughness={0.5} />
-      </mesh>
-      {/* Magazine */}
-      <mesh position={[0, -0.05, 0.0]}>
-        <boxGeometry args={[0.035, 0.05, 0.04]} />
-        <meshStandardMaterial color="#1c1917" metalness={0.7} roughness={0.3} />
-      </mesh>
-      {isFiring && (
-        <>
-          <pointLight position={[0, 0.01, -0.55]} color="#fbbf24" intensity={10} distance={3.5} />
-          <mesh position={[0, 0.01, -0.55]}>
-            <planeGeometry args={[0.14, 0.14]} />
+          <pointLight position={muzzlePos} color="#fbbf24" intensity={8} distance={3} />
+          <mesh position={muzzlePos}>
+            <planeGeometry args={[flashSize, flashSize]} />
             <meshBasicMaterial map={muzzleTex} transparent blending={THREE.AdditiveBlending} depthWrite={false} />
           </mesh>
         </>
@@ -549,11 +440,14 @@ function SniperModel({ isFiring, muzzleTex }: { isFiring: boolean; muzzleTex: TH
    ═══════════════════════════════════════════════════════════ */
 function EnemyMesh({ enemy }: { enemy: Enemy }) {
   const groupRef = useRef<THREE.Group>(null);
-  const enemyTex = useLoader(THREE.TextureLoader, '/images/fps/enemy.png');
+  const model = useClonedGLTF(MODEL_PATHS.enemy, 1.6);
 
   useFrame(() => {
     if (!groupRef.current) return;
     groupRef.current.position.copy(enemy.pos);
+    if (enemy.lookDir.lengthSq() > 0.01) {
+      groupRef.current.rotation.y = Math.atan2(enemy.lookDir.x, enemy.lookDir.z);
+    }
     if (enemy.state === 'dead') {
       groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -Math.PI / 2, 0.1);
       groupRef.current.position.y = Math.max(0.2, groupRef.current.position.y - 0.05);
@@ -564,17 +458,23 @@ function EnemyMesh({ enemy }: { enemy: Enemy }) {
     if (groupRef.current) enemy.mesh = groupRef.current;
   }, [enemy]);
 
-  const op = enemy.state === 'dead' ? 0.4 : 1;
+  useEffect(() => {
+    if (!model) return;
+    const op = enemy.state === 'dead' ? 0.4 : 1;
+    model.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mat = (child as THREE.Mesh).material as THREE.MeshStandardMaterial;
+        if (mat) { mat.transparent = true; mat.opacity = op; }
+      }
+    });
+  }, [enemy.state, model]);
 
   return (
     <group ref={groupRef}>
-      {/* Billboard enemy sprite */}
-      <sprite position={[0, 0.9, 0]} scale={[1.0, 1.8, 1]}>
-        <spriteMaterial map={enemyTex} transparent alphaTest={0.1} opacity={op} />
-      </sprite>
+      <primitive object={model} />
       {/* HP bar */}
       {enemy.state !== 'dead' && enemy.hp < enemy.maxHp && (
-        <group position={[0, 1.95, 0]}>
+        <group position={[0, 1.8, 0]}>
           <mesh>
             <planeGeometry args={[0.6, 0.06]} />
             <meshBasicMaterial color="#1c1917" transparent opacity={0.7} />
