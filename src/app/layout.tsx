@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Inter, Noto_Sans_JP, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import Providers from './providers';
 import Header from '@/components/Header';
@@ -6,6 +7,27 @@ import Footer from '@/components/Footer';
 import AnalyticsTracker from '@/components/AnalyticsTracker';
 import QiitaSidebar from '@/components/QiitaSidebar';
 import LoadingScreen from '@/components/LoadingScreen';
+
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const notoSansJP = Noto_Sans_JP({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap',
+  variable: '--font-noto-sans-jp',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  display: 'swap',
+  variable: '--font-jetbrains-mono',
+});
 
 export const metadata: Metadata = {
   title: {
@@ -48,15 +70,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ja" suppressHydrationWarning>
+    <html lang="ja" suppressHydrationWarning className={`${inter.variable} ${notoSansJP.variable} ${jetbrainsMono.variable}`}>
       <head>
         <meta
           httpEquiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://qiita-user-contents.imgix.net https://avatars.githubusercontent.com https://img.shields.io data:; connect-src 'self' https://qiita.com https://api.github.com https://zenn.dev; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://api.github.com; upgrade-insecure-requests;"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https://qiita-user-contents.imgix.net https://avatars.githubusercontent.com https://img.shields.io data:; connect-src 'self' https://qiita.com https://api.github.com https://zenn.dev; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self' https://api.github.com; upgrade-insecure-requests;"
         />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
+        <link rel="alternate" type="application/rss+xml" title="mirukyのIT備忘録 RSS" href="/feed.xml" />
       </head>
-      <body className="min-h-screen flex flex-col">
+      <body className="min-h-screen flex flex-col font-sans">
         <Providers>
           <LoadingScreen />
           <AnalyticsTracker />

@@ -4,10 +4,8 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { parseWord, getDisplayRomaji, Chunk } from '@/lib/romaji';
 import { getWords, Difficulty, TimeLimit, TypingWord } from '@/data/typing-words';
-
-// ─── Types ───
-type Phase = 'menu' | 'time-select' | 'countdown' | 'playing' | 'result';
-type MascotMood = 'happy' | 'reading' | 'shy' | 'question';
+import { Phase, MascotMood, RankRecord, STORAGE_KEY, GRADE_COLORS, GRADE_MSG, getGrade } from '@/lib/typing-utils';
+import TypingResultScreen from './TypingResultScreen';
 
 interface GameState {
   chunks: Chunk[];
@@ -26,18 +24,6 @@ interface GameState {
   wordsCleared: number;
 }
 
-interface RankRecord {
-  score: number;
-  kpm: number;
-  accuracy: number;
-  grade: string;
-  date: string;
-  timeLimit: TimeLimit;
-}
-
-// ─── Constants ───
-const STORAGE_KEY = 'miruky-typing-rankings';
-
 function createGameState(): GameState {
   return { chunks: [], chunkIdx: 0, typed: '', options: [], pending: null, completed: [], correct: 0, miss: 0, score: 0, streak: 0, maxStreak: 0, wordMiss: 0, wordStart: 0, wordsCleared: 0 };
 }
@@ -51,33 +37,6 @@ function calcWordScore(g: GameState, wordTime: number): number {
   const streakBonus = Math.min(g.streak * 20, 200);
   return base + speedBonus + accuracyBonus + streakBonus;
 }
-
-function getGrade(kpm: number, accuracy: number): string {
-  if (kpm >= 400 && accuracy >= 98) return 'SS';
-  if (kpm >= 350 && accuracy >= 95) return 'S';
-  if (kpm >= 250 && accuracy >= 85) return 'A';
-  if (kpm >= 150 && accuracy >= 75) return 'B';
-  if (kpm >= 80 && accuracy >= 60) return 'C';
-  return 'D';
-}
-
-const GRADE_COLORS: Record<string, string> = {
-  SS: 'from-rose-400 via-yellow-300 to-emerald-300',
-  S: 'from-yellow-300 to-amber-500',
-  A: 'from-accent-cyan to-accent-purple',
-  B: 'from-green-400 to-emerald-500',
-  C: 'from-blue-400 to-indigo-500',
-  D: 'from-slate-400 to-slate-500',
-};
-
-const GRADE_MSG: Record<string, string> = {
-  SS: '☆超絶タイピスト！神の領域！☆',
-  S: '素晴らしい！マスタータイピスト！',
-  A: 'お見事！かなりの腕前です！',
-  B: 'いい感じ！さらに上を目指そう！',
-  C: 'まずまず。練習あるのみ！',
-  D: 'がんばろう！何度でも挑戦！',
-};
 
 const DIFF_CONFIG: Record<Difficulty, { label: string; sub: string; desc: string; color: string }> = {
   easy: { label: 'Easy', sub: 'かんたん', desc: '基本のひらがな短文', color: 'from-green-400 to-emerald-500' },
@@ -757,143 +716,19 @@ export default function TypingGame({ onBack }: { onBack?: () => void }) {
 
   // ─── Result ───
   if (phase === 'result') {
-    const r = getResults();
-    const gradeColor = GRADE_COLORS[r.grade] || GRADE_COLORS.D;
-    const gradeMsg = GRADE_MSG[r.grade] || GRADE_MSG.D;
-    const gradeMascot = r.grade === 'SS' || r.grade === 'S' || r.grade === 'A' ? 'happy' : r.grade === 'B' ? 'reading' : 'question';
-
-    const record = resultRecord;
-    const rankings = savedRankings;
-    const currentRank = record ? rankings.findIndex(rr => rr.date === record.date) + 1 : 0;
-    const isNewBest = currentRank === 1 && rankings.length > 1;
-
     return (
-      <div className="w-full max-w-lg mx-auto px-4 text-center">
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-          <h2 className="text-2xl font-bold text-white mb-4">Result</h2>
-
-          {/* New Best Badge */}
-          {isNewBest && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', delay: 0.1 }}
-              className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-yellow-500/20 border border-yellow-500/40 text-yellow-400 text-xs font-bold mb-4"
-            >
-              🎉 NEW BEST!
-            </motion.div>
-          )}
-
-          {/* Grade */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 15, delay: 0.2 }}
-            className="mb-4"
-          >
-            <span className={`text-8xl font-black bg-gradient-to-br ${gradeColor} bg-clip-text text-transparent`}>
-              {r.grade}
-            </span>
-          </motion.div>
-
-          {/* Mascot */}
-          <div className="mb-4">
-            <div className={r.grade === 'SS' || r.grade === 'S' || r.grade === 'A' ? 'mascot-bounce inline-block' : 'mascot-float inline-block'}>
-              <img src={`/images/mascot/mascot-${gradeMascot}.png`} alt="" className="w-20 h-auto mx-auto drop-shadow-md" />
-            </div>
-            <p className="text-slate-400 text-sm mt-2">{gradeMsg}</p>
-          </div>
-
-          {/* Score Details */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="glass-card neon-border p-5 rounded-xl text-left space-y-2.5 mb-6"
-          >
-            <div className="flex justify-between"><span className="text-slate-400 text-sm">Score</span><span className="text-white font-bold font-mono">{r.score}</span></div>
-            <div className="flex justify-between"><span className="text-slate-400 text-sm">KPM（打鍵/分）</span><span className="text-accent-cyan font-bold font-mono">{Math.round(r.kpm)}</span></div>
-            <div className="flex justify-between"><span className="text-slate-400 text-sm">正確率</span><span className="text-accent-green font-bold font-mono">{r.accuracy.toFixed(1)}%</span></div>
-            <div className="flex justify-between"><span className="text-slate-400 text-sm">正打 / ミス</span><span className="font-mono"><span className="text-accent-green">{r.correct}</span> / <span className="text-red-400">{r.miss}</span></span></div>
-            <div className="flex justify-between"><span className="text-slate-400 text-sm">クリア単語数</span><span className="text-accent-purple font-bold font-mono">{r.wordsCleared}</span></div>
-            <div className="flex justify-between"><span className="text-slate-400 text-sm">最大ストリーク</span><span className="text-accent-purple font-bold font-mono">{r.maxStreak}</span></div>
-            <div className="flex justify-between"><span className="text-slate-400 text-sm">プレイ時間</span><span className="text-white font-mono">{Math.round(r.elapsed)}s / {timeLimit}s</span></div>
-            <div className="flex justify-between"><span className="text-slate-400 text-sm">難易度</span><span className="text-white capitalize">{difficulty} ({timeLimit === 60 ? '1分' : timeLimit === 180 ? '3分' : '5分'})</span></div>
-            {currentRank > 0 && (
-              <div className="flex justify-between border-t border-dark-700/50 pt-2.5"><span className="text-slate-400 text-sm">自己ランキング</span><span className={`font-bold ${currentRank <= 3 ? 'text-yellow-400' : 'text-white'}`}>#{currentRank} / {rankings.length}</span></div>
-            )}
-          </motion.div>
-
-          {/* Rankings Toggle */}
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-            <button
-              onClick={() => setShowRankings(!showRankings)}
-              className="text-xs text-accent-cyan hover:text-accent-cyan/80 transition-colors mb-4"
-            >
-              {showRankings ? '▲ ランキングを閉じる' : '▼ 自己ランキング TOP 10 を見る'}
-            </button>
-
-            <AnimatePresence>
-              {showRankings && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="overflow-hidden mb-6"
-                >
-                  <div className="glass-card neon-border rounded-xl p-4 text-left">
-                    <h3 className="text-sm font-bold text-accent-cyan mb-3">🏆 {difficulty.toUpperCase()} - {timeLimit === 60 ? '1分' : timeLimit === 180 ? '3分' : '5分'}</h3>
-                    {rankings.length === 0 ? (
-                      <p className="text-slate-500 text-xs">まだ記録がありません</p>
-                    ) : (
-                      <div className="space-y-1.5">
-                        {rankings.map((rr, i) => (
-                          <div
-                            key={i}
-                            className={`flex items-center gap-3 py-1.5 px-2 rounded text-xs ${
-                              record && rr.date === record.date ? 'bg-accent-cyan/10 border border-accent-cyan/30' : 'border-b border-dark-700/30'
-                            }`}
-                          >
-                            <span className={`font-bold w-6 text-center ${i === 0 ? 'text-yellow-400' : i === 1 ? 'text-slate-300' : i === 2 ? 'text-amber-600' : 'text-slate-500'}`}>#{i + 1}</span>
-                            <span className={`font-bold bg-gradient-to-r ${GRADE_COLORS[rr.grade] || GRADE_COLORS.D} bg-clip-text text-transparent`}>{rr.grade}</span>
-                            <span className="text-white font-mono flex-1">{rr.score}</span>
-                            <span className="text-accent-cyan">{rr.kpm} KPM</span>
-                            <span className="text-slate-400">{rr.accuracy}%</span>
-                            <span className="text-slate-600">{new Date(rr.date).toLocaleDateString('ja-JP')}</span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-
-          {/* Buttons */}
-          <div className="flex gap-3 justify-center">
-            <button
-              onClick={() => startGame(difficulty, timeLimit)}
-              className="px-6 py-3 rounded-lg font-medium bg-gradient-to-r from-accent-cyan to-accent-purple text-white hover:opacity-90 transition-all shadow-lg shadow-accent-cyan/20"
-            >
-              Retry
-            </button>
-            <button
-              onClick={() => setPhase('time-select')}
-              className="px-6 py-3 rounded-lg font-medium border border-accent-purple/40 text-accent-purple hover:bg-accent-purple/10 transition-all"
-            >
-              時間変更
-            </button>
-            <button
-              onClick={() => onBack ? onBack() : setPhase('menu')}
-              className="px-6 py-3 rounded-lg font-medium border border-accent-cyan/40 text-accent-cyan hover:bg-accent-cyan/10 transition-all"
-            >
-              Menu
-            </button>
-          </div>
-        </motion.div>
-      </div>
+      <TypingResultScreen
+        results={getResults()}
+        difficulty={difficulty}
+        timeLimit={timeLimit}
+        resultRecord={resultRecord}
+        savedRankings={savedRankings}
+        showRankings={showRankings}
+        onToggleRankings={() => setShowRankings(!showRankings)}
+        onRetry={() => startGame(difficulty, timeLimit)}
+        onTimeChange={() => setPhase('time-select')}
+        onMenu={() => onBack ? onBack() : setPhase('menu')}
+      />
     );
   }
 

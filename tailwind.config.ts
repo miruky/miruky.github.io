@@ -43,8 +43,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['"Inter"', '"Noto Sans JP"', 'sans-serif'],
-        mono: ['"JetBrains Mono"', '"Fira Code"', 'monospace'],
+        sans: ['var(--font-inter)', 'var(--font-noto-sans-jp)', 'sans-serif'],
+        mono: ['var(--font-jetbrains-mono)', '"Fira Code"', 'monospace'],
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

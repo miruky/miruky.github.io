@@ -148,7 +148,7 @@ interface Session {
   nonce: string;
 }
 
-const SESSION_DURATION = 4 * 60 * 1000; // 4 hours
+const SESSION_DURATION = 4 * 60 * 60 * 1000; // 4 hours
 
 async function hmacSign(data: string): Promise<string> {
   const enc = new TextEncoder();

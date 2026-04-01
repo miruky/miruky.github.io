@@ -1,7 +1,8 @@
-import { getAllPostSlugs, getPostData, getSortedPostsData } from '@/lib/blog';
+import { getAllPostSlugs, getPostData, getSortedPostsData, injectHeadingIds } from '@/lib/blog';
 import Link from 'next/link';
 import { FaArrowLeft, FaCalendar, FaTag } from 'react-icons/fa';
 import { notFound } from 'next/navigation';
+import BlogTOC from '@/components/BlogTOC';
 
 export async function generateStaticParams() {
   const slugs = getAllPostSlugs();
@@ -20,6 +21,19 @@ export async function generateMetadata({
   return {
     title: `${post.title} | mirukyのIT備忘録`,
     description: post.description || post.excerpt || '',
+    openGraph: {
+      title: post.title,
+      description: post.description || post.excerpt || '',
+      url: `https://miruky.github.io/blog/${params.slug}/`,
+      type: 'article',
+      publishedTime: post.date,
+      tags: post.tags,
+    },
+    twitter: {
+      card: 'summary',
+      title: post.title,
+      description: post.description || post.excerpt || '',
+    },
   };
 }
 
@@ -34,10 +48,14 @@ export default async function BlogPostPage({
     return null; // unreachable, but satisfies TypeScript
   }
 
+  const htmlWithIds = post.contentHtml ? injectHeadingIds(post.contentHtml) : '';
+
   return (
     <div className="pt-24 pb-20">
       <div className="section-container">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-6xl mx-auto flex gap-10">
+          {/* Main Content */}
+          <div className="max-w-3xl min-w-0 flex-1">
           {/* Back link */}
           <Link
             href="/blog"
@@ -79,7 +97,7 @@ export default async function BlogPostPage({
               prose-img:rounded-lg
               prose-blockquote:border-accent-cyan/50
             "
-            dangerouslySetInnerHTML={{ __html: post.contentHtml || post.content }}
+            dangerouslySetInnerHTML={{ __html: htmlWithIds }}
           />
 
           {/* Footer Navigation */}
@@ -92,6 +110,14 @@ export default async function BlogPostPage({
               Back to Blog
             </Link>
           </div>
+          </div>
+
+          {/* TOC Sidebar */}
+          {post.headings && post.headings.length > 0 && (
+            <aside className="w-56 shrink-0">
+              <BlogTOC headings={post.headings} />
+            </aside>
+          )}
         </div>
       </div>
     </div>

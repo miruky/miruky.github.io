@@ -14,6 +14,15 @@ export function generateStaticParams() {
   return params;
 }
 
+export function generateMetadata({ params }: { params: { lang: string; lesson: string } }) {
+  const labels: Record<string, string> = { python: 'Python', typescript: 'TypeScript', java: 'Java' };
+  const name = labels[params.lang] || params.lang;
+  return {
+    title: `${name} Reading ${params.lesson}`,
+    description: `${name} code reading lesson ${params.lesson}`,
+  };
+}
+
 export default function Page() {
   return <ReadingLessonClient />;
 }

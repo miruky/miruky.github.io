@@ -284,6 +284,11 @@ export default function SpaceBackground() {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    // Respect prefers-reduced-motion
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isMobile = window.innerWidth < 768;
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -304,9 +309,11 @@ export default function SpaceBackground() {
     };
 
     const init = () => {
-      // Stars – 3 layers (far, mid, near)
-      const count = Math.floor((w * h) / 2200);
-      stars = Array.from({ length: Math.min(count, 500) }, () => {
+      // Stars – 3 layers (far, mid, near); reduce on mobile
+      const baseDensity = isMobile ? 5000 : 2200;
+      const maxStars = isMobile ? 200 : 500;
+      const count = Math.floor((w * h) / baseDensity);
+      stars = Array.from({ length: Math.min(count, maxStars) }, () => {
         const layer = Math.random();
         const speed = layer < 0.5 ? 0.02 : layer < 0.8 ? 0.06 : 0.12;
         return {
@@ -332,7 +339,7 @@ export default function SpaceBackground() {
         }));
 
       const S = Math.max(w, h);
-      nebulae = [
+      const allNebulae: Nebula[] = [
         // Primary large nebulae (bigger, more vivid)
         { x: w * 0.15, y: h * 0.35, radius: S * 0.30, r: 40, g: 70, b: 220, alpha: 0.08, driftX: 0.1, driftY: 0.04, pulseSpeed: 0.3, pulseOffset: 0, lobes: makeLobes(5, S * 0.30) },
         { x: w * 0.8, y: h * 0.55, radius: S * 0.35, r: 160, g: 30, b: 200, alpha: 0.07, driftX: -0.08, driftY: 0.05, pulseSpeed: 0.25, pulseOffset: 2, lobes: makeLobes(6, S * 0.35) },
@@ -344,17 +351,21 @@ export default function SpaceBackground() {
         { x: w * 0.25, y: h * 0.58, radius: S * 0.20, r: 180, g: 80, b: 160, alpha: 0.05, driftX: 0.07, driftY: 0.05, pulseSpeed: 0.32, pulseOffset: 0.5, lobes: makeLobes(4, S * 0.20) },
         { x: w * 0.7, y: h * 0.82, radius: S * 0.16, r: 60, g: 100, b: 200, alpha: 0.05, driftX: -0.05, driftY: -0.03, pulseSpeed: 0.38, pulseOffset: 3.5, lobes: makeLobes(3, S * 0.16) },
       ];
+      // On mobile, keep only 3 nebulae
+      nebulae = isMobile ? allNebulae.slice(0, 3) : allNebulae;
 
       shootingStars = [];
 
-      // Spiral galaxies – pre-rendered textures for performance (5 total)
-      const galaxyConfigs = [
+      // Spiral galaxies – pre-rendered textures for performance
+      const allGalaxyConfigs = [
         { x: 0.12, y: 0.22, sizeMul: 0.08, tilt: 0.55, rotSpeed: 0.02, brightness: 0.7 },
         { x: 0.72, y: 0.15, sizeMul: 0.06, tilt: 0.45, rotSpeed: -0.015, brightness: 0.6 },
         { x: 0.88, y: 0.65, sizeMul: 0.05, tilt: 0.6, rotSpeed: 0.018, brightness: 0.55 },
         { x: 0.05, y: 0.08, sizeMul: 0.045, tilt: 0.4, rotSpeed: -0.012, brightness: 0.5 },
         { x: 0.55, y: 0.78, sizeMul: 0.055, tilt: 0.5, rotSpeed: 0.014, brightness: 0.5 },
       ];
+      // On mobile, only render 2 galaxies to save GPU
+      const galaxyConfigs = isMobile ? allGalaxyConfigs.slice(0, 2) : allGalaxyConfigs;
       galaxies = galaxyConfigs.map((gc) => {
         const sz = Math.max(w, h) * gc.sizeMul;
         return {
@@ -362,15 +373,15 @@ export default function SpaceBackground() {
           y: h * gc.y,
           size: sz,
           angle: Math.random() * Math.PI * 2,
-          rotSpeed: gc.rotSpeed,
+          rotSpeed: prefersReducedMotion ? 0 : gc.rotSpeed,
           tilt: gc.tilt,
           brightness: gc.brightness,
           texture: createGalaxyTexture(sz, 2, gc.tilt),
         };
       });
 
-      // Milky way – pre-rendered once
-      milkyWayTex = createMilkyWayTexture(w, h);
+      // Milky way – skip on mobile for performance
+      milkyWayTex = isMobile ? null : createMilkyWayTexture(w, h);
     };
 
     const spawnShootingStar = () => {

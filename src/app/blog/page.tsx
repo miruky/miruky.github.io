@@ -39,7 +39,7 @@ export default function BlogPage() {
             {posts.map((post) => (
               <Link
                 key={post.slug}
-                href={`/blog/${post.slug}`}
+                href={`/blog/${post.slug}/`}
                 className="glass-card p-6 hover-card neon-border group block"
               >
                 <h2 className="text-lg font-bold dark:text-white text-slate-900 group-hover:text-cyan-700 dark:group-hover:text-accent-cyan transition-colors mb-2">

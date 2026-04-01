@@ -10,7 +10,7 @@ export async function fetchGitHubUser(
       headers: {
         Accept: 'application/vnd.github.v3+json',
       },
-      next: { revalidate: 3600 },
+      cache: 'force-cache',
     });
 
     if (!res.ok) {
@@ -34,7 +34,7 @@ export async function fetchGitHubRepos(
         headers: {
           Accept: 'application/vnd.github.v3+json',
         },
-        next: { revalidate: 3600 },
+        cache: 'force-cache',
       }
     );
 

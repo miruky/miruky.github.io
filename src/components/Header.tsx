@@ -2,21 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import ThemeToggle from './ThemeToggle';
+import SearchDialog from './SearchDialog';
 import { motion, AnimatePresence } from 'framer-motion';
-
-const navItems = [
-  { href: '/', label: 'Home' },
-  { href: '/articles/', label: 'Qiita' },
-  { href: '/skilltree/', label: 'Skills' },
-  { href: '/program/', label: 'Program' },
-  { href: '/architect/', label: 'Architect' },
-  { href: '/projects/', label: 'Projects' },
-  { href: '/blog/', label: 'Blog' },
-  { href: '/game/', label: 'Game' },
-  { href: '/contact/', label: 'Contact' },
-];
+import { navItems } from '@/data/config';
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -61,10 +52,12 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <img
+            <Image
               src="/images/icon.png"
               alt="miruky"
-              className="w-8 h-8 rounded-lg object-cover group-hover:scale-110 transition-transform"
+              width={32}
+              height={32}
+              className="rounded-lg object-cover group-hover:scale-110 transition-transform"
             />
             <span className="font-bold text-lg hidden sm:block">
               <span className={isHeaderOverDark ? 'text-white' : 'text-slate-900 dark:text-white'}>miruky</span><span className="gradient-text-static">のIT備忘録</span>
@@ -98,13 +91,15 @@ export default function Header() {
                 </Link>
               );
             })}
-            <div className="ml-4">
+            <div className="ml-4 flex items-center gap-2">
+              <SearchDialog />
               <ThemeToggle />
             </div>
           </nav>
 
           {/* Mobile Menu Button */}
           <div className="flex items-center gap-3 md:hidden">
+            <SearchDialog />
             <ThemeToggle />
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

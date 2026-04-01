@@ -1,9 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { FaGithub, FaXTwitter } from 'react-icons/fa6';
 import { SiQiita, SiZenn } from 'react-icons/si';
+import { navItems } from '@/data/config';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -19,10 +21,12 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <img
+              <Image
                 src="/images/icon.png"
                 alt="miruky"
-                className="w-8 h-8 rounded-lg object-cover"
+                width={32}
+                height={32}
+                className="rounded-lg object-cover"
               />
               <span className="font-bold text-lg dark:text-white text-slate-900">
                 <span className="dark:text-white text-slate-900">miruky</span><span className="gradient-text-static">のIT備忘録</span>
@@ -40,17 +44,7 @@ export default function Footer() {
               Pages
             </h3>
             <ul className="space-y-2">
-              {[
-                { href: '/', label: 'Home' },
-                { href: '/articles/', label: 'Articles' },
-                { href: '/skilltree/', label: 'Skills' },
-                { href: '/program/', label: 'Program' },
-                { href: '/architect/', label: 'Architect' },
-                { href: '/projects/', label: 'Projects' },
-                { href: '/blog/', label: 'Blog' },
-                { href: '/game/', label: 'Game' },
-                { href: '/contact/', label: 'Contact' },
-              ].map((item) => (
+              {navItems.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}

@@ -57,6 +57,7 @@ export interface BlogPost {
   description?: string;
   content: string;
   contentHtml?: string;
+  headings?: { id: string; text: string; level: number }[];
 }
 
 export interface CareerItem {

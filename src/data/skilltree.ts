@@ -77,7 +77,7 @@ export const skillTreeData: SkillBranch[] = [
       { id: 'rds', name: 'Amazon RDS', shortName: 'RDS', level: 85, description: 'RDB管理・Multi-AZ・リードレプリカ' },
       { id: 'cloudfront', name: 'Amazon CloudFront', shortName: 'CF', level: 85, description: 'CDN配信・キャッシュ戦略・OAC設定' },
       { id: 'connect', name: 'Amazon Connect', shortName: 'Connect', level: 80, description: 'クラウドコンタクトセンターの構築' },
-      { id: 'bedrock', name: 'Amazon Bedrock', shortName: 'Bedrock', level: 80, description: '生成AI基盤モデルの活用・Agents構築' },
+      { id: 'bedrock', name: 'Amazon Bedrock', shortName: 'Bedrock', level: 80, description: 'Agents・Guardrails・Knowledge Base構築' },
       { id: 'lex', name: 'Amazon Lex', shortName: 'Lex', level: 75, description: '会話型AIボットの開発' },
     ],
   },
@@ -98,7 +98,7 @@ export const skillTreeData: SkillBranch[] = [
     icon: '',
     color: '#a855f7',
     skills: [
-      { id: 'bedrock-ai', name: 'Amazon Bedrock', shortName: 'Bedrock', level: 80, description: '基盤モデルの活用・プロンプトエンジニアリング' },
+      { id: 'bedrock-ai', name: 'Bedrock AI/ML', shortName: 'Bedrock ML', level: 80, description: '基盤モデル選定・プロンプトエンジニアリング・RAG連携' },
       { id: 'rag', name: 'RAG', shortName: 'RAG', level: 75, description: '検索拡張生成パターンの設計・Knowledge Base活用' },
       { id: 'langchain', name: 'LangChain', shortName: 'LC', level: 70, description: 'LLMアプリケーションフレームワーク' },
       { id: 'vectordb', name: 'ChromaDB / FAISS', shortName: 'VecDB', level: 70, description: 'ベクトルDB・類似検索エンジン' },

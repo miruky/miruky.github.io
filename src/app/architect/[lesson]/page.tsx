@@ -7,6 +7,13 @@ export function generateStaticParams() {
   }));
 }
 
+export function generateMetadata({ params }: { params: { lesson: string } }) {
+  return {
+    title: `Architect Lesson ${params.lesson}`,
+    description: `AWS Solutions Architect lesson ${params.lesson}`,
+  };
+}
+
 export default function Page() {
   return <LessonClient />;
 }

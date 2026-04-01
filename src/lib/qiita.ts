@@ -23,7 +23,7 @@ export async function fetchQiitaArticles(
       `${QIITA_API_BASE}/users/${userId}/items?page=${page}&per_page=${perPage}`,
       {
         headers: getHeaders(),
-        next: { revalidate: 3600 },
+        cache: 'force-cache',
       }
     );
 
@@ -60,7 +60,7 @@ export async function fetchQiitaUser(userId: string): Promise<QiitaUser | null> 
   try {
     const res = await fetch(`${QIITA_API_BASE}/users/${userId}`, {
       headers: getHeaders(),
-      next: { revalidate: 3600 },
+      cache: 'force-cache',
     });
 
     if (!res.ok) {
