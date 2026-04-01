@@ -17,13 +17,14 @@ export function HUD({ gs }: { gs: GameState }) {
     <div className="absolute inset-0 pointer-events-none z-40 text-white" style={{ fontFamily: "'Rajdhani', 'Orbitron', monospace" }}>
       {/* ── Crosshair / Scope ── */}
       {gs.isADS && gs.weaponIndex === 3 ? (
-        /* Sniper scope overlay */
-        <div className="absolute inset-0 z-50">
-          <img src="/images/fps/scope.png" alt="" className="w-full h-full object-contain" style={{ mixBlendMode: 'screen' }} />
-          {/* Black vignette around scope */}
-          <div className="absolute inset-0" style={{
-            background: 'radial-gradient(circle at 50% 50%, transparent 28%, rgba(0,0,0,0.97) 42%)'
-          }} />
+        /* Sniper scope overlay – scope.png with transparent center */
+        <div className="absolute inset-0 z-50 bg-black">
+          <img
+            src="/images/fps/scope.png"
+            alt=""
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-full"
+            style={{ aspectRatio: '1/1', objectFit: 'contain' }}
+          />
         </div>
       ) : (
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -58,10 +59,13 @@ export function HUD({ gs }: { gs: GameState }) {
         </div>
       ))}
 
-      {/* ── Top center: Timer ── */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2">
+      {/* ── Top center: Timer + Wave ── */}
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-3">
         <div className="bg-black/60 backdrop-blur-sm rounded-lg px-6 py-2 border border-white/10">
           <p className="text-2xl font-bold tracking-wider tabular-nums">{timeStr}</p>
+        </div>
+        <div className="bg-black/60 backdrop-blur-sm rounded-lg px-3 py-2 border border-orange-500/30">
+          <p className="text-xs text-orange-400 font-bold">WAVE {gs.wave}</p>
         </div>
       </div>
 
@@ -69,6 +73,9 @@ export function HUD({ gs }: { gs: GameState }) {
       <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm rounded-lg px-4 py-2 border border-white/10">
         <p className="text-xs text-slate-400 uppercase tracking-wider">Score</p>
         <p className="text-2xl font-bold text-accent-cyan tabular-nums">{gs.score.toLocaleString()}</p>
+        {gs.scoreMultiplier > 1 && (
+          <p className="text-xs text-yellow-400 font-bold animate-pulse">x{gs.scoreMultiplier}</p>
+        )}
       </div>
 
       {/* ── Top left: Kills/Deaths ── */}
@@ -90,7 +97,27 @@ export function HUD({ gs }: { gs: GameState }) {
       {gs.streakCount >= 3 && (
         <div className="absolute top-20 left-1/2 -translate-x-1/2 animate-pulse">
           <div className="bg-gradient-to-r from-orange-500/80 to-red-600/80 backdrop-blur-sm rounded-lg px-6 py-1.5 border border-orange-400/40">
-            <p className="text-sm font-bold tracking-wider">🔥 {gs.streakCount} KILL STREAK</p>
+            <p className="text-sm font-bold tracking-wider">{gs.streakCount} KILL STREAK</p>
+          </div>
+        </div>
+      )}
+
+      {/* ── Active Killstreak reward ── */}
+      {gs.killstreakActive && (
+        <div className="absolute top-28 left-1/2 -translate-x-1/2">
+          <div className="bg-gradient-to-r from-blue-600/70 to-purple-600/70 backdrop-blur-sm rounded-lg px-4 py-1 border border-blue-400/30">
+            <p className="text-xs font-bold tracking-wider text-blue-200">
+              {gs.killstreakActive} ({Math.ceil(gs.killstreakTimer)}s)
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* ── Armor indicator ── */}
+      {gs.armorActive && (
+        <div className="absolute top-36 left-1/2 -translate-x-1/2">
+          <div className="bg-blue-500/30 backdrop-blur-sm rounded px-3 py-0.5 border border-blue-400/40">
+            <p className="text-[10px] font-bold text-blue-300">ARMOR ACTIVE -50% DMG</p>
           </div>
         </div>
       )}
@@ -149,10 +176,19 @@ export function HUD({ gs }: { gs: GameState }) {
         ))}
       </div>
 
-      {/* ── Bottom left: HP ── */}
+      {/* ── Bottom left: HP + Grenade + Stance ── */}
       <div className="absolute bottom-6 left-6">
         <div className="bg-black/60 backdrop-blur-sm rounded-xl px-6 py-4 border border-white/10 min-w-[200px]">
-          <p className="text-xs text-slate-400 mb-1">HEALTH</p>
+          <div className="flex items-center justify-between mb-1">
+            <p className="text-xs text-slate-400">HEALTH</p>
+            <div className="flex items-center gap-2">
+              {gs.isCrouching && (
+                <span className="text-[10px] font-bold text-blue-400 bg-blue-400/10 px-1.5 py-0.5 rounded border border-blue-400/20">
+                  CROUCH
+                </span>
+              )}
+            </div>
+          </div>
           <div className="flex items-end gap-2 mb-2">
             <p className={`text-3xl font-black tabular-nums leading-none ${
               gs.hp > 60 ? 'text-white' : gs.hp > 30 ? 'text-yellow-400' : 'text-red-500 animate-pulse'
@@ -169,6 +205,22 @@ export function HUD({ gs }: { gs: GameState }) {
               style={{ width: `${hpPercent * 100}%` }}
             />
           </div>
+          {/* Grenades */}
+          <div className="mt-2 flex items-center gap-1.5">
+            <span className="text-[10px] text-slate-400">GRENADE</span>
+            <div className="flex gap-1 ml-auto">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-3 h-3 rounded-full border ${
+                    i < gs.grenades
+                      ? 'bg-green-500 border-green-400'
+                      : 'bg-slate-800 border-slate-600'
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -176,7 +228,14 @@ export function HUD({ gs }: { gs: GameState }) {
       <div className="absolute top-24 right-4 space-y-1">
         {gs.killFeed.map((kf) => (
           <div key={kf.id} className="bg-black/50 backdrop-blur-sm rounded px-3 py-1 text-sm font-bold">
-            <span className={kf.text.includes('ヘッド') ? 'text-red-400' : kf.text.includes('リスポーン') ? 'text-slate-400' : 'text-yellow-400'}>
+            <span className={
+              kf.text.includes('\u30d8\u30c3\u30c9') ? 'text-red-400' :
+              kf.text.includes('\u30ea\u30b9\u30dd') || kf.text.includes('\u843d\u4e0b') ? 'text-slate-400' :
+              kf.text.includes('WAVE') ? 'text-orange-400' :
+              kf.text.includes('UAV') || kf.text.includes('\u30a2\u30fc\u30de\u30fc') || kf.text.includes('\u30c0\u30d6\u30eb') || kf.text.includes('NUKE') ? 'text-blue-400' :
+              kf.text.includes('\u56de\u53ce') || kf.text.includes('\u56de\u5fa9') ? 'text-green-400' :
+              'text-yellow-400'
+            }>
               {kf.text}
             </span>
           </div>
@@ -206,14 +265,14 @@ export function HUD({ gs }: { gs: GameState }) {
       {/* ── Controls hint (in-game) ── */}
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-3 text-xs">
         {[
-          ['WASD', '移動'],
-          ['Mouse', 'エイム'],
-          ['LMB', '射撃'],
+          ['WASD', '\u79fb\u52d5'],
+          ['LMB', '\u5c04\u6483'],
           ['RMB', 'ADS'],
-          ['R', 'リロード'],
-          ['Space', 'ジャンプ'],
-          ['1-4', '武器'],
-          ['Esc', 'ポーズ'],
+          ['R', '\u30ea\u30ed\u30fc\u30c9'],
+          ['G', '\u30b0\u30ec\u30cd\u30fc\u30c9'],
+          ['C', '\u3057\u3083\u304c\u307f'],
+          ['1-4', '\u6b66\u5668'],
+          ['Esc', '\u30dd\u30fc\u30ba'],
         ].map(([key, label]) => (
           <div key={key} className="flex items-center gap-1">
             <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-white/10 border border-white/20 text-[10px] font-bold text-white/70 min-w-[1.5rem] text-center">
