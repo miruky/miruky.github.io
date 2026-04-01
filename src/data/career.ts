@@ -32,3 +32,4 @@ export const careerTimeline: CareerItem[] = [
       'GitHubでポートフォリオを構築開始。LLM RAG Chatbot、AWS Serverless URL Shortenerなどのプロジェクトを公開し、OSSへの貢献やさらなる技術領域の拡大を目指す。',
   },
 ];
+

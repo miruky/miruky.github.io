@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { FaCode, FaBook, FaGamepad, FaTrophy, FaArrowLeft } from 'react-icons/fa';
+import { FaCode, FaBook, FaGamepad, FaTrophy, FaArrowLeft, FaKeyboard } from 'react-icons/fa';
 
 interface LangProgress {
   lang: string;
@@ -12,27 +12,43 @@ interface LangProgress {
   completed: number[];
 }
 
-interface GameStats {
-  typingBest: number | null;
-  blocksBest: number | null;
-  quizBest: number | null;
+interface TypingBest {
+  grade: string;
+  score: number;
+  kpm: number;
+  accuracy: number;
 }
+
+const WRITING_LANGS = [
+  { id: 'python', label: 'Python', total: 30 },
+  { id: 'typescript', label: 'TypeScript', total: 30 },
+  { id: 'javascript', label: 'JavaScript', total: 30 },
+  { id: 'java', label: 'Java', total: 30 },
+  { id: 'ruby', label: 'Ruby', total: 30 },
+  { id: 'html-css', label: 'HTML & CSS', total: 30 },
+  { id: 'c-lang', label: 'C言語', total: 30 },
+  { id: 'sql', label: 'SQL', total: 30 },
+  { id: 'secure', label: 'セキュリティ', total: 30 },
+];
+
+const READING_LANGS = [
+  { id: 'python', label: 'Python', total: 34 },
+  { id: 'typescript', label: 'TypeScript', total: 33 },
+  { id: 'java', label: 'Java', total: 33 },
+];
+
+const ARCHITECT_TOTAL = 100;
 
 export default function DashboardClient() {
   const [writingProgress, setWritingProgress] = useState<LangProgress[]>([]);
   const [readingProgress, setReadingProgress] = useState<LangProgress[]>([]);
   const [architectProgress, setArchitectProgress] = useState<number[]>([]);
-  const [gameStats, setGameStats] = useState<GameStats>({ typingBest: null, blocksBest: null, quizBest: null });
+  const [typingBest, setTypingBest] = useState<TypingBest | null>(null);
 
   useEffect(() => {
-    // Writing progress
-    const langs = [
-      { id: 'python', label: 'Python', total: 30 },
-      { id: 'typescript', label: 'TypeScript', total: 30 },
-      { id: 'java', label: 'Java', total: 30 },
-    ];
+    // Writing progress (9 languages)
     setWritingProgress(
-      langs.map((l) => ({
+      WRITING_LANGS.map((l) => ({
         lang: l.id,
         label: l.label,
         total: l.total,
@@ -40,14 +56,9 @@ export default function DashboardClient() {
       }))
     );
 
-    // Reading progress
-    const readingLangs = [
-      { id: 'python', label: 'Python', total: 34 },
-      { id: 'typescript', label: 'TypeScript', total: 33 },
-      { id: 'java', label: 'Java', total: 33 },
-    ];
+    // Reading progress (3 languages)
     setReadingProgress(
-      readingLangs.map((l) => ({
+      READING_LANGS.map((l) => ({
         lang: l.id,
         label: l.label,
         total: l.total,
@@ -58,12 +69,22 @@ export default function DashboardClient() {
     // Architect progress
     setArchitectProgress(JSON.parse(localStorage.getItem('architect_progress') || '[]'));
 
-    // Game stats
-    setGameStats({
-      typingBest: Number(localStorage.getItem('typing_best_wpm')) || null,
-      blocksBest: Number(localStorage.getItem('blocks_best_score')) || null,
-      quizBest: Number(localStorage.getItem('quiz_best_score')) || null,
-    });
+    // Typing game best score (from miruky-typing-rankings)
+    try {
+      const raw = localStorage.getItem('miruky-typing-rankings');
+      if (raw) {
+        const rankings: Record<string, { score: number; kpm: number; accuracy: number; grade: string }[]> = JSON.parse(raw);
+        let best: TypingBest | null = null;
+        for (const records of Object.values(rankings)) {
+          for (const r of records) {
+            if (!best || r.score > best.score) {
+              best = { grade: r.grade, score: r.score, kpm: r.kpm, accuracy: r.accuracy };
+            }
+          }
+        }
+        setTypingBest(best);
+      }
+    } catch { /* silent */ }
   }, []);
 
   const totalWriting = writingProgress.reduce((s, l) => s + l.completed.length, 0);
@@ -71,7 +92,7 @@ export default function DashboardClient() {
   const totalReading = readingProgress.reduce((s, l) => s + l.completed.length, 0);
   const totalReadingMax = readingProgress.reduce((s, l) => s + l.total, 0);
   const overallCompleted = totalWriting + totalReading + architectProgress.length;
-  const overallTotal = totalWritingMax + totalReadingMax + 10; // 10 architect lessons
+  const overallTotal = totalWritingMax + totalReadingMax + ARCHITECT_TOTAL;
 
   return (
     <div className="pt-24 pb-20">
@@ -178,12 +199,12 @@ export default function DashboardClient() {
             </div>
             <div className="flex justify-between text-sm mb-1">
               <span className="text-slate-700 dark:text-slate-300">Completed lessons</span>
-              <span className="text-slate-500 dark:text-slate-400 font-mono">{architectProgress.length}/10</span>
+              <span className="text-slate-500 dark:text-slate-400 font-mono">{architectProgress.length}/{ARCHITECT_TOTAL}</span>
             </div>
             <div className="h-2 bg-slate-200 dark:bg-dark-700 rounded-full overflow-hidden">
               <div
                 className="h-full bg-amber-400 rounded-full transition-all duration-500"
-                style={{ width: `${(architectProgress.length / 10) * 100}%` }}
+                style={{ width: `${(architectProgress.length / ARCHITECT_TOTAL) * 100}%` }}
               />
             </div>
           </motion.div>
@@ -191,23 +212,31 @@ export default function DashboardClient() {
           {/* Game Stats */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="glass-card p-6">
             <div className="flex items-center gap-3 mb-4">
-              <FaGamepad className="w-5 h-5 text-accent-pink" />
-              <h2 className="text-lg font-bold dark:text-white text-slate-900">Games</h2>
+              <FaKeyboard className="w-5 h-5 text-accent-pink" />
+              <h2 className="text-lg font-bold dark:text-white text-slate-900">Typing Game</h2>
             </div>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-slate-700 dark:text-slate-300">Typing Best WPM</span>
-                <span className="font-mono font-bold text-accent-cyan">{gameStats.typingBest ?? '—'}</span>
+            {typingBest ? (
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-slate-700 dark:text-slate-300">Best Grade</span>
+                  <span className="font-mono font-bold text-accent-cyan">{typingBest.grade}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-700 dark:text-slate-300">Best Score</span>
+                  <span className="font-mono font-bold text-accent-cyan">{typingBest.score.toLocaleString()}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-700 dark:text-slate-300">Best KPM</span>
+                  <span className="font-mono font-bold text-accent-cyan">{typingBest.kpm}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-700 dark:text-slate-300">Best Accuracy</span>
+                  <span className="font-mono font-bold text-accent-cyan">{typingBest.accuracy}%</span>
+                </div>
               </div>
-              <div className="flex justify-between">
-                <span className="text-slate-700 dark:text-slate-300">Blocks Best Score</span>
-                <span className="font-mono font-bold text-accent-cyan">{gameStats.blocksBest ?? '—'}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-slate-700 dark:text-slate-300">Quiz Best Score</span>
-                <span className="font-mono font-bold text-accent-cyan">{gameStats.quizBest ?? '—'}</span>
-              </div>
-            </div>
+            ) : (
+              <p className="text-sm text-slate-500 dark:text-slate-400">まだプレイ記録がありません</p>
+            )}
           </motion.div>
         </div>
       </div>
