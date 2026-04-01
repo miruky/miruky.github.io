@@ -17,14 +17,26 @@ export function HUD({ gs }: { gs: GameState }) {
     <div className="absolute inset-0 pointer-events-none z-40 text-white" style={{ fontFamily: "'Rajdhani', 'Orbitron', monospace" }}>
       {/* ── Crosshair / Scope ── */}
       {gs.isADS && gs.weaponIndex === 3 ? (
-        /* Sniper scope overlay – scope.png with transparent center */
-        <div className="absolute inset-0 z-50 bg-black">
+        /* Sniper scope overlay – transparent center shows 3D scene */
+        <div className="absolute inset-0 z-50">
+          {/* Radial vignette: transparent center, opaque black edges */}
+          <div className="absolute inset-0" style={{
+            background: 'radial-gradient(circle at 50% 50%, transparent 18%, rgba(0,0,0,0.6) 25%, rgba(0,0,0,0.98) 32%)'
+          }} />
+          {/* Scope reticle image */}
           <img
             src="/images/fps/scope.png"
             alt=""
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-full"
-            style={{ aspectRatio: '1/1', objectFit: 'contain' }}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-full pointer-events-none"
+            style={{ aspectRatio: '1/1', objectFit: 'contain', opacity: 0.85, mixBlendMode: 'multiply' }}
           />
+          {/* Crosshair lines in scope center */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div className="relative w-12 h-12">
+              <div className="absolute left-1/2 top-0 w-[1px] h-full bg-red-500/60 -translate-x-1/2" />
+              <div className="absolute top-1/2 left-0 h-[1px] w-full bg-red-500/60 -translate-y-1/2" />
+            </div>
+          </div>
         </div>
       ) : (
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -35,7 +47,14 @@ export function HUD({ gs }: { gs: GameState }) {
               <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full border border-red-400/90" />
             </div>
           ) : (
-            <img src="/images/fps/crosshair.png" alt="" className="w-8 h-8 opacity-80" style={{ mixBlendMode: 'screen' }} />
+            /* CSS crosshair (no external image needed) */
+            <div className="relative w-8 h-8">
+              <div className="absolute left-1/2 top-0 w-[2px] h-2 bg-white/70 -translate-x-1/2" />
+              <div className="absolute left-1/2 bottom-0 w-[2px] h-2 bg-white/70 -translate-x-1/2" />
+              <div className="absolute top-1/2 left-0 h-[2px] w-2 bg-white/70 -translate-y-1/2" />
+              <div className="absolute top-1/2 right-0 h-[2px] w-2 bg-white/70 -translate-y-1/2" />
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1 h-1 rounded-full bg-white/60" />
+            </div>
           )}
         </div>
       )}
@@ -171,7 +190,7 @@ export function HUD({ gs }: { gs: GameState }) {
             }`}
           >
             <span className="w-3 text-center text-[10px] text-slate-500">{i + 1}</span>
-            <span>{w.name}</span>
+            <span>{w.nameJa}</span>
           </div>
         ))}
       </div>
@@ -229,11 +248,11 @@ export function HUD({ gs }: { gs: GameState }) {
         {gs.killFeed.map((kf) => (
           <div key={kf.id} className="bg-black/50 backdrop-blur-sm rounded px-3 py-1 text-sm font-bold">
             <span className={
-              kf.text.includes('\u30d8\u30c3\u30c9') ? 'text-red-400' :
-              kf.text.includes('\u30ea\u30b9\u30dd') || kf.text.includes('\u843d\u4e0b') ? 'text-slate-400' :
+              kf.text.includes('ヘッド') ? 'text-red-400' :
+              kf.text.includes('リスポ') || kf.text.includes('落下') ? 'text-slate-400' :
               kf.text.includes('WAVE') ? 'text-orange-400' :
-              kf.text.includes('UAV') || kf.text.includes('\u30a2\u30fc\u30de\u30fc') || kf.text.includes('\u30c0\u30d6\u30eb') || kf.text.includes('NUKE') ? 'text-blue-400' :
-              kf.text.includes('\u56de\u53ce') || kf.text.includes('\u56de\u5fa9') ? 'text-green-400' :
+              kf.text.includes('UAV') || kf.text.includes('アーマー') || kf.text.includes('ダブル') || kf.text.includes('NUKE') ? 'text-blue-400' :
+              kf.text.includes('回収') || kf.text.includes('回復') ? 'text-green-400' :
               'text-yellow-400'
             }>
               {kf.text}
@@ -265,14 +284,14 @@ export function HUD({ gs }: { gs: GameState }) {
       {/* ── Controls hint (in-game) ── */}
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-3 text-xs">
         {[
-          ['WASD', '\u79fb\u52d5'],
-          ['LMB', '\u5c04\u6483'],
+          ['WASD', '移動'],
+          ['LMB', '射撃'],
           ['RMB', 'ADS'],
-          ['R', '\u30ea\u30ed\u30fc\u30c9'],
-          ['G', '\u30b0\u30ec\u30cd\u30fc\u30c9'],
-          ['C', '\u3057\u3083\u304c\u307f'],
-          ['1-4', '\u6b66\u5668'],
-          ['Esc', '\u30dd\u30fc\u30ba'],
+          ['R', 'リロード'],
+          ['G', 'グレネード'],
+          ['C', 'しゃがみ'],
+          ['1-4', '武器'],
+          ['Esc', 'ポーズ'],
         ].map(([key, label]) => (
           <div key={key} className="flex items-center gap-1">
             <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded bg-white/10 border border-white/20 text-[10px] font-bold text-white/70 min-w-[1.5rem] text-center">

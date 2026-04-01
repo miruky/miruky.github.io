@@ -100,11 +100,25 @@ function useClonedGLTF(path: string, targetSize: number) {
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
+        const fixMat = (m: THREE.Material): THREE.Material => {
+          const c = m.clone();
+          const std = c as THREE.MeshStandardMaterial;
+          // Ensure texture colorSpace for correct color display
+          if (std.map) { std.map.colorSpace = THREE.SRGBColorSpace; std.map.needsUpdate = true; }
+          if (std.emissiveMap) { std.emissiveMap.colorSpace = THREE.SRGBColorSpace; std.emissiveMap.needsUpdate = true; }
+          if (std.normalMap) std.normalMap.needsUpdate = true;
+          if (std.roughnessMap) std.roughnessMap.needsUpdate = true;
+          if (std.metalnessMap) std.metalnessMap.needsUpdate = true;
+          c.needsUpdate = true;
+          return c;
+        };
         if (Array.isArray(mesh.material)) {
-          mesh.material = mesh.material.map((m) => m.clone());
+          mesh.material = mesh.material.map(fixMat);
         } else {
-          mesh.material = mesh.material.clone();
+          mesh.material = fixMat(mesh.material);
         }
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
       }
     });
     const box = new THREE.Box3().setFromObject(clone);
@@ -198,6 +212,14 @@ interface HitMarker {
   id: number;
   time: number;
   headshot: boolean;
+}
+
+interface DamageNumber {
+  id: number;
+  pos: THREE.Vector3;
+  damage: number;
+  headshot: boolean;
+  time: number;
 }
 
 interface KillFeed {
@@ -488,7 +510,9 @@ function GLBWeapon({
    ═══════════════════════════════════════════════════════════ */
 function EnemyMesh({ enemy }: { enemy: Enemy }) {
   const groupRef = useRef<THREE.Group>(null);
+  const hpBarRef = useRef<THREE.Group>(null);
   const model = useClonedGLTF(MODEL_PATHS.enemy, 1.6);
+  const { camera } = useThree();
 
   useFrame(() => {
     if (!groupRef.current) return;
@@ -499,6 +523,10 @@ function EnemyMesh({ enemy }: { enemy: Enemy }) {
     if (enemy.state === 'dead') {
       groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -Math.PI / 2, 0.1);
       groupRef.current.position.y = Math.max(0.2, groupRef.current.position.y - 0.05);
+    }
+    // HP bar always faces camera (billboard)
+    if (hpBarRef.current) {
+      hpBarRef.current.lookAt(camera.position);
     }
   });
 
@@ -517,19 +545,33 @@ function EnemyMesh({ enemy }: { enemy: Enemy }) {
     });
   }, [enemy.state, model]);
 
+  const hpRatio = enemy.hp / enemy.maxHp;
+  const hpColor = hpRatio > 0.6 ? '#22c55e' : hpRatio > 0.3 ? '#eab308' : '#ef4444';
+
   return (
     <group ref={groupRef}>
       <primitive object={model} />
-      {enemy.state !== 'dead' && enemy.hp < enemy.maxHp && (
-        <group position={[0, 1.8, 0]}>
-          <mesh>
-            <planeGeometry args={[0.6, 0.06]} />
-            <meshBasicMaterial color="#1c1917" transparent opacity={0.7} />
+      {enemy.state !== 'dead' && (
+        <group ref={hpBarRef} position={[0, 2.0, 0]}>
+          {/* HP bar background */}
+          <mesh position={[0, 0, 0]}>
+            <planeGeometry args={[0.8, 0.08]} />
+            <meshBasicMaterial color="#1c1917" transparent opacity={0.8} />
           </mesh>
-          <mesh position={[(enemy.hp / enemy.maxHp - 1) * 0.3, 0, 0.001]}>
-            <planeGeometry args={[(enemy.hp / enemy.maxHp) * 0.6, 0.06]} />
-            <meshBasicMaterial color="#ef4444" />
+          {/* HP bar fill */}
+          <mesh position={[(hpRatio - 1) * 0.4, 0, 0.001]}>
+            <planeGeometry args={[hpRatio * 0.8, 0.08]} />
+            <meshBasicMaterial color={hpColor} />
           </mesh>
+          {/* HP number - sprite */}
+          <sprite position={[0, 0.12, 0]} scale={[0.6, 0.2, 1]}>
+            <spriteMaterial
+              transparent
+              depthWrite={false}
+              color="#ffffff"
+              opacity={0.9}
+            />
+          </sprite>
         </group>
       )}
     </group>
@@ -630,6 +672,58 @@ function ExplosionEffect({ position, startTime }: { position: THREE.Vector3; sta
 }
 
 /* ═══════════════════════════════════════════════════════════
+   Damage number floating sprite
+   ═══════════════════════════════════════════════════════════ */
+function DamageNumberSprite({ dn }: { dn: DamageNumber }) {
+  const ref = useRef<THREE.Sprite>(null);
+  const texture = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 192;
+    canvas.height = 96;
+    const ctx = canvas.getContext('2d')!;
+    const dmgText = Math.round(dn.damage).toString();
+    ctx.font = `bold ${dn.headshot ? 56 : 44}px Arial`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle = '#000';
+    ctx.lineWidth = 5;
+    ctx.strokeText(dmgText, 96, dn.headshot ? 36 : 48);
+    ctx.fillStyle = dn.headshot ? '#ff3333' : '#ffcc00';
+    ctx.fillText(dmgText, 96, dn.headshot ? 36 : 48);
+    if (dn.headshot) {
+      ctx.font = 'bold 20px Arial';
+      ctx.fillStyle = '#ff5555';
+      ctx.strokeText('HEADSHOT', 96, 72);
+      ctx.fillText('HEADSHOT', 96, 72);
+    }
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
+  }, [dn.damage, dn.headshot]);
+
+  useFrame(() => {
+    if (!ref.current) return;
+    const elapsed = Date.now() / 1000 - dn.time;
+    const jitterX = Math.sin(dn.id * 7.3) * 0.3;
+    const jitterZ = Math.cos(dn.id * 5.1) * 0.3;
+    ref.current.position.set(
+      dn.pos.x + jitterX,
+      dn.pos.y + 1.8 + elapsed * 2.0,
+      dn.pos.z + jitterZ,
+    );
+    const scale = dn.headshot ? 1.8 : 1.2;
+    ref.current.scale.set(scale, scale * 0.5, 1);
+    (ref.current.material as THREE.SpriteMaterial).opacity = Math.max(0, 1 - elapsed * 1.5);
+  });
+
+  return (
+    <sprite ref={ref}>
+      <spriteMaterial map={texture} transparent depthWrite={false} sizeAttenuation />
+    </sprite>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════
    Game Loop (inside Canvas)
    ═══════════════════════════════════════════════════════════ */
 function GameLoop({
@@ -669,6 +763,10 @@ function GameLoop({
   const wasOnGround = useRef(true);
   const lastWave = useRef(0);
   const grenadeCount = useRef(GRENADE_MAX);
+  const damageNumbersRef = useRef<DamageNumber[]>([]);
+  const respawnProtectionRef = useRef(0);
+  const lastKillTime = useRef(0);
+  const multiKillCount = useRef(0);
 
   // Weapon state
   const weaponIdx = useRef(0);
@@ -686,13 +784,8 @@ function GameLoop({
 
   const weaponGroupRef = useRef<THREE.Group>(null);
 
-  useEffect(() => {
-    const group = weaponGroupRef.current;
-    if (group) {
-      camera.add(group);
-      return () => { camera.remove(group); };
-    }
-  }, [camera]);
+  // Weapon group follows camera in scene space (not camera.add, which breaks R3F rendering)
+  // Updated in useFrame below
 
   // ── Pointer lock ──
   const requestPointerLock = useCallback(() => {
@@ -920,7 +1013,7 @@ function GameLoop({
     if (wave > lastWave.current) {
       lastWave.current = wave;
       if (wave > 1) {
-        newKills.push({ id: bulletId.current++, text: `WAVE ${wave} \u2500 \u6575\u304c\u5f37\u5316\uff01`, time: now });
+        newKills.push({ id: bulletId.current++, text: `WAVE ${wave} ─ 敵が強化！`, time: now });
       }
     }
 
@@ -940,6 +1033,15 @@ function GameLoop({
     const shakeX = (Math.random() - 0.5) * screenShakeRef.current;
     const shakeY = (Math.random() - 0.5) * screenShakeRef.current;
     camera.position.set(playerPos.current.x + shakeX, playerPos.current.y + shakeY, playerPos.current.z);
+
+    // ── Weapon group follows camera in scene space ──
+    if (weaponGroupRef.current) {
+      weaponGroupRef.current.position.copy(camera.position);
+      weaponGroupRef.current.quaternion.copy(camera.quaternion);
+    }
+
+    // ── Respawn protection countdown ──
+    if (respawnProtectionRef.current > 0) respawnProtectionRef.current -= dt;
 
     const targetFov = gs.isADS ? weapon.adsFov : NORMAL_FOV;
     const cam = camera as THREE.PerspectiveCamera;
@@ -994,7 +1096,7 @@ function GameLoop({
               gs.deaths++;
               gs.hp = PLAYER_MAX_HP;
               playerPos.current.set(0, PLAYER_HEIGHT, 20);
-              newKills.push({ id: bulletId.current++, text: '\u843d\u4e0b\u6b7b...\u30ea\u30b9\u30dd\u30fc\u30f3', time: now });
+              newKills.push({ id: bulletId.current++, text: '落下死...リスポーン', time: now });
             }
           }
         }
@@ -1141,7 +1243,7 @@ function GameLoop({
         gs.kills++;
         gs.score += score;
         gs.streakCount++;
-        newKills.push({ id: bulletId.current++, text: `\u30b0\u30ec\u30cd\u30fc\u30c9\u30ad\u30eb +${score}`, time: now });
+        newKills.push({ id: bulletId.current++, text: `グレネードキル +${score}`, time: now });
         spawnPickup(e.pos.clone());
         continue;
       }
@@ -1196,13 +1298,13 @@ function GameLoop({
           const w = WEAPONS[weaponIdx.current];
           gs.reserve = Math.min(gs.reserve + Math.ceil(w.magSize * 0.5), w.totalAmmo);
           weaponReserve.current[weaponIdx.current] = gs.reserve;
-          newKills.push({ id: bulletId.current++, text: '\u5f3e\u85ac\u56de\u53ce', time: now });
+          newKills.push({ id: bulletId.current++, text: '弾薬回収', time: now });
         } else if (p.type === 'health') {
           gs.hp = Math.min(PLAYER_MAX_HP, gs.hp + 30);
-          newKills.push({ id: bulletId.current++, text: '\u56de\u5fa9\u30d1\u30c3\u30af', time: now });
+          newKills.push({ id: bulletId.current++, text: '回復パック', time: now });
         } else if (p.type === 'grenade') {
           grenadeCount.current = Math.min(GRENADE_MAX, grenadeCount.current + 1);
-          newKills.push({ id: bulletId.current++, text: '\u30b0\u30ec\u30cd\u30fc\u30c9\u56de\u53ce', time: now });
+          newKills.push({ id: bulletId.current++, text: 'グレネード回収', time: now });
         }
         p.life = 0;
       }
@@ -1231,15 +1333,21 @@ function GameLoop({
             e.hp -= dmg;
             b.life = 0;
             newHits.push({ id: bulletId.current++, time: now, headshot: true });
+            damageNumbersRef.current.push({ id: bulletId.current++, pos: e.pos.clone().setY(1.3), damage: dmg, headshot: true, time: now });
             screenShakeRef.current = Math.max(screenShakeRef.current, 0.008);
             if (e.hp <= 0) {
               e.state = 'dead';
               e.deathTime = now;
-              const score = Math.round((100 + gs.streakCount * 25) * scoreMultiplierRef.current);
+              // Multi-kill detection
+              const timeSinceLastKill = now - lastKillTime.current;
+              lastKillTime.current = now;
+              if (timeSinceLastKill < 3) { multiKillCount.current++; } else { multiKillCount.current = 1; }
+              const multiLabel = multiKillCount.current >= 4 ? 'MEGA KILL! ' : multiKillCount.current === 3 ? 'トリプルキル! ' : multiKillCount.current === 2 ? 'ダブルキル! ' : '';
+              const score = Math.round((100 + gs.streakCount * 25 + (multiKillCount.current - 1) * 50) * scoreMultiplierRef.current);
               gs.kills++;
               gs.score += score;
               gs.streakCount++;
-              newKills.push({ id: bulletId.current++, text: `\u30d8\u30c3\u30c9\u30b7\u30e7\u30c3\u30c8 +${score}`, time: now });
+              newKills.push({ id: bulletId.current++, text: `${multiLabel}ヘッドショット +${score}`, time: now });
               spawnPickup(e.pos.clone());
             }
             break;
@@ -1248,14 +1356,19 @@ function GameLoop({
             e.hp -= dmg;
             b.life = 0;
             newHits.push({ id: bulletId.current++, time: now, headshot: false });
+            damageNumbersRef.current.push({ id: bulletId.current++, pos: e.pos.clone().setY(0.7), damage: dmg, headshot: false, time: now });
             if (e.hp <= 0) {
               e.state = 'dead';
               e.deathTime = now;
-              const score = Math.round((75 + gs.streakCount * 25) * scoreMultiplierRef.current);
+              const timeSinceLastKill = now - lastKillTime.current;
+              lastKillTime.current = now;
+              if (timeSinceLastKill < 3) { multiKillCount.current++; } else { multiKillCount.current = 1; }
+              const multiLabel = multiKillCount.current >= 4 ? 'MEGA KILL! ' : multiKillCount.current === 3 ? 'トリプルキル! ' : multiKillCount.current === 2 ? 'ダブルキル! ' : '';
+              const score = Math.round((75 + gs.streakCount * 25 + (multiKillCount.current - 1) * 50) * scoreMultiplierRef.current);
               gs.kills++;
               gs.score += score;
               gs.streakCount++;
-              newKills.push({ id: bulletId.current++, text: `\u30ad\u30eb +${score}`, time: now });
+              newKills.push({ id: bulletId.current++, text: `${multiLabel}キル +${score}`, time: now });
               spawnPickup(e.pos.clone());
             }
             break;
@@ -1264,6 +1377,8 @@ function GameLoop({
       } else {
         if (b.pos.distanceTo(playerPos.current) < PLAYER_RADIUS + 0.2) {
           b.life = 0;
+          // Respawn protection
+          if (respawnProtectionRef.current > 0) continue;
           const dmg = armorActiveRef.current ? ENEMY_DAMAGE * 0.5 : ENEMY_DAMAGE;
           gs.hp = Math.max(0, gs.hp - dmg);
           lastDamageTime.current = now;
@@ -1282,12 +1397,16 @@ function GameLoop({
             killstreakActiveRef.current = null;
             armorActiveRef.current = false;
             scoreMultiplierRef.current = 1;
-            newKills.push({ id: bulletId.current++, text: '\u30ea\u30b9\u30dd\u30fc\u30f3...', time: now });
+            newKills.push({ id: bulletId.current++, text: 'リスポーン...', time: now });
+            respawnProtectionRef.current = 2.0; // 2 seconds invincibility after respawn
           }
         }
       }
     }
     bullets.current = bullets.current.filter((b) => b.life > 0);
+
+    // ── Clean up damage numbers ──
+    damageNumbersRef.current = damageNumbersRef.current.filter((dn) => now - dn.time < 1.2);
 
     // ── HP regen ──
     if (now - lastDamageTime.current > HP_REGEN_DELAY && gs.hp < PLAYER_MAX_HP) {
@@ -1299,21 +1418,21 @@ function GameLoop({
       streakRewardsGiven.current.add(3);
       killstreakActiveRef.current = 'UAV';
       killstreakTimerRef.current = 15;
-      newKills.push({ id: bulletId.current++, text: 'UAV\u8d77\u52d5\uff01\u6575\u4f4d\u7f6e\u5f37\u5316\u8868\u793a', time: now });
+      newKills.push({ id: bulletId.current++, text: 'UAV起動！敵位置強化表示', time: now });
     }
     if (gs.streakCount >= 5 && !streakRewardsGiven.current.has(5)) {
       streakRewardsGiven.current.add(5);
       scoreMultiplierRef.current = 2;
       killstreakActiveRef.current = 'DOUBLE SCORE';
       killstreakTimerRef.current = 20;
-      newKills.push({ id: bulletId.current++, text: '\u30c0\u30d6\u30eb\u30b9\u30b3\u30a2\u767a\u52d5\uff0120\u79d2\u9593', time: now });
+      newKills.push({ id: bulletId.current++, text: 'ダブルスコア発動！20秒間', time: now });
     }
     if (gs.streakCount >= 7 && !streakRewardsGiven.current.has(7)) {
       streakRewardsGiven.current.add(7);
       armorActiveRef.current = true;
       killstreakActiveRef.current = 'ARMOR';
       killstreakTimerRef.current = 25;
-      newKills.push({ id: bulletId.current++, text: '\u30a2\u30fc\u30de\u30fc\u767a\u52d5\uff01\u30c0\u30e1\u30fc\u30b850%\u30ab\u30c3\u30c8', time: now });
+      newKills.push({ id: bulletId.current++, text: 'アーマー発動！ダメージ50%カット', time: now });
     }
     if (gs.streakCount >= 10 && !streakRewardsGiven.current.has(10)) {
       streakRewardsGiven.current.add(10);
@@ -1321,7 +1440,7 @@ function GameLoop({
         if (e.state !== 'dead') e.hp -= 200;
       }
       screenShakeRef.current = 0.1;
-      newKills.push({ id: bulletId.current++, text: 'NUKE\u767a\u52d5\uff01\u5168\u6575\u306b\u5927\u30c0\u30e1\u30fc\u30b8\uff01', time: now });
+      newKills.push({ id: bulletId.current++, text: 'NUKE発動！全敵に大ダメージ！', time: now });
     }
 
     if (killstreakTimerRef.current > 0) {
@@ -1398,6 +1517,9 @@ function GameLoop({
       ))}
       {explosionsRef.current.map((e) => (
         <ExplosionEffect key={e.id} position={e.pos} startTime={e.time} />
+      ))}
+      {damageNumbersRef.current.map((dn) => (
+        <DamageNumberSprite key={dn.id} dn={dn} />
       ))}
     </>
   );
@@ -1521,12 +1643,12 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
         <div className="relative z-10 text-center max-w-xl mx-auto px-4">
           <h1 className="text-5xl md:text-7xl font-black mb-2 tracking-tighter">
             <span className="bg-gradient-to-r from-red-500 via-orange-400 to-yellow-300 bg-clip-text text-transparent">
-              TACTICAL
+              タクティカル
             </span>
             <br />
-            <span className="text-white">STRIKE</span>
+            <span className="text-white">ストライク</span>
           </h1>
-          <p className="text-slate-400 mb-8">3\u5206\u9593\u30b5\u30d0\u30a4\u30d0\u30eb \u2015 \u6575\u3092\u5012\u3057\u3066\u30cf\u30a4\u30b9\u30b3\u30a2\u3092\u76ee\u6307\u305b</p>
+          <p className="text-slate-400 mb-8">3分間サバイバル ― 敵を倒してハイスコアを目指せ</p>
 
           <button
             onClick={startGame}
@@ -1537,61 +1659,61 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
 
           {/* Visual control guide */}
           <div className="mt-8 bg-black/40 backdrop-blur-sm rounded-xl p-5 border border-white/10 text-left">
-            <p className="text-xs text-slate-400 uppercase tracking-widest mb-3 text-center">\u64cd\u4f5c\u30ac\u30a4\u30c9</p>
+            <p className="text-xs text-slate-400 uppercase tracking-widest mb-3 text-center">操作ガイド</p>
             <div className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5">
                   <KeyCap>W</KeyCap><KeyCap>A</KeyCap><KeyCap>S</KeyCap><KeyCap>D</KeyCap>
                 </div>
-                <span className="text-slate-300">\u79fb\u52d5</span>
+                <span className="text-slate-300">移動</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-slate-400 text-xs">\ud83d\uddb1 \u30de\u30a6\u30b9</span>
-                <span className="text-slate-300">\u30a8\u30a4\u30e0</span>
+                <span className="text-slate-400 text-xs">🖱 マウス</span>
+                <span className="text-slate-300">エイム</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-slate-400 text-xs">\ud83d\uddb1 \u5de6\u30af\u30ea\u30c3\u30af</span>
-                <span className="text-slate-300">\u5c04\u6483</span>
+                <span className="text-slate-400 text-xs">🖱 左クリック</span>
+                <span className="text-slate-300">射撃</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-slate-400 text-xs">\ud83d\uddb1 \u53f3\u30af\u30ea\u30c3\u30af</span>
-                <span className="text-slate-300">ADS\uff08\u30b9\u30b3\u30fc\u30d7\uff09</span>
+                <span className="text-slate-400 text-xs">🖱 右クリック</span>
+                <span className="text-slate-300">ADS（スコープ）</span>
               </div>
               <div className="flex items-center gap-2">
                 <KeyCap>R</KeyCap>
-                <span className="text-slate-300">\u30ea\u30ed\u30fc\u30c9</span>
+                <span className="text-slate-300">リロード</span>
               </div>
               <div className="flex items-center gap-2">
                 <KeyCap>G</KeyCap>
-                <span className="text-slate-300">\u30b0\u30ec\u30cd\u30fc\u30c9</span>
+                <span className="text-slate-300">グレネード</span>
               </div>
               <div className="flex items-center gap-2">
                 <KeyCap>C</KeyCap>
-                <span className="text-slate-300">\u3057\u3083\u304c\u307f</span>
+                <span className="text-slate-300">しゃがみ</span>
               </div>
               <div className="flex items-center gap-2">
                 <KeyCap wide>Space</KeyCap>
-                <span className="text-slate-300">\u30b8\u30e3\u30f3\u30d7</span>
+                <span className="text-slate-300">ジャンプ</span>
               </div>
               <div className="flex items-center gap-2">
                 <KeyCap wide>Shift</KeyCap>
-                <span className="text-slate-300">\u30c0\u30c3\u30b7\u30e5</span>
+                <span className="text-slate-300">ダッシュ</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="flex gap-0.5">
                   <KeyCap>1</KeyCap><KeyCap>2</KeyCap><KeyCap>3</KeyCap><KeyCap>4</KeyCap>
                 </div>
-                <span className="text-slate-300">\u6b66\u5668\u5207\u66ff</span>
+                <span className="text-slate-300">武器切替</span>
               </div>
               <div className="flex items-center gap-2 col-span-2 justify-center mt-1 pt-2 border-t border-white/10">
                 <KeyCap wide>Esc</KeyCap>
-                <span className="text-slate-300">\u30dd\u30fc\u30ba / \u30d5\u30eb\u30b9\u30af\u30ea\u30fc\u30f3\u7d42\u4e86</span>
+                <span className="text-slate-300">ポーズ / フルスクリーン終了</span>
               </div>
             </div>
           </div>
 
           <button onClick={handleBack} className="mt-6 text-xs text-slate-600 hover:text-slate-400 transition-colors">
-            \u2190 \u30b2\u30fc\u30e0\u9078\u629e\u306b\u623b\u308b
+            ← ゲーム選択に戻る
           </button>
         </div>
       </div>
@@ -1608,23 +1730,23 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
         <div className="absolute inset-0 bg-gradient-to-b from-[#0a0e27]/85 to-[#1a1f4e]/85" />
         <div className="relative z-10 text-center">
           <h1 className="text-4xl md:text-6xl font-black mb-2">MISSION COMPLETE</h1>
-          <p className="text-slate-400 mb-8">\u30df\u30c3\u30b7\u30e7\u30f3\u7d42\u4e86</p>
+          <p className="text-slate-400 mb-8">ミッション終了</p>
           <div className="grid grid-cols-4 gap-6 mb-10 max-w-xl mx-auto">
             <div>
               <p className="text-3xl font-bold text-accent-cyan">{gs.score.toLocaleString()}</p>
-              <p className="text-xs text-slate-400 mt-1">\u30b9\u30b3\u30a2</p>
+              <p className="text-xs text-slate-400 mt-1">スコア</p>
             </div>
             <div>
               <p className="text-3xl font-bold text-red-400">{gs.kills}</p>
-              <p className="text-xs text-slate-400 mt-1">\u30ad\u30eb\u6570</p>
+              <p className="text-xs text-slate-400 mt-1">キル数</p>
             </div>
             <div>
               <p className="text-3xl font-bold text-yellow-400">{kd}</p>
-              <p className="text-xs text-slate-400 mt-1">K/D \u30ec\u30b7\u30aa</p>
+              <p className="text-xs text-slate-400 mt-1">K/D レシオ</p>
             </div>
             <div>
               <p className="text-3xl font-bold text-green-400">{gs.wave}</p>
-              <p className="text-xs text-slate-400 mt-1">\u6700\u7d42WAVE</p>
+              <p className="text-xs text-slate-400 mt-1">最終WAVE</p>
             </div>
           </div>
           <div className="flex gap-4 justify-center">
@@ -1635,7 +1757,7 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
               RETRY
             </button>
             <button onClick={handleBack} className="px-8 py-3 border border-slate-600 rounded-xl font-bold hover:bg-slate-800 transition-colors">
-              \u30b2\u30fc\u30e0\u9078\u629e
+              ゲーム選択
             </button>
           </div>
         </div>
@@ -1653,8 +1775,8 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
       <GLBErrorBoundary fallback={
         <div className="absolute inset-0 flex items-center justify-center text-white">
           <div className="text-center">
-            <p className="text-xl mb-4">3D\u30e2\u30c7\u30eb\u306e\u8aad\u307f\u8fbc\u307f\u306b\u5931\u6557\u3057\u307e\u3057\u305f</p>
-            <button onClick={handleBack} className="px-6 py-2 bg-red-600 rounded-lg">\u623b\u308b</button>
+            <p className="text-xl mb-4">3Dモデルの読み込みに失敗しました</p>
+            <button onClick={handleBack} className="px-6 py-2 bg-red-600 rounded-lg">戻る</button>
           </div>
         </div>
       }>
@@ -1698,7 +1820,7 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
         <div className="absolute inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center">
           <div className="text-center">
             <h2 className="text-4xl font-black text-white mb-2 tracking-wider">PAUSED</h2>
-            <p className="text-slate-400 text-sm mb-10">\u4e00\u6642\u505c\u6b62\u4e2d</p>
+            <p className="text-slate-400 text-sm mb-10">一時停止中</p>
             <div className="flex flex-col gap-3 w-64 mx-auto">
               <button
                 onClick={resumeGame}
@@ -1713,7 +1835,7 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
                 QUIT TO MENU
               </button>
             </div>
-            <p className="text-slate-600 text-xs mt-8">\u30af\u30ea\u30c3\u30af\u3057\u3066\u30b2\u30fc\u30e0\u306b\u623b\u308b\u3001\u307e\u305f\u306f\u300cQUIT\u300d\u3067\u7d42\u4e86</p>
+            <p className="text-slate-600 text-xs mt-8">クリックしてゲームに戻る、または「QUIT」で終了</p>
           </div>
         </div>
       )}

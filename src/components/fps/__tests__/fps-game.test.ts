@@ -395,14 +395,53 @@ assert(fpsSource.includes("fog attach=\"fog\" args={['#78716c', 80, 160]}"), 'Fo
 // Check HUD updates
 const hudSource = fs.readFileSync(path.join(wsRoot, 'src/components/fps/HUD.tsx'), 'utf8');
 assert(hudSource.includes('scope.png'), 'HUD references scope.png');
-assert(hudSource.includes('bg-black'), 'Scope overlay has black background (no screen blend)');
-assert(!hudSource.includes("mixBlendMode: 'screen'") || hudSource.indexOf("mixBlendMode: 'screen'") > hudSource.indexOf('crosshair.png'), 'Scope overlay does NOT use screen blend mode');
+assert(!hudSource.includes('z-50 bg-black'), 'Scope overlay NO longer has bg-black (transparent center)');
+assert(hudSource.includes('radial-gradient'), 'Scope uses radial-gradient for transparent center');
+assert(hudSource.includes("mixBlendMode: 'multiply'"), 'Scope uses multiply blend mode');
+assert(!hudSource.includes('crosshair.png'), 'No crosshair.png reference (CSS crosshair)');
+assert(hudSource.includes('bg-white/70'), 'CSS crosshair lines present');
+assert(hudSource.includes('w.nameJa'), 'Weapon selector uses Japanese name (nameJa)');
 assert(hudSource.includes('GRENADE'), 'HUD shows grenade count');
 assert(hudSource.includes('WAVE'), 'HUD shows wave number');
 assert(hudSource.includes('killstreakActive'), 'HUD shows killstreak info');
 assert(hudSource.includes('CROUCH'), 'HUD shows crouch indicator');
 assert(hudSource.includes('armorActive'), 'HUD shows armor status');
 assert(hudSource.includes('scoreMultiplier'), 'HUD shows score multiplier');
+
+console.log('\n🆕 === NEW FEATURE TESTS (v2) ===');
+
+// DamageNumber system
+assert(fpsSource.includes('interface DamageNumber'), 'DamageNumber interface defined');
+assert(fpsSource.includes('function DamageNumberSprite'), 'DamageNumberSprite component exists');
+assert(fpsSource.includes('damageNumbersRef'), 'damageNumbersRef for tracking damage numbers');
+assert(fpsSource.includes('CanvasTexture(canvas)'), 'DamageNumber uses CanvasTexture');
+
+// Respawn invincibility
+assert(fpsSource.includes('respawnProtectionRef'), 'Respawn protection ref exists');
+assert(fpsSource.includes('respawnProtectionRef.current = 2.0'), 'Respawn protection = 2 seconds');
+
+// Multi-kill detection
+assert(fpsSource.includes('multiKillCount'), 'Multi-kill counter exists');
+assert(fpsSource.includes('lastKillTime'), 'Last kill time tracking exists');
+assert(fpsSource.includes('ダブルキル'), 'Double kill message in Japanese');
+assert(fpsSource.includes('トリプルキル'), 'Triple kill message in Japanese');
+assert(fpsSource.includes('MEGA KILL'), 'Mega kill message exists');
+
+// useClonedGLTF material/color fix
+assert(fpsSource.includes('THREE.SRGBColorSpace'), 'useClonedGLTF sets SRGBColorSpace');
+assert(fpsSource.includes('needsUpdate = true'), 'Textures marked needsUpdate');
+assert(fpsSource.includes('mesh.castShadow = true'), 'Meshes have castShadow');
+assert(fpsSource.includes('mesh.receiveShadow = true'), 'Meshes have receiveShadow');
+
+// Weapon rendering (scene-space, not camera.add)
+assert(!fpsSource.includes('camera.add(group)'), 'Weapon NOT attached via camera.add');
+assert(fpsSource.includes('weaponGroupRef.current.quaternion.copy(camera.quaternion)'), 'Weapon syncs quaternion to camera');
+
+// Japanese text (no Unicode escapes)
+assert(fpsSource.includes('タクティカル'), 'Title contains タクティカル (not escaped)');
+assert(fpsSource.includes('操作ガイド'), 'Guide text in actual Japanese (not escaped)');
+assert(!/\\u[0-9a-fA-F]{4}/.test(fpsSource), 'No Unicode escape sequences in FPSGame');
+assert(!/\\u[0-9a-fA-F]{4}/.test(hudSource), 'No Unicode escape sequences in HUD');
 
 /* ═══════════════════════════════════════════════════════════
    RESULTS
