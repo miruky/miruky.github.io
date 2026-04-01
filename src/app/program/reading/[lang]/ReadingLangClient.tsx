@@ -221,8 +221,8 @@ export default function ReadingLangClient() {
 
                     <div className="flex-1 min-w-0">
                       <h3 className="text-sm font-semibold text-white group-hover:text-accent-purple transition-colors truncate">
-                        {lesson.title}
-                        <span className="text-slate-500 font-normal ml-2 text-xs">{lesson.titleJa}</span>
+                        {lesson.titleJa}
+                        <span className="text-slate-500 font-normal ml-2 text-xs">{lesson.title}</span>
                       </h3>
                       <p className="text-xs text-slate-500 truncate mt-0.5">
                         {lesson.category} · {lesson.description.slice(0, 60)}...
