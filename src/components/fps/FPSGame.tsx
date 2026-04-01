@@ -146,8 +146,12 @@ const PLAYER_HEIGHT = 1.7;
 const CROUCH_HEIGHT = 0.9;
 const PLAYER_RADIUS = 0.4;
 const NORMAL_FOV = 75;
-const ENEMY_SPEED = 3.5;
+const ENEMY_SPEED = 2.0;
 const ENEMY_HP = 100;
+const HEAD_HITBOX_RADIUS = 0.45;
+const BODY_HITBOX_RADIUS = 0.75;
+const HEAD_CENTER_Y = 1.4;
+const BODY_CENTER_Y = 0.7;
 const ENEMY_SPAWN_INTERVAL = 4;
 const MAX_ENEMIES = 12;
 const MATCH_TIME = 180;
@@ -962,9 +966,9 @@ function GameLoop({
     });
   }, []);
 
-  const fireBullet = useCallback((from: THREE.Vector3, dir: THREE.Vector3, isEnemy: boolean, wIdx: number) => {
+  const fireBullet = useCallback((from: THREE.Vector3, dir: THREE.Vector3, isEnemy: boolean, wIdx: number, speedOverride?: number) => {
     const weapon = WEAPONS[wIdx];
-    const speed = isEnemy ? 100 : weapon.bulletSpeed;
+    const speed = speedOverride ?? (isEnemy ? 100 : weapon.bulletSpeed);
     const range = isEnemy ? 60 : weapon.range;
     bullets.current.push({
       id: bulletId.current++, pos: from.clone(),
@@ -1181,12 +1185,14 @@ function GameLoop({
       gs.ammo--;
       weaponAmmo.current[weaponIdx.current] = gs.ammo;
       const spreadVal = (gs.isADS ? weapon.adsSpread : weapon.spread) * spreadMult;
+      // Sniper ADS uses hitscan speed (effectively instant ray)
+      const sniperHitscan = weaponIdx.current === 3 && gs.isADS;
       for (let i = 0; i < weapon.bulletsPerShot; i++) {
         const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
         dir.x += (Math.random() - 0.5) * spreadVal;
         dir.y += (Math.random() - 0.5) * spreadVal;
         dir.normalize();
-        fireBullet(playerPos.current.clone().add(dir.clone().multiplyScalar(0.5)), dir, false, weaponIdx.current);
+        fireBullet(playerPos.current.clone().add(dir.clone().multiplyScalar(0.5)), dir, false, weaponIdx.current, sniperHitscan ? 5000 : undefined);
       }
       screenShakeRef.current = Math.max(screenShakeRef.current, 0.005);
       setGameState((s) => ({ ...s, ammo: gs.ammo }));
@@ -1311,13 +1317,21 @@ function GameLoop({
     }
     pickupsRef.current = pickupsRef.current.filter((p) => p.life > 0);
 
-    // ── Update bullets ──
+    // ── Update bullets (ray-based hit detection for fast bullets) ──
     const newHits: HitMarker[] = [];
+    const _hp = new THREE.Vector3();
     for (const b of bullets.current) {
+      const prevPos = b.pos.clone();
       b.pos.add(b.vel.clone().multiplyScalar(dt));
       b.life -= dt;
       if (b.pos.y < 0 || Math.abs(b.pos.x) > MAP_SIZE + 10 || Math.abs(b.pos.z) > MAP_SIZE + 10) b.life = 0;
       if (collidesWithBuildings(b.pos, 0.1)) b.life = 0;
+      if (b.life <= 0) continue;
+
+      const moveVec = b.pos.clone().sub(prevPos);
+      const moveDist = moveVec.length();
+      const moveDir = moveDist > 0.001 ? moveVec.clone().normalize() : b.vel.clone().normalize();
+      const ray = new THREE.Ray(prevPos, moveDir);
 
       if (!b.isEnemy) {
         const bWeapon = WEAPONS[b.weaponIdx];
@@ -1325,20 +1339,23 @@ function GameLoop({
 
         for (const e of enemies.current) {
           if (e.state === 'dead') continue;
-          const headDist = b.pos.distanceTo(e.pos.clone().setY(1.3));
-          const bodyDist = b.pos.distanceTo(e.pos.clone().setY(0.7));
 
-          if (headDist < 0.3) {
+          // Head hitbox (ray-sphere intersection)
+          const headCenter = e.pos.clone();
+          headCenter.y = HEAD_CENTER_Y;
+          const headHit = ray.intersectSphere(new THREE.Sphere(headCenter, HEAD_HITBOX_RADIUS), _hp);
+          const headInside = b.pos.distanceTo(headCenter) < HEAD_HITBOX_RADIUS;
+
+          if ((headHit && prevPos.distanceTo(_hp) <= moveDist + 0.5) || headInside) {
             const dmg = calcDamage(bWeapon.damage, dist, bWeapon) * bWeapon.headshotMult;
             e.hp -= dmg;
             b.life = 0;
             newHits.push({ id: bulletId.current++, time: now, headshot: true });
-            damageNumbersRef.current.push({ id: bulletId.current++, pos: e.pos.clone().setY(1.3), damage: dmg, headshot: true, time: now });
+            damageNumbersRef.current.push({ id: bulletId.current++, pos: headCenter.clone(), damage: dmg, headshot: true, time: now });
             screenShakeRef.current = Math.max(screenShakeRef.current, 0.008);
             if (e.hp <= 0) {
               e.state = 'dead';
               e.deathTime = now;
-              // Multi-kill detection
               const timeSinceLastKill = now - lastKillTime.current;
               lastKillTime.current = now;
               if (timeSinceLastKill < 3) { multiKillCount.current++; } else { multiKillCount.current = 1; }
@@ -1351,12 +1368,20 @@ function GameLoop({
               spawnPickup(e.pos.clone());
             }
             break;
-          } else if (bodyDist < 0.5) {
+          }
+
+          // Body hitbox (ray-sphere intersection)
+          const bodyCenter = e.pos.clone();
+          bodyCenter.y = BODY_CENTER_Y;
+          const bodyHit = ray.intersectSphere(new THREE.Sphere(bodyCenter, BODY_HITBOX_RADIUS), _hp);
+          const bodyInside = b.pos.distanceTo(bodyCenter) < BODY_HITBOX_RADIUS;
+
+          if ((bodyHit && prevPos.distanceTo(_hp) <= moveDist + 0.5) || bodyInside) {
             const dmg = calcDamage(bWeapon.damage, dist, bWeapon);
             e.hp -= dmg;
             b.life = 0;
             newHits.push({ id: bulletId.current++, time: now, headshot: false });
-            damageNumbersRef.current.push({ id: bulletId.current++, pos: e.pos.clone().setY(0.7), damage: dmg, headshot: false, time: now });
+            damageNumbersRef.current.push({ id: bulletId.current++, pos: bodyCenter.clone(), damage: dmg, headshot: false, time: now });
             if (e.hp <= 0) {
               e.state = 'dead';
               e.deathTime = now;
@@ -1375,7 +1400,12 @@ function GameLoop({
           }
         }
       } else {
-        if (b.pos.distanceTo(playerPos.current) < PLAYER_RADIUS + 0.2) {
+        // Enemy bullet → player (ray-based detection)
+        const playerSphere = new THREE.Sphere(playerPos.current, PLAYER_RADIUS + 0.3);
+        const playerHit = ray.intersectSphere(playerSphere, _hp);
+        const playerInside = b.pos.distanceTo(playerPos.current) < PLAYER_RADIUS + 0.3;
+
+        if ((playerHit && prevPos.distanceTo(_hp) <= moveDist + 0.5) || playerInside) {
           b.life = 0;
           // Respawn protection
           if (respawnProtectionRef.current > 0) continue;
@@ -1398,7 +1428,7 @@ function GameLoop({
             armorActiveRef.current = false;
             scoreMultiplierRef.current = 1;
             newKills.push({ id: bulletId.current++, text: 'リスポーン...', time: now });
-            respawnProtectionRef.current = 2.0; // 2 seconds invincibility after respawn
+            respawnProtectionRef.current = 2.0;
           }
         }
       }
