@@ -1013,20 +1013,24 @@ function GameLoop({
 
   return (
     <>
-      {/* Weapon attached to camera */}
+      {/* Weapon attached to camera – Suspense so game logic isn't blocked by GLB load */}
       <group ref={weaponGroupRef}>
-        <WeaponModel
-          weaponIndex={gameState.current.weaponIndex}
-          isADS={gameState.current.isADS}
-          isFiring={isFiringRef.current}
-          isReloading={gameState.current.isReloading}
-          isSwitching={isSwitchingRef.current}
-          isMoving={isMovingRef.current}
-        />
+        <Suspense fallback={null}>
+          <WeaponModel
+            weaponIndex={gameState.current.weaponIndex}
+            isADS={gameState.current.isADS}
+            isFiring={isFiringRef.current}
+            isReloading={gameState.current.isReloading}
+            isSwitching={isSwitchingRef.current}
+            isMoving={isMovingRef.current}
+          />
+        </Suspense>
       </group>
-      {enemies.current.map((e) => (
-        <EnemyMesh key={e.id} enemy={e} />
-      ))}
+      <Suspense fallback={null}>
+        {enemies.current.map((e) => (
+          <EnemyMesh key={e.id} enemy={e} />
+        ))}
+      </Suspense>
       {bullets.current.map((b) => (
         <BulletTracer key={b.id} bullet={b} />
       ))}
@@ -1191,9 +1195,7 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
           <fog attach="fog" args={['#78716c', 60, 120]} />
           <SkyDome />
           <GameMap />
-          <Suspense fallback={null}>
-            <GameLoop gameState={gsRef} setGameState={setGs} />
-          </Suspense>
+          <GameLoop gameState={gsRef} setGameState={setGs} />
         </Suspense>
       </Canvas>
 
