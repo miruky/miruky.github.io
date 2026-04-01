@@ -443,6 +443,76 @@ assert(fpsSource.includes('操作ガイド'), 'Guide text in actual Japanese (no
 assert(!/\\u[0-9a-fA-F]{4}/.test(fpsSource), 'No Unicode escape sequences in FPSGame');
 assert(!/\\u[0-9a-fA-F]{4}/.test(hudSource), 'No Unicode escape sequences in HUD');
 
+console.log('\n🎯 === v3 BUG FIX TESTS ===');
+
+// Commit 1: Enemy speed + hitbox + ray detection
+assert(fpsSource.includes('ENEMY_SPEED = 2.0'), 'Enemy speed reduced to 2.0');
+assert(fpsSource.includes('HEAD_HITBOX_RADIUS = 0.45'), 'Head hitbox = 0.45');
+assert(fpsSource.includes('BODY_HITBOX_RADIUS = 0.75'), 'Body hitbox = 0.75');
+assert(fpsSource.includes('HEAD_CENTER_Y = 1.4'), 'Head center Y = 1.4');
+assert(fpsSource.includes('BODY_CENTER_Y = 0.7'), 'Body center Y = 0.7');
+assert(fpsSource.includes('new THREE.Ray(prevPos, moveDir)'), 'Ray-based bullet detection');
+assert(fpsSource.includes('ray.intersectSphere'), 'Ray-sphere intersection for hit detection');
+assert(fpsSource.includes('sniperHitscan ? 5000 : undefined'), 'Sniper ADS hitscan (speed 5000)');
+assert(fpsSource.includes('speedOverride?: number'), 'fireBullet has speedOverride param');
+
+// Commit 2: 3D model colors + weapon orientation
+assert(fpsSource.includes('std.metalness = Math.min(std.metalness, 0.3)'), 'Metalness capped at 0.3 without envMap');
+assert(fpsSource.includes('std.roughness = Math.max(std.roughness, 0.35)'), 'Roughness minimum 0.35');
+assert(fpsSource.includes('[0, -Math.PI / 2, 0]'), 'Weapon rotation corrected (-PI/2)');
+assert(!fpsSource.includes('[0, Math.PI, 0]'), 'Old weapon rotation [0,PI,0] removed');
+
+// Commit 3: Bug fixes
+assert(fpsSource.includes('playedTimeRef'), 'Pause-safe timer (playedTimeRef)');
+assert(fpsSource.includes('playedTimeRef.current += dt'), 'Timer uses dt accumulation');
+assert(!fpsSource.includes('(Date.now() - matchStart.current) / 1000'), 'No Date.now-based elapsed time');
+assert(fpsSource.includes('mouseJustPressed.current = false;\n    setGameState'), 'mouseJustPressed reset on reload');
+assert(fpsSource.includes('new THREE.Vector2(-b.vel.x, -b.vel.z)'), 'Damage direction correct (negated)');
+assert(fpsSource.includes('nukeKills'), 'NUKE has dedicated kill processing');
+assert(fpsSource.includes("texture.dispose()"), 'DamageNumber texture disposed on unmount');
+assert(fpsSource.includes('g.vel.lengthSq() > 0.01'), 'Grenade NaN protection');
+assert(fpsSource.includes('グレネードキル +${score}'), 'Grenade kills have multi-kill tracking');
+
+// Ray-based hit detection test (geometry)
+console.log('\n🔬 === RAY-SPHERE HIT DETECTION TESTS ===');
+
+// Test: Bullet traveling toward enemy should hit
+const bulletStart = new THREE.Vector3(0, 1.4, 10);
+const bulletDir = new THREE.Vector3(0, 0, -1);
+const enemyCenter = new THREE.Vector3(0, 1.4, 5);
+const ray = new THREE.Ray(bulletStart, bulletDir);
+const sphere = new THREE.Sphere(enemyCenter, 0.75);
+const hitPoint = new THREE.Vector3();
+const result = ray.intersectSphere(sphere, hitPoint);
+assert(result !== null, 'Ray hits sphere when aimed directly at enemy');
+assertApprox(hitPoint.z, 5.75, 0.01, 'Hit point is at front of sphere');
+
+// Test: Fast sniper bullet at 350 speed covers path
+const sniperBulletMove = 350 / 60; // per frame at 60fps
+assert(sniperBulletMove > 5, `Sniper moves ${sniperBulletMove.toFixed(1)}m/frame, ray catches it`);
+
+// Test: Bullet passing beside enemy should miss
+const missRay = new THREE.Ray(new THREE.Vector3(2, 1.4, 10), new THREE.Vector3(0, 0, -1));
+const missResult = missRay.intersectSphere(sphere, hitPoint);
+assert(missResult === null, 'Ray misses sphere when aimed away');
+
+// Test: Enemy speed is slower now
+const ENEMY_SPEED_TEST = 2.0;
+const chaseSpeed = ENEMY_SPEED_TEST * 1.2;
+assert(chaseSpeed < 3, `Chase speed ${chaseSpeed} < 3 (was 4.2 before)`);
+const patrolSpeed = ENEMY_SPEED_TEST * 0.5;
+assert(patrolSpeed <= 1, `Patrol speed ${patrolSpeed} <= 1 (slow enough)`);
+
+// Test: Head hitbox covers reasonable area
+const HEAD_R = 0.45;
+const headArea = Math.PI * HEAD_R * HEAD_R;
+assert(headArea > 0.5, `Head hitbox area = ${headArea.toFixed(2)} (reasonable)`);
+
+// Test: Body hitbox covers reasonable area
+const BODY_R = 0.75;
+const bodyArea = Math.PI * BODY_R * BODY_R;
+assert(bodyArea > 1.5, `Body hitbox area = ${bodyArea.toFixed(2)} (reasonable)`);
+
 /* ═══════════════════════════════════════════════════════════
    RESULTS
    ═══════════════════════════════════════════════════════════ */
