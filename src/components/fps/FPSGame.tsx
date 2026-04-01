@@ -109,6 +109,13 @@ function useClonedGLTF(path: string, targetSize: number) {
           if (std.normalMap) std.normalMap.needsUpdate = true;
           if (std.roughnessMap) std.roughnessMap.needsUpdate = true;
           if (std.metalnessMap) std.metalnessMap.needsUpdate = true;
+          // Cap metalness to prevent black appearance without environment map
+          if (!std.envMap && typeof std.metalness === 'number') {
+            std.metalness = Math.min(std.metalness, 0.3);
+          }
+          if (typeof std.roughness === 'number') {
+            std.roughness = Math.max(std.roughness, 0.35);
+          }
           c.needsUpdate = true;
           return c;
         };
@@ -495,7 +502,7 @@ function GLBWeapon({
   const model = useClonedGLTF(path, 0.5);
   return (
     <group>
-      <primitive object={model} position={[0, -0.06, 0]} rotation={[0, Math.PI, 0]} />
+      <primitive object={model} position={[0, -0.06, 0]} rotation={[0, -Math.PI / 2, 0]} />
       {isFiring && (
         <>
           <pointLight position={muzzlePos} color="#fbbf24" intensity={8} distance={3} />
