@@ -49,9 +49,9 @@ export default function Header() {
       style={isOnDarkBgPage ? { background: 'rgba(10, 14, 39, 0.95)', borderBottom: '1px solid rgba(255,255,255,0.08)' } : undefined}
     >
       <div className="section-container">
-        <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
+          <Link href="/" className="flex items-center gap-2 group shrink-0">
             <Image
               src="/images/icon.png"
               alt="miruky"
@@ -59,20 +59,20 @@ export default function Header() {
               height={32}
               className="rounded-lg object-cover group-hover:scale-110 transition-transform"
             />
-            <span className="font-bold text-lg hidden sm:block">
+            <span className="font-bold text-lg hidden sm:block whitespace-nowrap">
               <span className={isHeaderOverDark ? 'text-white' : 'text-slate-900 dark:text-white'}>miruky</span><span className="gradient-text-static">のIT備忘録</span>
             </span>
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-0.5">
             {navItems.map((item) => {
               const isActive = pathname === item.href || pathname === item.href.slice(0, -1);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  className={`relative px-2.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 whitespace-nowrap ${
                     isActive
                       ? (isHeaderOverDark ? 'text-accent-cyan' : 'text-cyan-700 dark:text-accent-cyan')
                       : isHeaderOverDark
@@ -98,7 +98,7 @@ export default function Header() {
           </nav>
 
           {/* Mobile Menu Button */}
-          <div className="flex items-center gap-3 md:hidden">
+          <div className="flex items-center gap-3 lg:hidden">
             <SearchDialog />
             <ThemeToggle />
             <button
@@ -139,7 +139,7 @@ export default function Header() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden glass-nav border-t border-slate-200/10"
+            className="lg:hidden glass-nav border-t border-slate-200/10"
           >
             <nav className="section-container py-4 flex flex-col gap-1">
               {navItems.map((item) => {
