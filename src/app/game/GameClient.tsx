@@ -7,8 +7,9 @@ import dynamic from 'next/dynamic';
 const TypingGame = dynamic(() => import('@/components/TypingGame'), { ssr: false });
 const BlockGame = dynamic(() => import('@/components/BlockGame'), { ssr: false });
 const QuizGame = dynamic(() => import('@/components/QuizGame'), { ssr: false });
+const FPSGame = dynamic(() => import('@/components/fps/FPSGame'), { ssr: false });
 
-type GameMode = 'select' | 'typing' | 'blocks' | 'quiz';
+type GameMode = 'select' | 'typing' | 'blocks' | 'quiz' | 'fps';
 
 export default function GameClient() {
   const [mode, setMode] = useState<GameMode>('select');
@@ -39,7 +40,7 @@ export default function GameClient() {
             </div>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-2xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
             {/* タイピングゲーム */}
             <motion.button
               initial={{ opacity: 0, y: 20 }}
@@ -91,6 +92,26 @@ export default function GameClient() {
               <h3 className="text-lg font-bold text-white mb-1">IT知識クイズ</h3>
               <p className="text-xs text-slate-400">IPA試験レベルの選択問題</p>
             </motion.button>
+
+            {/* FPSゲーム */}
+            <motion.button
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.55 }}
+              onClick={() => setMode('fps')}
+              className="glass-card p-6 hover-card neon-border text-center group transition-all"
+            >
+              <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-gradient-to-br from-red-500/20 to-orange-500/20 flex items-center justify-center border border-red-500/20 group-hover:border-red-500/40 transition-colors">
+                <svg className="w-7 h-7 text-red-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12" y2="16" />
+                  <line x1="8" y1="12" x2="16" y2="12" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-white mb-1">FPSシューティング</h3>
+              <p className="text-xs text-slate-400">3D本格FPS ― 敵を殲滅せよ</p>
+            </motion.button>
           </div>
 
           <p className="text-slate-600 text-[10px] mt-8">ゲーム内メニューからいつでも戻れます</p>
@@ -100,6 +121,7 @@ export default function GameClient() {
       {mode === 'typing' && <TypingGame onBack={() => setMode('select')} />}
       {mode === 'blocks' && <BlockGame onBack={() => setMode('select')} />}
       {mode === 'quiz' && <QuizGame onBack={() => setMode('select')} />}
+      {mode === 'fps' && <FPSGame onBack={() => setMode('select')} />}
     </div>
   );
 }

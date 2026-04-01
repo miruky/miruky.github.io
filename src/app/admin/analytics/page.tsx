@@ -238,7 +238,7 @@ function EmptyChart({ width, height }: { width: number; height: number }) {
 function MetricCard({ label, value, icon: Icon, color, sub }: {
   label: string;
   value: string | number;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
   color: string;
   sub?: string;
 }) {
