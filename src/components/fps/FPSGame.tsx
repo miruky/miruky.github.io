@@ -77,7 +77,7 @@ export const WEAPONS: WeaponDef[] = [
 ];
 
 /* ═══════════════════════════════════════════════════════════
-   GLB preloads (KHR_mesh_quantization – natively supported)
+   GLB preloads (KHR_draco_mesh_compression + EXT_texture_webp)
    ═══════════════════════════════════════════════════════════ */
 const MODEL_PATHS = {
   ar: '/models/fps/ar.glb',
@@ -90,6 +90,8 @@ const MODEL_PATHS = {
   barricade: '/models/fps/barricade.glb',
   barricade2: '/models/fps/barricade2.glb',
 };
+// Draco decoder for KHR_draco_mesh_compression
+useGLTF.setDecoderPath('/draco/gltf/');
 Object.values(MODEL_PATHS).forEach((p) => useGLTF.preload(p));
 
 /* ═══════════════════════════════════════════════════════════
