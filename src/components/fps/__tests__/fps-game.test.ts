@@ -456,10 +456,10 @@ assert(fpsSource.includes('ray.intersectSphere'), 'Ray-sphere intersection for h
 assert(fpsSource.includes('sniperHitscan ? 5000 : undefined'), 'Sniper ADS hitscan (speed 5000)');
 assert(fpsSource.includes('speedOverride?: number'), 'fireBullet has speedOverride param');
 
-// Commit 2 → v4: 3D model colors + weapon orientation + Environment map
-assert(fpsSource.includes('std.metalness = Math.min(std.metalness, 0.8)'), 'Metalness capped at 0.8 with Environment');
+// Commit 2 → v4: 3D model colors + weapon orientation + standard GLB loading
+assert(fpsSource.includes('std.metalness = Math.min(std.metalness, 0.8)'), 'Metalness capped at 0.8');
 assert(fpsSource.includes('std.roughness = Math.max(std.roughness, 0.2)'), 'Roughness minimum 0.2');
-assert(fpsSource.includes('Environment preset='), 'Environment map preset enabled');
+assert(!fpsSource.includes('Environment preset='), 'Environment map removed (standard GLB only)');
 assert(fpsSource.includes('enemy2'), 'Enemy model variant 2 available');
 assert(fpsSource.includes('barricade2'), 'Barricade model variant 2 available');
 assert(fpsSource.includes('[0, -Math.PI / 2, 0]'), 'Weapon rotation corrected (-PI/2)');

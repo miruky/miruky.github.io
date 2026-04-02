@@ -3,7 +3,7 @@
 import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
-import { useGLTF, Environment } from '@react-three/drei';
+import { useGLTF } from '@react-three/drei';
 import * as THREE from 'three';
 import { HUD } from './HUD';
 import { Minimap } from './Minimap';
@@ -11,13 +11,27 @@ import { Minimap } from './Minimap';
 /* ═══════════════════════════════════════════════════════════
    Error Boundary
    ═══════════════════════════════════════════════════════════ */
-interface EBProps { children: ReactNode; fallback: ReactNode }
+interface EBProps { children: ReactNode; onError?: (msg: string) => void }
 interface EBState { hasError: boolean; error: Error | null }
 class GLBErrorBoundary extends Component<EBProps, EBState> {
   constructor(props: EBProps) { super(props); this.state = { hasError: false, error: null }; }
   static getDerivedStateFromError(error: Error) { return { hasError: true, error }; }
   componentDidCatch(error: Error, info: ErrorInfo) { console.error('[FPS] GLB/WebGL error:', error, info); }
-  render() { return this.state.hasError ? this.props.fallback : this.props.children; }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="absolute inset-0 flex items-center justify-center text-white bg-black">
+          <div className="text-center max-w-lg">
+            <p className="text-xl mb-4">3Dモデルの読み込みに失敗しました</p>
+            <p className="text-sm text-gray-400 mb-4 break-all">{this.state.error?.message || 'Unknown error'}</p>
+            <button onClick={() => window.location.reload()} className="px-6 py-2 bg-red-600 rounded-lg mr-2">リトライ</button>
+            <button onClick={() => window.history.back()} className="px-6 py-2 bg-gray-600 rounded-lg">戻る</button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -77,7 +91,7 @@ export const WEAPONS: WeaponDef[] = [
 ];
 
 /* ═══════════════════════════════════════════════════════════
-   GLB preloads (KHR_draco_mesh_compression + EXT_texture_webp)
+   GLB preloads (KHR_mesh_quantization – natively supported by Three.js)
    ═══════════════════════════════════════════════════════════ */
 const MODEL_PATHS = {
   ar: '/models/fps/ar.glb',
@@ -90,8 +104,6 @@ const MODEL_PATHS = {
   barricade: '/models/fps/barricade.glb',
   barricade2: '/models/fps/barricade2.glb',
 };
-// Draco decoder for KHR_draco_mesh_compression
-useGLTF.setDecoderPath('/draco/gltf/');
 Object.values(MODEL_PATHS).forEach((p) => useGLTF.preload(p));
 
 /* ═══════════════════════════════════════════════════════════
@@ -1834,14 +1846,7 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
       className="w-full h-screen relative overflow-hidden bg-black select-none"
       style={{ cursor: gs.phase === 'paused' ? 'default' : 'none' }}
     >
-      <GLBErrorBoundary fallback={
-        <div className="absolute inset-0 flex items-center justify-center text-white">
-          <div className="text-center">
-            <p className="text-xl mb-4">3Dモデルの読み込みに失敗しました</p>
-            <button onClick={handleBack} className="px-6 py-2 bg-red-600 rounded-lg">戻る</button>
-          </div>
-        </div>
-      }>
+      <GLBErrorBoundary>
       <Canvas
         shadows
         camera={{ fov: NORMAL_FOV, near: 0.1, far: 500 }}
@@ -1849,8 +1854,7 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
         style={{ position: 'absolute', inset: 0 }}
       >
         <Suspense fallback={null}>
-          <Environment preset="sunset" background={false} />
-          <ambientLight intensity={0.6} />
+          <ambientLight intensity={0.7} />
           <directionalLight
             position={[30, 50, 20]}
             intensity={1.5}
