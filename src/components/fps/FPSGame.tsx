@@ -265,28 +265,28 @@ export const WEAPONS: WeaponDef[] = [
   {
     name: 'Assault Rifle', nameJa: 'アサルトライフル',
     fireRate: 0.1, damage: 30, magSize: 30, totalAmmo: 210, reloadTime: 1.5,
-    spread: 0.025, adsSpread: 0.006, adsFov: 45, bulletsPerShot: 1, auto: true,
+    spread: 0.025, adsSpread: 0.006, adsFov: 55, bulletsPerShot: 1, auto: true,
     bulletSpeed: 150, range: 200, damageDropoffStart: 25, damageDropoffEnd: 80,
     minDamageMult: 0.5, headshotMult: 2.0, moveSpeedMult: 0.95,
   },
   {
     name: 'SMG', nameJa: 'サブマシンガン',
     fireRate: 0.055, damage: 20, magSize: 40, totalAmmo: 320, reloadTime: 1.1,
-    spread: 0.035, adsSpread: 0.015, adsFov: 50, bulletsPerShot: 1, auto: true,
+    spread: 0.035, adsSpread: 0.015, adsFov: 58, bulletsPerShot: 1, auto: true,
     bulletSpeed: 130, range: 80, damageDropoffStart: 12, damageDropoffEnd: 40,
     minDamageMult: 0.35, headshotMult: 1.8, moveSpeedMult: 1.05,
   },
   {
     name: 'Shotgun', nameJa: 'ショットガン',
     fireRate: 0.8, damage: 18, magSize: 8, totalAmmo: 48, reloadTime: 1.8,
-    spread: 0.12, adsSpread: 0.08, adsFov: 55, bulletsPerShot: 10, auto: false,
+    spread: 0.12, adsSpread: 0.08, adsFov: 62, bulletsPerShot: 10, auto: false,
     bulletSpeed: 90, range: 25, damageDropoffStart: 5, damageDropoffEnd: 18,
     minDamageMult: 0.08, headshotMult: 2.0, moveSpeedMult: 0.9,
   },
   {
     name: 'Sniper Rifle', nameJa: 'スナイパーライフル',
     fireRate: 1.2, damage: 90, magSize: 5, totalAmmo: 30, reloadTime: 2.5,
-    spread: 0.015, adsSpread: 0.0005, adsFov: 15, bulletsPerShot: 1, auto: false,
+    spread: 0.015, adsSpread: 0.0005, adsFov: 30, bulletsPerShot: 1, auto: false,
     bulletSpeed: 350, range: 500, damageDropoffStart: 100, damageDropoffEnd: 400,
     minDamageMult: 0.85, headshotMult: 3.5, moveSpeedMult: 0.85,
   },
@@ -372,17 +372,17 @@ function useClonedGLTF(path: string, targetSize: number) {
 /* ═══════════════════════════════════════════════════════════
    Constants
    ═══════════════════════════════════════════════════════════ */
-const MOVE_SPEED = 10;
-const SPRINT_SPEED = 18;
+const MOVE_SPEED = 7;
+const SPRINT_SPEED = 12;
 const CROUCH_SPEED = 5;
 const GRAVITY = -30;
 const JUMP_VEL = 10;
-const MOUSE_SENS = 0.003;
-const ADS_SENS = 0.0015;
+const MOUSE_SENS = 0.002;
+const ADS_SENS = 0.001;
 const PLAYER_HEIGHT = 1.7;
 const CROUCH_HEIGHT = 0.9;
 const PLAYER_RADIUS = 0.4;
-const NORMAL_FOV = 85;
+const NORMAL_FOV = 75;
 const ENEMY_SPEED = 2.0;
 const ENEMY_HP = 100;
 const HEAD_HITBOX_RADIUS = 0.45;
@@ -629,7 +629,10 @@ function GameMap() {
   groundTex.wrapS = groundTex.wrapT = THREE.RepeatWrapping;
   groundTex.repeat.set(20, 20);
   wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
-  wallTex.repeat.set(4, 4);
+  wallTex.repeat.set(2, 2);
+  // Reduce visual contrast on textures to minimize motion sickness
+  groundTex.colorSpace = THREE.SRGBColorSpace;
+  wallTex.colorSpace = THREE.SRGBColorSpace;
 
   return (
     <group>
@@ -645,13 +648,13 @@ function GameMap() {
       ]).map((w, i) => (
         <mesh key={`wall-${i}`} position={w.p} castShadow receiveShadow>
           <boxGeometry args={w.s} />
-          <meshStandardMaterial map={wallTex} roughness={0.8} />
+          <meshStandardMaterial map={wallTex} roughness={0.95} />
         </mesh>
       ))}
       {BUILDINGS.map((b, i) => (
         <mesh key={`bld-${i}`} position={b.pos} castShadow receiveShadow>
           <boxGeometry args={b.size} />
-          <meshStandardMaterial map={wallTex} roughness={0.7} />
+          <meshStandardMaterial map={wallTex} roughness={0.9} />
         </mesh>
       ))}
       <Suspense fallback={null}>
@@ -741,9 +744,9 @@ function WeaponModel({
   useFrame((_, delta) => {
     if (!groupRef.current) return;
     const dt = Math.min(delta, 0.05);
-    if (isMoving) bobTime.current += dt * 9;
-    const bob = isMoving ? Math.sin(bobTime.current) * 0.006 : 0;
-    const sway = isMoving ? Math.cos(bobTime.current * 0.5) * 0.003 : 0;
+    if (isMoving) bobTime.current += dt * 5;
+    const bob = isMoving ? Math.sin(bobTime.current) * 0.002 : 0;
+    const sway = isMoving ? Math.cos(bobTime.current * 0.5) * 0.001 : 0;
     if (isFiring) recoilRef.current = Math.min(recoilRef.current + dt * 40, 1);
     else recoilRef.current = Math.max(recoilRef.current - dt * 15, 0);
     const recoil = recoilRef.current * 0.025;
@@ -1060,6 +1063,7 @@ function GameLoop({
   const weaponReserve = useRef(WEAPONS.map((w) => w.totalAmmo));
   const switchTimer = useRef(0);
   const isSwitchingRef = useRef(false);
+  const switchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Killstreak state
   const killstreakActiveRef = useRef<string | null>(null);
@@ -1128,11 +1132,11 @@ function GameLoop({
     };
     const ctx = (e: Event) => e.preventDefault();
     gl.domElement.addEventListener('mousedown', onDown);
-    gl.domElement.addEventListener('mouseup', onUp);
+    document.addEventListener('mouseup', onUp);
     gl.domElement.addEventListener('contextmenu', ctx);
     return () => {
       gl.domElement.removeEventListener('mousedown', onDown);
-      gl.domElement.removeEventListener('mouseup', onUp);
+      document.removeEventListener('mouseup', onUp);
       gl.domElement.removeEventListener('contextmenu', ctx);
     };
   }, [gl, requestPointerLock, setGameState, gameState]);
@@ -1161,7 +1165,9 @@ function GameLoop({
       isSwitchingRef.current = true;
       switchTimer.current = WEAPON_SWITCH_TIME;
       gameState.current.isSwitching = true;
-      setTimeout(() => {
+      if (switchTimeoutRef.current) clearTimeout(switchTimeoutRef.current);
+      switchTimeoutRef.current = setTimeout(() => {
+        if (gameState.current.phase !== 'playing') return;
         weaponIdx.current = newIdx;
         gameState.current.ammo = weaponAmmo.current[newIdx];
         gameState.current.reserve = weaponReserve.current[newIdx];
@@ -1206,11 +1212,16 @@ function GameLoop({
       if (e.code === 'Digit4') switchToWeapon(3);
     };
     const onKeyUp = (e: KeyboardEvent) => { keys.current.delete(e.code); };
+    const onVisChange = () => {
+      if (document.hidden) { keys.current.clear(); isMouseDown.current = false; }
+    };
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
+    document.addEventListener('visibilitychange', onVisChange);
     return () => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
+      document.removeEventListener('visibilitychange', onVisChange);
     };
   }, [gameState, switchToWeapon]);
 
@@ -1236,10 +1247,12 @@ function GameLoop({
   const spawnEnemy = useCallback((wave: number) => {
     const angle = Math.random() * Math.PI * 2;
     const dist = 20 + Math.random() * 20;
+    const px = playerPos.current.x;
+    const pz = playerPos.current.z;
     const pos = new THREE.Vector3(
-      Math.max(-MAP_SIZE + 2, Math.min(MAP_SIZE - 2, Math.cos(angle) * dist)),
+      Math.max(-MAP_SIZE + 2, Math.min(MAP_SIZE - 2, px + Math.cos(angle) * dist)),
       0,
-      Math.max(-MAP_SIZE + 2, Math.min(MAP_SIZE - 2, Math.sin(angle) * dist))
+      Math.max(-MAP_SIZE + 2, Math.min(MAP_SIZE - 2, pz + Math.sin(angle) * dist))
     );
     if (collidesWithBuildings(pos, 1)) return;
     const hpMult = 1 + (wave - 1) * 0.2;
@@ -1274,7 +1287,7 @@ function GameLoop({
 
   const explodeGrenade = useCallback((gpos: THREE.Vector3, now: number) => {
     explosionsRef.current.push({ id: bulletId.current++, pos: gpos.clone(), time: now });
-    screenShakeRef.current = Math.max(screenShakeRef.current, 0.06);
+    screenShakeRef.current = Math.max(screenShakeRef.current, 0.015);
     playGunSound('explosion');
     for (const e of enemies.current) {
       if (e.state === 'dead') continue;
@@ -1325,10 +1338,8 @@ function GameLoop({
     const targetH = isCrouch ? CROUCH_HEIGHT : PLAYER_HEIGHT;
     currentHeight.current = THREE.MathUtils.lerp(currentHeight.current, targetH, dt * 16);
 
-    screenShakeRef.current = Math.max(0, screenShakeRef.current - dt * 5);
-    const shakeX = (Math.random() - 0.5) * screenShakeRef.current;
-    const shakeY = (Math.random() - 0.5) * screenShakeRef.current;
-    camera.position.set(playerPos.current.x + shakeX, playerPos.current.y + shakeY, playerPos.current.z);
+    screenShakeRef.current = Math.max(0, screenShakeRef.current - dt * 8);
+    camera.position.set(playerPos.current.x, playerPos.current.y, playerPos.current.z);
 
     // ── Weapon group follows camera in scene space ──
     if (weaponGroupRef.current) {
@@ -1341,7 +1352,7 @@ function GameLoop({
 
     const targetFov = gs.isADS ? weapon.adsFov : NORMAL_FOV;
     const cam = camera as THREE.PerspectiveCamera;
-    cam.fov = THREE.MathUtils.lerp(cam.fov, targetFov, dt * 18);
+    cam.fov = THREE.MathUtils.lerp(cam.fov, targetFov, dt * 8);
     cam.updateProjectionMatrix();
 
     // ── Movement ──
@@ -1398,7 +1409,7 @@ function GameLoop({
             const dmg = Math.min(50, (fallDist - FALL_DAMAGE_THRESHOLD) * FALL_DAMAGE_MULT);
             gs.hp = Math.max(0, gs.hp - dmg);
             lastDamageTime.current = now;
-            screenShakeRef.current = Math.max(screenShakeRef.current, dmg * 0.002);
+            screenShakeRef.current = Math.max(screenShakeRef.current, dmg * 0.001);
             if (gs.hp <= 0) {
               gs.deaths++;
               gs.hp = PLAYER_MAX_HP;
@@ -1434,7 +1445,7 @@ function GameLoop({
           const dmg = Math.min(50, (fallDist - FALL_DAMAGE_THRESHOLD) * FALL_DAMAGE_MULT);
           gs.hp = Math.max(0, gs.hp - dmg);
           lastDamageTime.current = now;
-          screenShakeRef.current = Math.max(screenShakeRef.current, dmg * 0.002);
+          screenShakeRef.current = Math.max(screenShakeRef.current, dmg * 0.001);
         }
       }
       playerPos.current.y = pHeight;
@@ -1499,7 +1510,7 @@ function GameLoop({
       }
       const _gunTypes = ['ar', 'smg', 'shotgun', 'sniper'] as const;
       playGunSound(_gunTypes[weaponIdx.current]);
-      screenShakeRef.current = Math.max(screenShakeRef.current, 0.005);
+      screenShakeRef.current = Math.max(screenShakeRef.current, 0.002);
       setGameState((s) => ({ ...s, ammo: gs.ammo }));
       if (gs.ammo <= 0 && gs.reserve > 0) startReload();
     }
@@ -1759,7 +1770,7 @@ function GameLoop({
             b.life = 0;
             newHits.push({ id: bulletId.current++, time: now, headshot: true });
             damageNumbersRef.current.push({ id: bulletId.current++, pos: headCenter.clone(), damage: dmg, headshot: true, time: now });
-            screenShakeRef.current = Math.max(screenShakeRef.current, 0.008);
+            screenShakeRef.current = Math.max(screenShakeRef.current, 0.003);
             playGunSound('enemyHit');
             if (e.hp <= 0) {
               e.state = 'dead';
@@ -1824,7 +1835,7 @@ function GameLoop({
           playGunSound('playerHit');
           gs.streakCount = 0;
           streakRewardsGiven.current.clear();
-          screenShakeRef.current = Math.max(screenShakeRef.current, 0.02);
+          screenShakeRef.current = Math.max(screenShakeRef.current, 0.008);
           const ddir = new THREE.Vector2(-b.vel.x, -b.vel.z);
           const pdir = new THREE.Vector2(-Math.sin(yaw.current), -Math.cos(yaw.current));
           gs.damageDir = Math.atan2(ddir.cross(pdir), ddir.dot(pdir));
@@ -2071,16 +2082,14 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
     setGs((s) => ({ ...s, phase: 'playing' }));
     setTimeout(() => {
       const el = containerRef.current;
+      const canvas = el?.querySelector('canvas');
       if (el && !document.fullscreenElement) {
         el.requestFullscreen().then(() => {
-          const canvas = document.querySelector('canvas');
           if (canvas) canvas.requestPointerLock();
         }).catch(() => {
-          const canvas = document.querySelector('canvas');
           if (canvas) canvas.requestPointerLock();
         });
       } else {
-        const canvas = document.querySelector('canvas');
         if (canvas) canvas.requestPointerLock();
       }
     }, 50);

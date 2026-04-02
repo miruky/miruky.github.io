@@ -262,10 +262,9 @@ export function HUD({ gs }: { gs: GameState }) {
       </div>
 
       {/* ── Low HP damage overlay ── */}
-      {gs.hp < 40 && (
-        <div className="absolute inset-0 pointer-events-none animate-pulse">
-          <img src="/images/fps/blood.png" alt="" className="absolute inset-0 w-full h-full object-cover opacity-20" style={{ mixBlendMode: 'screen' }} />
-          <div className="absolute inset-0 border-[4px] border-red-500/30" />
+      {gs.hp < 30 && (
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 border-[3px] border-red-500/20 rounded-xl" />
         </div>
       )}
 

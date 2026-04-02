@@ -446,10 +446,10 @@ console.log('\n🎯 === v3 BUG FIX TESTS ===');
 
 // Commit 1: Enemy speed + hitbox + ray detection
 assert(fpsSource.includes('ENEMY_SPEED = 2.0'), 'Enemy speed at 2.0');
-assert(fpsSource.includes('MOVE_SPEED = 10'), 'Walk speed boosted to 10');
-assert(fpsSource.includes('SPRINT_SPEED = 18'), 'Sprint speed boosted to 18');
-assert(fpsSource.includes('MOUSE_SENS = 0.003'), 'Mouse sensitivity increased to 0.003');
-assert(fpsSource.includes('NORMAL_FOV = 85'), 'FOV widened to 85');
+assert(fpsSource.includes('MOVE_SPEED = 7'), 'Walk speed tuned to 7 (motion sickness fix)');
+assert(fpsSource.includes('SPRINT_SPEED = 12'), 'Sprint speed tuned to 12 (motion sickness fix)');
+assert(fpsSource.includes('MOUSE_SENS = 0.002'), 'Mouse sensitivity lowered to 0.002 (motion sickness fix)');
+assert(fpsSource.includes('NORMAL_FOV = 75'), 'FOV tuned to 75 (motion sickness fix)');
 assert(fpsSource.includes('WEAPON_SWITCH_TIME = 0.25'), 'Weapon switch faster (0.25s)');
 assert(fpsSource.includes('HEAD_HITBOX_RADIUS = 0.45'), 'Head hitbox = 0.45');
 assert(fpsSource.includes('BODY_HITBOX_RADIUS = 0.75'), 'Body hitbox = 0.75');
@@ -498,6 +498,26 @@ assert(fpsSource.includes('nukeKills'), 'NUKE has dedicated kill processing');
 assert(fpsSource.includes("texture.dispose()"), 'DamageNumber texture disposed on unmount');
 assert(fpsSource.includes('g.vel.lengthSq() > 0.01'), 'Grenade NaN protection');
 assert(fpsSource.includes('グレネードキル +${score}'), 'Grenade kills have multi-kill tracking');
+
+// v7: Motion sickness fix + wall texture fix + bug fixes
+console.log('\n🩺 === v7 MOTION SICKNESS FIX TESTS ===');
+assert(fpsSource.includes('MOVE_SPEED = 7'), 'Walk speed reduced for comfort');
+assert(fpsSource.includes('SPRINT_SPEED = 12'), 'Sprint speed reduced for comfort');
+assert(fpsSource.includes('MOUSE_SENS = 0.002'), 'Mouse sensitivity lowered');
+assert(fpsSource.includes('NORMAL_FOV = 75'), 'FOV at comfortable 75');
+assert(fpsSource.includes('dt * 5') && fpsSource.includes('bobTime'), 'Weapon bob frequency reduced (dt*5)');
+assert(fpsSource.includes('* 0.002') && fpsSource.includes('bob'), 'Weapon bob amplitude reduced (0.002)');
+assert(fpsSource.includes('* 0.001') && fpsSource.includes('sway'), 'Weapon sway reduced (0.001)');
+assert(!fpsSource.includes('(Math.random() - 0.5) * screenShakeRef.current'), 'Camera position shake removed');
+assert(fpsSource.includes('adsFov: 55'), 'AR ADS FOV raised to 55');
+assert(fpsSource.includes('adsFov: 30'), 'Sniper ADS FOV raised to 30 (less extreme)');
+assert(fpsSource.includes('dt * 8') && fpsSource.includes('cam.fov'), 'ADS FOV transition slowed (dt*8)');
+assert(fpsSource.includes('wallTex.repeat.set(2, 2)'), 'Wall texture repeat reduced to 2x2');
+assert(fpsSource.includes('roughness={0.95}'), 'Wall roughness increased to 0.95');
+assert(fpsSource.includes("document.addEventListener('mouseup'") || fpsSource.includes("document.removeEventListener('mouseup'"), 'mouseUp on document (prevents stuck fire)');
+assert(fpsSource.includes('visibilitychange'), 'Visibility change handler clears stuck keys');
+assert(fpsSource.includes('switchTimeoutRef'), 'Weapon switch timeout tracked for cleanup');
+assert(fpsSource.includes('el?.querySelector'), 'Canvas querySelector scoped to container');
 
 // Ray-based hit detection test (geometry)
 console.log('\n🔬 === RAY-SPHERE HIT DETECTION TESTS ===');
