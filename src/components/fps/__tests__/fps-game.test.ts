@@ -53,6 +53,12 @@ const WEAPONS: WeaponDef[] = [
     damageDropoffStart: 100, damageDropoffEnd: 400, minDamageMult: 0.85,
     headshotMult: 3.5, moveSpeedMult: 0.85, spread: 0.015, adsSpread: 0.0005,
   },
+  {
+    name: 'Katana', fireRate: 0.4, damage: 80, magSize: 999, totalAmmo: 0,
+    bulletsPerShot: 0, bulletSpeed: 0, range: 3.5,
+    damageDropoffStart: 0, damageDropoffEnd: 3.5, minDamageMult: 1.0,
+    headshotMult: 2.5, moveSpeedMult: 1.15, spread: 0, adsSpread: 0,
+  },
 ];
 
 function calcDamage(baseDmg: number, dist: number, weapon: WeaponDef): number {
@@ -158,14 +164,15 @@ function assertApprox(a: number, b: number, epsilon: number, name: string) {
 
 console.log('\n🔫 === WEAPON SYSTEM TESTS ===');
 
-// Test 1: All 4 weapons defined
-assert(WEAPONS.length === 4, 'All 4 weapons defined');
+// Test 1: All 5 weapons defined
+assert(WEAPONS.length === 5, 'All 5 weapons defined');
 
 // Test 2: Weapon names correct
 assert(WEAPONS[0].name === 'Assault Rifle', 'Weapon 0 = Assault Rifle');
 assert(WEAPONS[1].name === 'SMG', 'Weapon 1 = SMG');
 assert(WEAPONS[2].name === 'Shotgun', 'Weapon 2 = Shotgun');
 assert(WEAPONS[3].name === 'Sniper Rifle', 'Weapon 3 = Sniper Rifle');
+assert(WEAPONS[4].name === 'Katana', 'Weapon 4 = Katana');
 
 // Test 3: Shotgun has multiple pellets
 assert(WEAPONS[2].bulletsPerShot === 10, 'Shotgun fires 10 pellets');
@@ -342,7 +349,7 @@ const fs = require('fs');
 const path = require('path');
 const wsRoot = path.resolve(__dirname, '../../../..');
 
-const requiredGLB = ['ar.glb', 'smg.glb', 'shotgun.glb', 'sniper.glb', 'enemy.glb', 'crate.glb', 'barricade.glb'];
+const requiredGLB = ['ar.glb', 'smg.glb', 'shotgun.glb', 'sniper.glb', 'enemy.glb', 'crate.glb', 'barricade.glb', 'katana.glb'];
 const requiredTextures = ['blood.png', 'ground.png', 'menu-bg.png', 'muzzle.png', 'sky.png', 'wall.png', 'scope.png'];
 
 for (const f of requiredGLB) {
@@ -518,6 +525,46 @@ assert(fpsSource.includes("document.addEventListener('mouseup'") || fpsSource.in
 assert(fpsSource.includes('visibilitychange'), 'Visibility change handler clears stuck keys');
 assert(fpsSource.includes('switchTimeoutRef'), 'Weapon switch timeout tracked for cleanup');
 assert(fpsSource.includes('el?.querySelector'), 'Canvas querySelector scoped to container');
+
+// v8: Katana + Dash tests
+console.log('\n🗡️ === v8 KATANA + DASH TESTS ===');
+assert(fpsSource.includes("'katanaSlash'"), 'katanaSlash sound type defined');
+assert(fpsSource.includes("'katanaCharge'"), 'katanaCharge sound type defined');
+assert(fpsSource.includes('isMelee?: boolean'), 'WeaponDef has isMelee field');
+assert(fpsSource.includes('isMelee: true'), 'Katana weapon has isMelee: true');
+assert(fpsSource.includes('DASH_SPEED'), 'DASH_SPEED constant exists');
+assert(fpsSource.includes('DASH_DURATION'), 'DASH_DURATION constant exists');
+assert(fpsSource.includes('DASH_COOLDOWN'), 'DASH_COOLDOWN constant exists');
+assert(fpsSource.includes('KATANA_CHARGE_TIME'), 'KATANA_CHARGE_TIME constant exists');
+assert(fpsSource.includes('KATANA_CHARGE_DASH_DIST'), 'KATANA_CHARGE_DASH_DIST constant exists');
+assert(fpsSource.includes('KATANA_SLASH_DAMAGE'), 'KATANA_SLASH_DAMAGE constant exists');
+assert(fpsSource.includes('KATANA_CHARGE_DAMAGE'), 'KATANA_CHARGE_DAMAGE constant exists');
+assert(fpsSource.includes('KATANA_MELEE_RANGE'), 'KATANA_MELEE_RANGE constant exists');
+assert(fpsSource.includes('katanaCharge: number'), 'GameState has katanaCharge field');
+assert(fpsSource.includes('isDashing: boolean'), 'GameState has isDashing field');
+assert(fpsSource.includes('isKatanaSlashing: boolean'), 'GameState has isKatanaSlashing field');
+assert(fpsSource.includes('lastWTapTime'), 'Double-tap W dash detection ref exists');
+assert(fpsSource.includes('dashTimer'), 'Dash timer ref exists');
+assert(fpsSource.includes('isDashingRef'), 'isDashingRef ref exists');
+assert(fpsSource.includes('katanaChargeRef'), 'katanaChargeRef ref exists');
+assert(fpsSource.includes('katanaSlashingRef'), 'katanaSlashingRef ref exists');
+assert(fpsSource.includes('KatanaWeapon'), 'KatanaWeapon component exists');
+assert(fpsSource.includes('katana.glb'), 'Katana model path configured');
+assert(fpsSource.includes("Digit5") || fpsSource.includes("'Digit5'"), 'Digit5 key binding for katana');
+assert(hudSource.includes('MELEE'), 'HUD shows MELEE mode for katana');
+assert(hudSource.includes('katanaCharge'), 'HUD shows katana charge bar');
+assert(hudSource.includes('1-5'), 'HUD controls show 1-5 weapon keys');
+assert(hudSource.includes('ダッシュ'), 'HUD shows dash hint');
+
+// Katana weapon balance tests
+const katana = WEAPONS[4];
+assert(katana.damage === 80, 'Katana slash damage = 80');
+assert(katana.range === 3.5, 'Katana melee range = 3.5');
+assert(katana.moveSpeedMult === 1.15, 'Katana speed boost = 1.15');
+assert(katana.headshotMult === 2.5, 'Katana headshot mult = 2.5');
+assert(katana.bulletsPerShot === 0, 'Katana fires no bullets');
+assert(katana.totalAmmo === 0, 'Katana has no ammo');
+assert(katana.magSize === 999, 'Katana infinite mag');
 
 // Ray-based hit detection test (geometry)
 console.log('\n🔬 === RAY-SPHERE HIT DETECTION TESTS ===');

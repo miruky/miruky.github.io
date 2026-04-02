@@ -153,28 +153,55 @@ export function HUD({ gs }: { gs: GameState }) {
               </p>
             </div>
           </div>
-          <div className="flex items-end gap-2">
-            <p className="text-4xl font-black tabular-nums leading-none">
-              {gs.isReloading || gs.isSwitching ? '--' : gs.ammo}
-            </p>
-            <p className="text-slate-400 text-lg tabular-nums mb-0.5">/ {gs.reserve}</p>
-          </div>
-          {gs.isReloading && (
-            <div className="mt-2 w-full h-1 bg-slate-700 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-accent-cyan rounded-full transition-all duration-100"
-                style={{ width: `${gs.reloadProgress * 100}%` }}
-              />
-            </div>
+          {weapon.isMelee ? (
+            <>
+              <div className="flex items-end gap-2">
+                <p className="text-4xl font-black tabular-nums leading-none text-orange-400">∞</p>
+              </div>
+              {/* Katana charge bar */}
+              <div className="mt-2 w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-100 ${
+                    gs.katanaCharge >= 0.95 ? 'bg-red-500 animate-pulse' : 'bg-blue-400'
+                  }`}
+                  style={{ width: `${gs.katanaCharge * 100}%` }}
+                />
+              </div>
+              <p className="mt-1 text-[10px] text-slate-400">
+                {gs.katanaCharge >= 0.95 ? '⚡ 溜め切り準備完了' : gs.katanaCharge > 0 ? '長押しで溜め中...' : 'LMB: 斬撃 / 長押し: 溜め切り'}
+              </p>
+              <div className="mt-2 flex gap-1.5">
+                <div className="px-1.5 py-0.5 rounded text-[9px] font-bold border bg-orange-500/20 text-orange-400 border-orange-500/30">
+                  MELEE
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="flex items-end gap-2">
+                <p className="text-4xl font-black tabular-nums leading-none">
+                  {gs.isReloading || gs.isSwitching ? '--' : gs.ammo}
+                </p>
+                <p className="text-slate-400 text-lg tabular-nums mb-0.5">/ {gs.reserve}</p>
+              </div>
+              {gs.isReloading && (
+                <div className="mt-2 w-full h-1 bg-slate-700 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-accent-cyan rounded-full transition-all duration-100"
+                    style={{ width: `${gs.reloadProgress * 100}%` }}
+                  />
+                </div>
+              )}
+              <div className="mt-2 flex gap-1.5">
+                <div className={`px-1.5 py-0.5 rounded text-[9px] font-bold border ${weapon.auto ? 'bg-accent-cyan/20 text-accent-cyan border-accent-cyan/30' : 'bg-white/5 text-slate-500 border-transparent'}`}>
+                  AUTO
+                </div>
+                <div className={`px-1.5 py-0.5 rounded text-[9px] font-bold border ${!weapon.auto ? 'bg-accent-cyan/20 text-accent-cyan border-accent-cyan/30' : 'bg-white/5 text-slate-500 border-transparent'}`}>
+                  SEMI
+                </div>
+              </div>
+            </>
           )}
-          <div className="mt-2 flex gap-1.5">
-            <div className={`px-1.5 py-0.5 rounded text-[9px] font-bold border ${weapon.auto ? 'bg-accent-cyan/20 text-accent-cyan border-accent-cyan/30' : 'bg-white/5 text-slate-500 border-transparent'}`}>
-              AUTO
-            </div>
-            <div className={`px-1.5 py-0.5 rounded text-[9px] font-bold border ${!weapon.auto ? 'bg-accent-cyan/20 text-accent-cyan border-accent-cyan/30' : 'bg-white/5 text-slate-500 border-transparent'}`}>
-              SEMI
-            </div>
-          </div>
         </div>
       </div>
 
@@ -289,7 +316,8 @@ export function HUD({ gs }: { gs: GameState }) {
           ['R', 'リロード'],
           ['G', 'グレネード'],
           ['C', 'しゃがみ'],
-          ['1-4', '武器'],
+          ['1-5', '武器'],
+          ['WW', 'ダッシュ'],
           ['Esc', 'ポーズ'],
         ].map(([key, label]) => (
           <div key={key} className="flex items-center gap-1">
