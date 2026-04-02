@@ -264,28 +264,28 @@ export interface WeaponDef {
 export const WEAPONS: WeaponDef[] = [
   {
     name: 'Assault Rifle', nameJa: 'アサルトライフル',
-    fireRate: 0.1, damage: 30, magSize: 30, totalAmmo: 210, reloadTime: 2.0,
+    fireRate: 0.1, damage: 30, magSize: 30, totalAmmo: 210, reloadTime: 1.5,
     spread: 0.025, adsSpread: 0.006, adsFov: 45, bulletsPerShot: 1, auto: true,
     bulletSpeed: 150, range: 200, damageDropoffStart: 25, damageDropoffEnd: 80,
     minDamageMult: 0.5, headshotMult: 2.0, moveSpeedMult: 0.95,
   },
   {
     name: 'SMG', nameJa: 'サブマシンガン',
-    fireRate: 0.055, damage: 20, magSize: 40, totalAmmo: 320, reloadTime: 1.4,
+    fireRate: 0.055, damage: 20, magSize: 40, totalAmmo: 320, reloadTime: 1.1,
     spread: 0.035, adsSpread: 0.015, adsFov: 50, bulletsPerShot: 1, auto: true,
     bulletSpeed: 130, range: 80, damageDropoffStart: 12, damageDropoffEnd: 40,
     minDamageMult: 0.35, headshotMult: 1.8, moveSpeedMult: 1.05,
   },
   {
     name: 'Shotgun', nameJa: 'ショットガン',
-    fireRate: 0.8, damage: 18, magSize: 8, totalAmmo: 48, reloadTime: 2.5,
+    fireRate: 0.8, damage: 18, magSize: 8, totalAmmo: 48, reloadTime: 1.8,
     spread: 0.12, adsSpread: 0.08, adsFov: 55, bulletsPerShot: 10, auto: false,
     bulletSpeed: 90, range: 25, damageDropoffStart: 5, damageDropoffEnd: 18,
     minDamageMult: 0.08, headshotMult: 2.0, moveSpeedMult: 0.9,
   },
   {
     name: 'Sniper Rifle', nameJa: 'スナイパーライフル',
-    fireRate: 1.2, damage: 90, magSize: 5, totalAmmo: 30, reloadTime: 3.2,
+    fireRate: 1.2, damage: 90, magSize: 5, totalAmmo: 30, reloadTime: 2.5,
     spread: 0.015, adsSpread: 0.0005, adsFov: 15, bulletsPerShot: 1, auto: false,
     bulletSpeed: 350, range: 500, damageDropoffStart: 100, damageDropoffEnd: 400,
     minDamageMult: 0.85, headshotMult: 3.5, moveSpeedMult: 0.85,
@@ -311,49 +311,43 @@ Object.values(MODEL_PATHS).forEach((p) => useGLTF.preload(p));
 /* ═══════════════════════════════════════════════════════════
    GLB model helpers
    ═══════════════════════════════════════════════════════════ */
-/* Color tints for greyscale GLB models (baseColorTexture is grey, so we
-   multiply with a tint color to give each model its characteristic look) */
-const MODEL_TINTS: Record<string, THREE.Color> = {
-  [MODEL_PATHS.ar]:        new THREE.Color(0.30, 0.28, 0.26),  // gunmetal dark
-  [MODEL_PATHS.smg]:       new THREE.Color(0.25, 0.25, 0.28),  // blued steel
-  [MODEL_PATHS.shotgun]:   new THREE.Color(0.35, 0.25, 0.18),  // wood/brown
-  [MODEL_PATHS.sniper]:    new THREE.Color(0.22, 0.28, 0.22),  // dark olive
-  [MODEL_PATHS.enemy]:     new THREE.Color(0.45, 0.38, 0.30),  // desert khaki
-  [MODEL_PATHS.enemy2]:    new THREE.Color(0.30, 0.35, 0.28),  // camo green
-  [MODEL_PATHS.crate]:     new THREE.Color(0.55, 0.42, 0.25),  // wooden crate
-  [MODEL_PATHS.barricade]: new THREE.Color(0.50, 0.48, 0.42),  // concrete
-  [MODEL_PATHS.barricade2]:new THREE.Color(0.52, 0.45, 0.40),  // concrete warm
+/* Direct colors for models (baseColorTextures are greyscale in linear ~0.03,
+   so we REPLACE the map entirely and use bright material colors instead) */
+const MODEL_COLORS: Record<string, { color: THREE.Color; metalness: number; roughness: number }> = {
+  [MODEL_PATHS.ar]:        { color: new THREE.Color(0.22, 0.22, 0.24), metalness: 0.6, roughness: 0.35 },  // gunmetal
+  [MODEL_PATHS.smg]:       { color: new THREE.Color(0.18, 0.18, 0.22), metalness: 0.65, roughness: 0.3 },  // blued steel
+  [MODEL_PATHS.shotgun]:   { color: new THREE.Color(0.45, 0.28, 0.12), metalness: 0.15, roughness: 0.65 }, // wood/brown
+  [MODEL_PATHS.sniper]:    { color: new THREE.Color(0.15, 0.2, 0.12),  metalness: 0.4, roughness: 0.45 },  // dark olive
+  [MODEL_PATHS.enemy]:     { color: new THREE.Color(0.55, 0.45, 0.3),  metalness: 0.05, roughness: 0.8 },  // desert khaki
+  [MODEL_PATHS.enemy2]:    { color: new THREE.Color(0.3, 0.4, 0.25),   metalness: 0.05, roughness: 0.8 },  // camo green
+  [MODEL_PATHS.crate]:     { color: new THREE.Color(0.6, 0.42, 0.2),   metalness: 0.0, roughness: 0.9 },   // wooden crate
+  [MODEL_PATHS.barricade]: { color: new THREE.Color(0.55, 0.52, 0.45), metalness: 0.0, roughness: 0.95 },  // concrete
+  [MODEL_PATHS.barricade2]:{ color: new THREE.Color(0.5, 0.45, 0.38),  metalness: 0.0, roughness: 0.95 },  // concrete warm
 };
 
 function useClonedGLTF(path: string, targetSize: number) {
   const gltf = useGLTF(path);
   return useMemo(() => {
     const clone = gltf.scene.clone(true);
-    const tint = MODEL_TINTS[path] || new THREE.Color(0.5, 0.5, 0.5);
+    const preset = MODEL_COLORS[path] || { color: new THREE.Color(0.5, 0.5, 0.5), metalness: 0.1, roughness: 0.7 };
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
         const fixMat = (m: THREE.Material): THREE.Material => {
-          const c = m.clone();
-          const std = c as THREE.MeshStandardMaterial;
-          // Ensure texture colorSpace for correct color display
-          if (std.map) { std.map.colorSpace = THREE.SRGBColorSpace; std.map.needsUpdate = true; }
-          if (std.emissiveMap) { std.emissiveMap.colorSpace = THREE.SRGBColorSpace; std.emissiveMap.needsUpdate = true; }
-          if (std.normalMap) std.normalMap.needsUpdate = true;
-          if (std.roughnessMap) std.roughnessMap.needsUpdate = true;
-          if (std.metalnessMap) std.metalnessMap.needsUpdate = true;
-          // Tint the grey baseColorTexture with model-specific color
-          std.color.copy(tint);
-          // Keep metalness moderate for subtle sheen without needing envMap
-          if (typeof std.metalness === 'number') {
-            std.metalness = Math.min(std.metalness, 0.25);
-          }
-          if (typeof std.roughness === 'number') {
-            std.roughness = Math.max(std.roughness, 0.45);
-          }
-          std.side = THREE.DoubleSide;
-          c.needsUpdate = true;
-          return c;
+          const orig = m as THREE.MeshStandardMaterial;
+          // Create fresh material - the GLB baseColorTextures are greyscale
+          // (sRGB ~50/255 → linear ~0.03) so they render near-black.
+          // We replace with direct color + keep normalMap for surface detail.
+          const mat = new THREE.MeshStandardMaterial({
+            color: preset.color,
+            metalness: preset.metalness,
+            roughness: preset.roughness,
+            normalMap: orig.normalMap || null,
+            normalScale: orig.normalScale ? orig.normalScale.clone() : new THREE.Vector2(1, 1),
+            side: THREE.DoubleSide,
+            envMapIntensity: 1.0,
+          });
+          return mat;
         };
         if (Array.isArray(mesh.material)) {
           mesh.material = mesh.material.map(fixMat);
@@ -378,17 +372,17 @@ function useClonedGLTF(path: string, targetSize: number) {
 /* ═══════════════════════════════════════════════════════════
    Constants
    ═══════════════════════════════════════════════════════════ */
-const MOVE_SPEED = 8;
-const SPRINT_SPEED = 14;
-const CROUCH_SPEED = 4;
-const GRAVITY = -25;
-const JUMP_VEL = 9;
-const MOUSE_SENS = 0.002;
-const ADS_SENS = 0.001;
+const MOVE_SPEED = 10;
+const SPRINT_SPEED = 18;
+const CROUCH_SPEED = 5;
+const GRAVITY = -30;
+const JUMP_VEL = 10;
+const MOUSE_SENS = 0.003;
+const ADS_SENS = 0.0015;
 const PLAYER_HEIGHT = 1.7;
 const CROUCH_HEIGHT = 0.9;
 const PLAYER_RADIUS = 0.4;
-const NORMAL_FOV = 75;
+const NORMAL_FOV = 85;
 const ENEMY_SPEED = 2.0;
 const ENEMY_HP = 100;
 const HEAD_HITBOX_RADIUS = 0.45;
@@ -404,7 +398,7 @@ const PLAYER_MAX_HP = 100;
 const HP_REGEN_DELAY = 4;
 const HP_REGEN_RATE = 20;
 const MAP_SIZE = 50;
-const WEAPON_SWITCH_TIME = 0.45;
+const WEAPON_SWITCH_TIME = 0.25;
 const GRENADE_MAX = 4;
 const GRENADE_FUSE = 3.0;
 const GRENADE_RADIUS = 7;
@@ -681,7 +675,7 @@ function SkyDome() {
   const tex = useLoader(THREE.TextureLoader, '/images/fps/sky.png');
   return (
     <mesh>
-      <sphereGeometry args={[300, 64, 32]} />
+      <sphereGeometry args={[300, 32, 16]} />
       <meshBasicMaterial map={tex} side={THREE.BackSide} />
     </mesh>
   );
@@ -702,22 +696,22 @@ function ProceduralEnvMap() {
     const midColor = new THREE.Color(0.85, 0.82, 0.75);  // warm horizon
     const botColor = new THREE.Color(0.45, 0.42, 0.35);  // ground
     const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 256;
+    canvas.width = 256;
+    canvas.height = 128;
     const ctx = canvas.getContext('2d')!;
-    const grad = ctx.createLinearGradient(0, 0, 0, 256);
+    const grad = ctx.createLinearGradient(0, 0, 0, 128);
     grad.addColorStop(0, `rgb(${topColor.r * 255},${topColor.g * 255},${topColor.b * 255})`);
     grad.addColorStop(0.45, `rgb(${midColor.r * 255},${midColor.g * 255},${midColor.b * 255})`);
     grad.addColorStop(0.55, `rgb(${midColor.r * 255},${midColor.g * 255},${midColor.b * 255})`);
     grad.addColorStop(1.0, `rgb(${botColor.r * 255},${botColor.g * 255},${botColor.b * 255})`);
     ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 512, 256);
+    ctx.fillRect(0, 0, 256, 128);
     // Add some brightness variation (fake sun)
-    const sunGrad = ctx.createRadialGradient(380, 50, 0, 380, 50, 100);
+    const sunGrad = ctx.createRadialGradient(190, 25, 0, 190, 25, 50);
     sunGrad.addColorStop(0, 'rgba(255,240,200,0.6)');
     sunGrad.addColorStop(1, 'rgba(255,240,200,0)');
     ctx.fillStyle = sunGrad;
-    ctx.fillRect(0, 0, 512, 256);
+    ctx.fillRect(0, 0, 256, 128);
     const tex = new THREE.CanvasTexture(canvas);
     tex.mapping = THREE.EquirectangularReflectionMapping;
     const envMap = pmremGenerator.fromEquirectangular(tex).texture;
@@ -747,23 +741,23 @@ function WeaponModel({
   useFrame((_, delta) => {
     if (!groupRef.current) return;
     const dt = Math.min(delta, 0.05);
-    if (isMoving) bobTime.current += dt * 6;
-    const bob = isMoving ? Math.sin(bobTime.current) * 0.008 : 0;
-    const sway = isMoving ? Math.cos(bobTime.current * 0.5) * 0.004 : 0;
-    if (isFiring) recoilRef.current = Math.min(recoilRef.current + dt * 25, 1);
-    else recoilRef.current = Math.max(recoilRef.current - dt * 8, 0);
-    const recoil = recoilRef.current * 0.03;
-    if (isSwitching) switchOffsetRef.current = Math.min(switchOffsetRef.current + dt * 6, 1);
-    else switchOffsetRef.current = Math.max(switchOffsetRef.current - dt * 5, 0);
-    const switchDrop = switchOffsetRef.current * 0.4;
+    if (isMoving) bobTime.current += dt * 9;
+    const bob = isMoving ? Math.sin(bobTime.current) * 0.006 : 0;
+    const sway = isMoving ? Math.cos(bobTime.current * 0.5) * 0.003 : 0;
+    if (isFiring) recoilRef.current = Math.min(recoilRef.current + dt * 40, 1);
+    else recoilRef.current = Math.max(recoilRef.current - dt * 15, 0);
+    const recoil = recoilRef.current * 0.025;
+    if (isSwitching) switchOffsetRef.current = Math.min(switchOffsetRef.current + dt * 10, 1);
+    else switchOffsetRef.current = Math.max(switchOffsetRef.current - dt * 10, 0);
+    const switchDrop = switchOffsetRef.current * 0.3;
     const target = isADS
       ? new THREE.Vector3(0.0, -0.13, -0.35 + recoil)
       : new THREE.Vector3(0.28 + sway, -0.23 + bob - switchDrop, -0.55 + recoil);
-    groupRef.current.position.lerp(target, dt * (isADS ? 14 : 10));
+    groupRef.current.position.lerp(target, dt * (isADS ? 22 : 16));
     if (isReloading) {
-      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -0.5, dt * 4);
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -0.5, dt * 8);
     } else {
-      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, 0, dt * 6);
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, 0, dt * 12);
     }
   });
 
@@ -1329,9 +1323,9 @@ function GameLoop({
     // ── Camera ──
     camera.quaternion.setFromEuler(new THREE.Euler(pitch.current, yaw.current, 0, 'YXZ'));
     const targetH = isCrouch ? CROUCH_HEIGHT : PLAYER_HEIGHT;
-    currentHeight.current = THREE.MathUtils.lerp(currentHeight.current, targetH, dt * 10);
+    currentHeight.current = THREE.MathUtils.lerp(currentHeight.current, targetH, dt * 16);
 
-    screenShakeRef.current = Math.max(0, screenShakeRef.current - dt * 3);
+    screenShakeRef.current = Math.max(0, screenShakeRef.current - dt * 5);
     const shakeX = (Math.random() - 0.5) * screenShakeRef.current;
     const shakeY = (Math.random() - 0.5) * screenShakeRef.current;
     camera.position.set(playerPos.current.x + shakeX, playerPos.current.y + shakeY, playerPos.current.z);
@@ -1347,7 +1341,7 @@ function GameLoop({
 
     const targetFov = gs.isADS ? weapon.adsFov : NORMAL_FOV;
     const cam = camera as THREE.PerspectiveCamera;
-    cam.fov = THREE.MathUtils.lerp(cam.fov, targetFov, dt * 10);
+    cam.fov = THREE.MathUtils.lerp(cam.fov, targetFov, dt * 18);
     cam.updateProjectionMatrix();
 
     // ── Movement ──
@@ -2248,13 +2242,13 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
             position={[30, 50, 20]}
             intensity={2.0}
             castShadow
-            shadow-mapSize-width={2048}
-            shadow-mapSize-height={2048}
-            shadow-camera-far={100}
-            shadow-camera-left={-50}
-            shadow-camera-right={50}
-            shadow-camera-top={50}
-            shadow-camera-bottom={-50}
+            shadow-mapSize-width={1024}
+            shadow-mapSize-height={1024}
+            shadow-camera-far={80}
+            shadow-camera-left={-40}
+            shadow-camera-right={40}
+            shadow-camera-top={40}
+            shadow-camera-bottom={-40}
           />
           <hemisphereLight args={['#87ceeb', '#44403c', 0.7]} />
           <fog attach="fog" args={['#78716c', 80, 160]} />

@@ -428,8 +428,7 @@ assert(fpsSource.includes('トリプルキル'), 'Triple kill message in Japanes
 assert(fpsSource.includes('MEGA KILL'), 'Mega kill message exists');
 
 // useClonedGLTF material/color fix
-assert(fpsSource.includes('THREE.SRGBColorSpace'), 'useClonedGLTF sets SRGBColorSpace');
-assert(fpsSource.includes('needsUpdate = true'), 'Textures marked needsUpdate');
+assert(fpsSource.includes('MeshStandardMaterial'), 'useClonedGLTF creates fresh MeshStandardMaterial');
 assert(fpsSource.includes('mesh.castShadow = true'), 'Meshes have castShadow');
 assert(fpsSource.includes('mesh.receiveShadow = true'), 'Meshes have receiveShadow');
 
@@ -446,7 +445,12 @@ assert(!/\\u[0-9a-fA-F]{4}/.test(hudSource), 'No Unicode escape sequences in HUD
 console.log('\n🎯 === v3 BUG FIX TESTS ===');
 
 // Commit 1: Enemy speed + hitbox + ray detection
-assert(fpsSource.includes('ENEMY_SPEED = 2.0'), 'Enemy speed reduced to 2.0');
+assert(fpsSource.includes('ENEMY_SPEED = 2.0'), 'Enemy speed at 2.0');
+assert(fpsSource.includes('MOVE_SPEED = 10'), 'Walk speed boosted to 10');
+assert(fpsSource.includes('SPRINT_SPEED = 18'), 'Sprint speed boosted to 18');
+assert(fpsSource.includes('MOUSE_SENS = 0.003'), 'Mouse sensitivity increased to 0.003');
+assert(fpsSource.includes('NORMAL_FOV = 85'), 'FOV widened to 85');
+assert(fpsSource.includes('WEAPON_SWITCH_TIME = 0.25'), 'Weapon switch faster (0.25s)');
 assert(fpsSource.includes('HEAD_HITBOX_RADIUS = 0.45'), 'Head hitbox = 0.45');
 assert(fpsSource.includes('BODY_HITBOX_RADIUS = 0.75'), 'Body hitbox = 0.75');
 assert(fpsSource.includes('HEAD_CENTER_Y = 1.4'), 'Head center Y = 1.4');
@@ -457,9 +461,8 @@ assert(fpsSource.includes('sniperHitscan ? 5000 : undefined'), 'Sniper ADS hitsc
 assert(fpsSource.includes('speedOverride?: number'), 'fireBullet has speedOverride param');
 
 // Commit 2 → v5: 3D model colors fix + standard GLB + audio
-assert(fpsSource.includes('std.metalness = Math.min(std.metalness, 0.25)'), 'Metalness capped at 0.25 for env map');
-assert(fpsSource.includes('std.roughness = Math.max(std.roughness, 0.45)'), 'Roughness minimum 0.45');
-assert(fpsSource.includes('MODEL_TINTS'), 'Model color tinting via MODEL_TINTS');
+assert(fpsSource.includes('MODEL_COLORS'), 'Direct model colors via MODEL_COLORS (replaced greyscale texture)');
+assert(fpsSource.includes('std.map = null') || fpsSource.includes('new THREE.MeshStandardMaterial'), 'Fresh material replacing dark baseColor texture');
 assert(fpsSource.includes('ProceduralEnvMap'), 'Procedural environment map for PBR reflections');
 assert(fpsSource.includes('PMREMGenerator'), 'PMREM generator for environment map');
 assert(fpsSource.includes('playGunSound'), 'Procedural gun sounds via Web Audio API');
