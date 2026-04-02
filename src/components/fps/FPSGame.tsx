@@ -18,65 +18,195 @@ function getAudioCtx(): AudioContext {
   return _audioCtx;
 }
 
-function playGunSound(type: 'ar' | 'smg' | 'shotgun' | 'sniper' | 'explosion') {
+// Shared noise buffer (created once, reused)
+let _noiseBuf: AudioBuffer | null = null;
+function getNoiseBuf(): AudioBuffer {
+  const ctx = getAudioCtx();
+  if (!_noiseBuf || _noiseBuf.sampleRate !== ctx.sampleRate) {
+    const len = Math.floor(ctx.sampleRate * 0.8);
+    _noiseBuf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = _noiseBuf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+  }
+  return _noiseBuf;
+}
+
+type SoundType = 'ar' | 'smg' | 'shotgun' | 'sniper' | 'explosion' | 'enemyHit' | 'playerHit' | 'reload' | 'footstep' | 'dryfire';
+
+function playGunSound(type: SoundType) {
   try {
     const ctx = getAudioCtx();
     const now = ctx.currentTime;
-    // White noise buffer
-    const len = Math.floor(ctx.sampleRate * 0.4);
-    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
-    const d = buf.getChannelData(0);
-    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
-    const src = ctx.createBufferSource();
-    src.buffer = buf;
-    // Bandpass filter
-    const bp = ctx.createBiquadFilter();
-    bp.type = 'bandpass';
-    // Low-pass for body
-    const lp = ctx.createBiquadFilter();
-    lp.type = 'lowpass';
-    // Gain envelope
-    const g = ctx.createGain();
-    // Soft-clip distortion
-    const dist = ctx.createWaveShaper();
-    const curve = new Float32Array(256);
-    for (let i = 0; i < 256; i++) { const x = (i / 128) - 1; curve[i] = (3 + 10) * x / (3 + 10 * Math.abs(x)); }
-    dist.curve = curve;
 
-    switch (type) {
-      case 'ar':
-        bp.frequency.value = 900; bp.Q.value = 1.2;
-        lp.frequency.value = 3500;
-        g.gain.setValueAtTime(0.18, now);
-        g.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
-        break;
-      case 'smg':
-        bp.frequency.value = 1400; bp.Q.value = 1.5;
-        lp.frequency.value = 4500;
-        g.gain.setValueAtTime(0.14, now);
-        g.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
-        break;
-      case 'shotgun':
-        bp.frequency.value = 350; bp.Q.value = 0.7;
-        lp.frequency.value = 2000;
-        g.gain.setValueAtTime(0.30, now);
-        g.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
-        break;
-      case 'sniper':
-        bp.frequency.value = 500; bp.Q.value = 2.0;
-        lp.frequency.value = 2500;
-        g.gain.setValueAtTime(0.28, now);
-        g.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-        break;
-      case 'explosion':
-        bp.frequency.value = 120; bp.Q.value = 0.4;
-        lp.frequency.value = 800;
-        g.gain.setValueAtTime(0.40, now);
-        g.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
-        break;
+    // Master gain
+    const master = ctx.createGain();
+    master.connect(ctx.destination);
+
+    if (type === 'ar') {
+      // Assault rifle: sharp crack + low thump, medium duration
+      const nSrc = ctx.createBufferSource(); nSrc.buffer = getNoiseBuf();
+      const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 800; hp.Q.value = 0.5;
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 4000;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.22, now);
+      g.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      nSrc.connect(hp); hp.connect(lp); lp.connect(g); g.connect(master);
+      // Sub bass thump via oscillator
+      const osc = ctx.createOscillator(); osc.type = 'sine'; osc.frequency.value = 80;
+      const og = ctx.createGain();
+      og.gain.setValueAtTime(0.15, now);
+      og.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+      osc.connect(og); og.connect(master);
+      osc.start(now); osc.stop(now + 0.12);
+      nSrc.start(now); nSrc.stop(now + 0.15);
+    } else if (type === 'smg') {
+      // SMG: higher pitch, snappier, shorter
+      const nSrc = ctx.createBufferSource(); nSrc.buffer = getNoiseBuf();
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2500; bp.Q.value = 1.0;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.16, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.035);
+      nSrc.connect(bp); bp.connect(g); g.connect(master);
+      const osc = ctx.createOscillator(); osc.type = 'square'; osc.frequency.value = 150;
+      const og = ctx.createGain();
+      og.gain.setValueAtTime(0.08, now);
+      og.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+      osc.connect(og); og.connect(master);
+      osc.start(now); osc.stop(now + 0.05);
+      nSrc.start(now); nSrc.stop(now + 0.06);
+    } else if (type === 'shotgun') {
+      // Shotgun: heavy boom, deep bass, long sustain
+      const nSrc = ctx.createBufferSource(); nSrc.buffer = getNoiseBuf();
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 1800;
+      const dist = ctx.createWaveShaper();
+      const curve = new Float32Array(256);
+      for (let i = 0; i < 256; i++) { const x = (i / 128) - 1; curve[i] = Math.tanh(x * 3); }
+      dist.curve = curve;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.35, now);
+      g.gain.exponentialRampToValueAtTime(0.08, now + 0.08);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+      nSrc.connect(lp); lp.connect(dist); dist.connect(g); g.connect(master);
+      // Deep bass
+      const osc = ctx.createOscillator(); osc.type = 'sine'; osc.frequency.value = 55;
+      const og = ctx.createGain();
+      og.gain.setValueAtTime(0.25, now);
+      og.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      osc.connect(og); og.connect(master);
+      osc.start(now); osc.stop(now + 0.3);
+      nSrc.start(now); nSrc.stop(now + 0.35);
+    } else if (type === 'sniper') {
+      // Sniper: LOUD crack + supersonic whip sound + echoing tail
+      const nSrc = ctx.createBufferSource(); nSrc.buffer = getNoiseBuf();
+      const hp = ctx.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 600;
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 6000;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.40, now);
+      g.gain.exponentialRampToValueAtTime(0.12, now + 0.04);
+      g.gain.exponentialRampToValueAtTime(0.02, now + 0.15);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+      nSrc.connect(hp); hp.connect(lp); lp.connect(g); g.connect(master);
+      // Supersonic crack (high-freq transient)
+      const crack = ctx.createOscillator(); crack.type = 'sawtooth';
+      crack.frequency.setValueAtTime(3000, now);
+      crack.frequency.exponentialRampToValueAtTime(200, now + 0.08);
+      const cg = ctx.createGain();
+      cg.gain.setValueAtTime(0.18, now);
+      cg.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+      crack.connect(cg); cg.connect(master);
+      // Bass body
+      const osc = ctx.createOscillator(); osc.type = 'sine'; osc.frequency.value = 65;
+      const og = ctx.createGain();
+      og.gain.setValueAtTime(0.20, now);
+      og.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      osc.connect(og); og.connect(master);
+      crack.start(now); crack.stop(now + 0.12);
+      osc.start(now); osc.stop(now + 0.5);
+      nSrc.start(now); nSrc.stop(now + 0.55);
+    } else if (type === 'explosion') {
+      // Explosion: massive bass + rumble + noise
+      const nSrc = ctx.createBufferSource(); nSrc.buffer = getNoiseBuf();
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 600;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.45, now);
+      g.gain.exponentialRampToValueAtTime(0.15, now + 0.1);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+      nSrc.connect(lp); lp.connect(g); g.connect(master);
+      const osc = ctx.createOscillator(); osc.type = 'sine';
+      osc.frequency.setValueAtTime(40, now);
+      osc.frequency.exponentialRampToValueAtTime(20, now + 0.5);
+      const og = ctx.createGain();
+      og.gain.setValueAtTime(0.35, now);
+      og.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+      osc.connect(og); og.connect(master);
+      osc.start(now); osc.stop(now + 0.8);
+      nSrc.start(now); nSrc.stop(now + 0.9);
+    } else if (type === 'enemyHit') {
+      // Enemy hit: meaty thud
+      const osc = ctx.createOscillator(); osc.type = 'sine';
+      osc.frequency.setValueAtTime(300, now);
+      osc.frequency.exponentialRampToValueAtTime(80, now + 0.06);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.12, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      osc.connect(g); g.connect(master);
+      osc.start(now); osc.stop(now + 0.1);
+    } else if (type === 'playerHit') {
+      // Player hit: low punch + heartbeat-like thump
+      const osc = ctx.createOscillator(); osc.type = 'sine';
+      osc.frequency.setValueAtTime(120, now);
+      osc.frequency.exponentialRampToValueAtTime(40, now + 0.12);
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.25, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      osc.connect(g); g.connect(master);
+      // Second beat
+      const osc2 = ctx.createOscillator(); osc2.type = 'sine';
+      osc2.frequency.value = 60;
+      const g2 = ctx.createGain();
+      g2.gain.setValueAtTime(0.0, now);
+      g2.gain.setValueAtTime(0.15, now + 0.15);
+      g2.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+      osc2.connect(g2); g2.connect(master);
+      osc.start(now); osc.stop(now + 0.15);
+      osc2.start(now); osc2.stop(now + 0.35);
+    } else if (type === 'reload') {
+      // Reload: metallic click-clack
+      const nSrc = ctx.createBufferSource(); nSrc.buffer = getNoiseBuf();
+      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 3000; bp.Q.value = 3;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.10, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+      nSrc.connect(bp); bp.connect(g); g.connect(master);
+      // Second click
+      const nSrc2 = ctx.createBufferSource(); nSrc2.buffer = getNoiseBuf();
+      const bp2 = ctx.createBiquadFilter(); bp2.type = 'bandpass'; bp2.frequency.value = 4000; bp2.Q.value = 4;
+      const g2 = ctx.createGain();
+      g2.gain.setValueAtTime(0.0, now);
+      g2.gain.setValueAtTime(0.12, now + 0.15);
+      g2.gain.exponentialRampToValueAtTime(0.001, now + 0.19);
+      nSrc2.connect(bp2); bp2.connect(g2); g2.connect(master);
+      nSrc.start(now); nSrc.stop(now + 0.05);
+      nSrc2.start(now); nSrc2.stop(now + 0.25);
+    } else if (type === 'footstep') {
+      // Footstep: subtle low thud
+      const nSrc = ctx.createBufferSource(); nSrc.buffer = getNoiseBuf();
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 400;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.04, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+      nSrc.connect(lp); lp.connect(g); g.connect(master);
+      nSrc.start(now); nSrc.stop(now + 0.08);
+    } else if (type === 'dryfire') {
+      // Dry fire: empty click
+      const osc = ctx.createOscillator(); osc.type = 'square'; osc.frequency.value = 1200;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.06, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.02);
+      osc.connect(g); g.connect(master);
+      osc.start(now); osc.stop(now + 0.03);
     }
-    src.connect(bp); bp.connect(lp); lp.connect(dist); dist.connect(g); g.connect(ctx.destination);
-    src.start(now); src.stop(now + 0.7);
   } catch { /* audio not supported – silent fallback */ }
 }
 
@@ -181,10 +311,25 @@ Object.values(MODEL_PATHS).forEach((p) => useGLTF.preload(p));
 /* ═══════════════════════════════════════════════════════════
    GLB model helpers
    ═══════════════════════════════════════════════════════════ */
+/* Color tints for greyscale GLB models (baseColorTexture is grey, so we
+   multiply with a tint color to give each model its characteristic look) */
+const MODEL_TINTS: Record<string, THREE.Color> = {
+  [MODEL_PATHS.ar]:        new THREE.Color(0.30, 0.28, 0.26),  // gunmetal dark
+  [MODEL_PATHS.smg]:       new THREE.Color(0.25, 0.25, 0.28),  // blued steel
+  [MODEL_PATHS.shotgun]:   new THREE.Color(0.35, 0.25, 0.18),  // wood/brown
+  [MODEL_PATHS.sniper]:    new THREE.Color(0.22, 0.28, 0.22),  // dark olive
+  [MODEL_PATHS.enemy]:     new THREE.Color(0.45, 0.38, 0.30),  // desert khaki
+  [MODEL_PATHS.enemy2]:    new THREE.Color(0.30, 0.35, 0.28),  // camo green
+  [MODEL_PATHS.crate]:     new THREE.Color(0.55, 0.42, 0.25),  // wooden crate
+  [MODEL_PATHS.barricade]: new THREE.Color(0.50, 0.48, 0.42),  // concrete
+  [MODEL_PATHS.barricade2]:new THREE.Color(0.52, 0.45, 0.40),  // concrete warm
+};
+
 function useClonedGLTF(path: string, targetSize: number) {
   const gltf = useGLTF(path);
   return useMemo(() => {
     const clone = gltf.scene.clone(true);
+    const tint = MODEL_TINTS[path] || new THREE.Color(0.5, 0.5, 0.5);
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
@@ -197,15 +342,15 @@ function useClonedGLTF(path: string, targetSize: number) {
           if (std.normalMap) std.normalMap.needsUpdate = true;
           if (std.roughnessMap) std.roughnessMap.needsUpdate = true;
           if (std.metalnessMap) std.metalnessMap.needsUpdate = true;
-          // Without Environment map, high metalness appears black (no reflections).
-          // Keep metalness very low so diffuse color is visible.
+          // Tint the grey baseColorTexture with model-specific color
+          std.color.copy(tint);
+          // Keep metalness moderate for subtle sheen without needing envMap
           if (typeof std.metalness === 'number') {
-            std.metalness = Math.min(std.metalness, 0.15);
+            std.metalness = Math.min(std.metalness, 0.25);
           }
           if (typeof std.roughness === 'number') {
-            std.roughness = Math.max(std.roughness, 0.5);
+            std.roughness = Math.max(std.roughness, 0.45);
           }
-          // Respect GLB doubleSided flag
           std.side = THREE.DoubleSide;
           c.needsUpdate = true;
           return c;
@@ -289,11 +434,15 @@ interface Enemy {
   maxHp: number;
   vel: THREE.Vector3;
   lastFire: number;
-  state: 'patrol' | 'chase' | 'dead';
+  state: 'patrol' | 'chase' | 'flank' | 'cover' | 'retreat' | 'dead';
   deathTime: number;
   patrolTarget: THREE.Vector3;
   mesh: THREE.Group | null;
   lookDir: THREE.Vector3;
+  coverTimer: number;       // time remaining in cover
+  lastStateChange: number;  // when state last changed
+  accuracy: number;         // individual accuracy multiplier (0.5-1.5)
+  strafeDir: number;        // strafe direction for flanking (-1 or 1)
 }
 
 interface Grenade {
@@ -361,6 +510,8 @@ export interface GameState {
   killstreakTimer: number;
   scoreMultiplier: number;
   armorActive: boolean;
+  waveAnnounce: number;  // wave number being announced (0 = no announce)
+  waveAnnounceTime: number;  // timestamp when wave announced
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -534,6 +685,48 @@ function SkyDome() {
       <meshBasicMaterial map={tex} side={THREE.BackSide} />
     </mesh>
   );
+}
+
+/* ═══════════════════════════════════════════════════════════
+   Procedural environment map for PBR reflections
+   ═══════════════════════════════════════════════════════════ */
+function ProceduralEnvMap() {
+  const { scene, gl } = useThree();
+  useEffect(() => {
+    const pmremGenerator = new THREE.PMREMGenerator(gl);
+    pmremGenerator.compileEquirectangularShader();
+    // Create a simple gradient scene for reflections
+    const envScene = new THREE.Scene();
+    // Sky gradient
+    const topColor = new THREE.Color(0.5, 0.7, 1.0);    // light blue sky
+    const midColor = new THREE.Color(0.85, 0.82, 0.75);  // warm horizon
+    const botColor = new THREE.Color(0.45, 0.42, 0.35);  // ground
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d')!;
+    const grad = ctx.createLinearGradient(0, 0, 0, 256);
+    grad.addColorStop(0, `rgb(${topColor.r * 255},${topColor.g * 255},${topColor.b * 255})`);
+    grad.addColorStop(0.45, `rgb(${midColor.r * 255},${midColor.g * 255},${midColor.b * 255})`);
+    grad.addColorStop(0.55, `rgb(${midColor.r * 255},${midColor.g * 255},${midColor.b * 255})`);
+    grad.addColorStop(1.0, `rgb(${botColor.r * 255},${botColor.g * 255},${botColor.b * 255})`);
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 512, 256);
+    // Add some brightness variation (fake sun)
+    const sunGrad = ctx.createRadialGradient(380, 50, 0, 380, 50, 100);
+    sunGrad.addColorStop(0, 'rgba(255,240,200,0.6)');
+    sunGrad.addColorStop(1, 'rgba(255,240,200,0)');
+    ctx.fillStyle = sunGrad;
+    ctx.fillRect(0, 0, 512, 256);
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.mapping = THREE.EquirectangularReflectionMapping;
+    const envMap = pmremGenerator.fromEquirectangular(tex).texture;
+    scene.environment = envMap;
+    tex.dispose();
+    pmremGenerator.dispose();
+    return () => { scene.environment = null; envMap.dispose(); };
+  }, [scene, gl]);
+  return null;
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -854,6 +1047,7 @@ function GameLoop({
   const matchStart = useRef(Date.now());
   const onGround = useRef(true);
   const isMovingRef = useRef(false);
+  const footstepTimer = useRef(0);
   const isCrouchingRef = useRef(false);
   const currentHeight = useRef(PLAYER_HEIGHT);
   const screenShakeRef = useRef(0);
@@ -1031,6 +1225,7 @@ function GameLoop({
     gameState.current.isReloading = true;
     reloadTimer.current = w.reloadTime;
     mouseJustPressed.current = false;
+    playGunSound('reload');
     setGameState((s) => ({ ...s, isReloading: true, reloadProgress: 0 }));
   }, [gameState, setGameState]);
 
@@ -1060,6 +1255,9 @@ function GameLoop({
       vel: new THREE.Vector3(), lastFire: 0, state: 'patrol', deathTime: 0,
       patrolTarget: new THREE.Vector3((Math.random() - 0.5) * MAP_SIZE, 0, (Math.random() - 0.5) * MAP_SIZE),
       mesh: null, lookDir: new THREE.Vector3(0, 0, 1),
+      coverTimer: 0, lastStateChange: 0,
+      accuracy: 0.7 + Math.random() * 0.6,
+      strafeDir: Math.random() > 0.5 ? 1 : -1,
     });
   }, []);
 
@@ -1116,6 +1314,8 @@ function GameLoop({
       lastWave.current = wave;
       if (wave > 1) {
         newKills.push({ id: bulletId.current++, text: `WAVE ${wave} ─ 敵が強化！`, time: now });
+        gs.waveAnnounce = wave;
+        gs.waveAnnounceTime = now;
       }
     }
 
@@ -1164,6 +1364,17 @@ function GameLoop({
     if (keys.current.has('KeyD')) moveDir.add(right);
     if (moveDir.lengthSq() > 0) moveDir.normalize();
     isMovingRef.current = moveDir.lengthSq() > 0;
+
+    // Footstep sounds
+    if (isMovingRef.current && onGround.current) {
+      footstepTimer.current -= dt;
+      if (footstepTimer.current <= 0) {
+        playGunSound('footstep');
+        footstepTimer.current = isSprinting ? 0.28 : (isCrouch ? 0.55 : 0.4);
+      }
+    } else {
+      footstepTimer.current = 0;
+    }
 
     playerVel.current.y += GRAVITY * dt;
     const desired = playerPos.current.clone();
@@ -1298,6 +1509,11 @@ function GameLoop({
       setGameState((s) => ({ ...s, ammo: gs.ammo }));
       if (gs.ammo <= 0 && gs.reserve > 0) startReload();
     }
+    // Dry fire click when out of ammo
+    if (wantsFire && !gs.isReloading && !isSwitchingRef.current && gs.ammo <= 0 && now - lastFire.current > 0.3) {
+      lastFire.current = now;
+      playGunSound('dryfire');
+    }
     if (!isMouseDown.current) mouseJustPressed.current = false;
 
     // ── Spawn enemies (difficulty scaling) ──
@@ -1333,7 +1549,7 @@ function GameLoop({
     grenadesRef.current = grenadesRef.current.filter((g) => g.timer > -999);
     explosionsRef.current = explosionsRef.current.filter((e) => now - e.time < 1.5);
 
-    // ── Update enemies ──
+    // ── Update enemies (intelligent AI) ──
     const waveSpdMult = 1 + (wave - 1) * 0.1;
     const waveAccMult = Math.max(0.4, 1 - (wave - 1) * 0.01);
 
@@ -1347,7 +1563,6 @@ function GameLoop({
       if (e.hp <= 0) {
         e.state = 'dead';
         e.deathTime = now;
-        // Multi-kill tracking for grenade kills
         const timeSinceLastKill = now - lastKillTime.current;
         lastKillTime.current = now;
         if (timeSinceLastKill < 3) { multiKillCount.current++; } else { multiKillCount.current = 1; }
@@ -1364,36 +1579,123 @@ function GameLoop({
       const toPlayer = new THREE.Vector3().subVectors(playerPos.current, e.pos);
       toPlayer.y = 0;
       const distToPlayer = toPlayer.length();
-      e.state = distToPlayer < 35 ? 'chase' : 'patrol';
+      const hpRatio = e.hp / e.maxHp;
+      const timeSinceStateChange = now - e.lastStateChange;
 
-      let target: THREE.Vector3;
-      if (e.state === 'chase') {
-        target = playerPos.current.clone();
-        target.y = 0;
-      } else {
-        target = e.patrolTarget;
-        if (e.pos.distanceTo(target) < 2) {
-          e.patrolTarget.set((Math.random() - 0.5) * MAP_SIZE * 1.5, 0, (Math.random() - 0.5) * MAP_SIZE * 1.5);
+      // ── State machine: decide behavior ──
+      if (distToPlayer > 40) {
+        if (e.state !== 'patrol') { e.state = 'patrol'; e.lastStateChange = now; }
+      } else if (hpRatio < 0.3 && distToPlayer < 15) {
+        // Low HP + close = retreat to find cover
+        if (e.state !== 'retreat') { e.state = 'retreat'; e.lastStateChange = now; }
+      } else if (distToPlayer < 8) {
+        // Very close: strafe/flank around player
+        if (e.state !== 'flank') { e.state = 'flank'; e.lastStateChange = now; }
+      } else if (distToPlayer < 25 && timeSinceStateChange > 2) {
+        // Mid-range: alternate between chase and cover
+        const shouldTakeCover = Math.random() < 0.3 && e.coverTimer <= 0;
+        if (shouldTakeCover && e.state !== 'cover') {
+          e.state = 'cover'; e.lastStateChange = now;
+          e.coverTimer = 1.5 + Math.random() * 2;
+        } else if (e.state !== 'chase' && e.state !== 'cover') {
+          e.state = 'chase'; e.lastStateChange = now;
+        }
+      } else if (distToPlayer <= 40) {
+        if (e.state !== 'chase' && e.state !== 'flank' && e.state !== 'cover' && e.state !== 'retreat') {
+          e.state = 'chase'; e.lastStateChange = now;
         }
       }
 
-      const dir = new THREE.Vector3().subVectors(target, e.pos);
-      dir.y = 0;
-      if (dir.lengthSq() > 0.1) {
-        dir.normalize();
-        e.lookDir.copy(dir);
-        const spd = (e.state === 'chase' ? ENEMY_SPEED * 1.2 : ENEMY_SPEED * 0.5) * waveSpdMult;
-        const next = e.pos.clone().add(dir.clone().multiplyScalar(spd * dt));
+      // ── Cover timer countdown ──
+      if (e.state === 'cover') {
+        e.coverTimer -= dt;
+        if (e.coverTimer <= 0) { e.state = 'chase'; e.lastStateChange = now; }
+      }
+
+      // ── Movement per state ──
+      let moveDir = new THREE.Vector3();
+      let moveSpeed = ENEMY_SPEED * waveSpdMult;
+
+      switch (e.state) {
+        case 'patrol': {
+          if (e.pos.distanceTo(e.patrolTarget) < 2) {
+            e.patrolTarget.set((Math.random() - 0.5) * MAP_SIZE * 1.5, 0, (Math.random() - 0.5) * MAP_SIZE * 1.5);
+          }
+          moveDir.subVectors(e.patrolTarget, e.pos); moveDir.y = 0;
+          moveSpeed = ENEMY_SPEED * 0.5 * waveSpdMult;
+          break;
+        }
+        case 'chase': {
+          moveDir.copy(toPlayer); moveDir.y = 0;
+          moveSpeed = ENEMY_SPEED * 1.2 * waveSpdMult;
+          break;
+        }
+        case 'flank': {
+          // Strafe perpendicular to player direction
+          const perp = new THREE.Vector3(-toPlayer.z, 0, toPlayer.x).normalize();
+          moveDir.copy(perp).multiplyScalar(e.strafeDir);
+          // Also approach slightly
+          moveDir.add(toPlayer.clone().normalize().multiplyScalar(0.3));
+          moveSpeed = ENEMY_SPEED * 1.4 * waveSpdMult;
+          // Periodically switch strafe direction
+          if (timeSinceStateChange > 1.5 + Math.random() * 2) {
+            e.strafeDir *= -1; e.lastStateChange = now;
+          }
+          break;
+        }
+        case 'cover': {
+          // Move toward nearest cover point (building/crate)
+          let nearestDist = Infinity;
+          let nearestPoint = e.pos.clone();
+          for (const box of allCollisionBoxes) {
+            const center = new THREE.Vector3();
+            box.getCenter(center);
+            const d = e.pos.distanceTo(center);
+            if (d < nearestDist && d > 1.5) { nearestDist = d; nearestPoint = center; }
+          }
+          moveDir.subVectors(nearestPoint, e.pos); moveDir.y = 0;
+          moveSpeed = ENEMY_SPEED * 1.3 * waveSpdMult;
+          // Stop when close to cover
+          if (nearestDist < 2.5) moveSpeed = 0;
+          break;
+        }
+        case 'retreat': {
+          // Run away from player, toward a cover point
+          moveDir.copy(toPlayer).negate(); moveDir.y = 0;
+          moveSpeed = ENEMY_SPEED * 1.6 * waveSpdMult;
+          // Switch to chase after retreating enough
+          if (distToPlayer > 20) { e.state = 'chase'; e.lastStateChange = now; }
+          break;
+        }
+      }
+
+      if (moveDir.lengthSq() > 0.01) {
+        moveDir.normalize();
+        e.lookDir.lerp(toPlayer.clone().normalize(), dt * 5); // Always look toward player
+        e.lookDir.normalize();
+        const next = e.pos.clone().add(moveDir.multiplyScalar(moveSpeed * dt));
         next.y = 0;
         if (!collidesWithBuildings(new THREE.Vector3(next.x, 0.7, next.z), 0.4)) e.pos.copy(next);
         clampToMap(e.pos);
       }
 
-      const fireRate = ENEMY_FIRE_RATE * waveAccMult;
-      if (e.state === 'chase' && distToPlayer < 30 && now - e.lastFire > fireRate) {
+      // ── Firing (varies by state) ──
+      const baseFireRate = ENEMY_FIRE_RATE * waveAccMult;
+      const canSeePlayer = distToPlayer < 35;
+      let fireChance = false;
+      let inaccuracy = 0.08 * waveAccMult * (2 - e.accuracy);
+
+      switch (e.state) {
+        case 'chase': fireChance = canSeePlayer && now - e.lastFire > baseFireRate; break;
+        case 'flank': fireChance = canSeePlayer && now - e.lastFire > baseFireRate * 0.8; inaccuracy *= 1.3; break;
+        case 'cover': fireChance = canSeePlayer && now - e.lastFire > baseFireRate * 1.5 && e.coverTimer < 1; break;
+        case 'retreat': fireChance = canSeePlayer && distToPlayer < 12 && now - e.lastFire > baseFireRate * 2; inaccuracy *= 1.8; break;
+        default: break;
+      }
+
+      if (fireChance) {
         e.lastFire = now;
         const fd = new THREE.Vector3().subVectors(playerPos.current, e.pos).normalize();
-        const inaccuracy = 0.08 * waveAccMult;
         fd.x += (Math.random() - 0.5) * inaccuracy;
         fd.y += (Math.random() - 0.5) * inaccuracy;
         fireBullet(e.pos.clone().setY(1.0), fd, true, 0);
@@ -1464,6 +1766,7 @@ function GameLoop({
             newHits.push({ id: bulletId.current++, time: now, headshot: true });
             damageNumbersRef.current.push({ id: bulletId.current++, pos: headCenter.clone(), damage: dmg, headshot: true, time: now });
             screenShakeRef.current = Math.max(screenShakeRef.current, 0.008);
+            playGunSound('enemyHit');
             if (e.hp <= 0) {
               e.state = 'dead';
               e.deathTime = now;
@@ -1493,6 +1796,7 @@ function GameLoop({
             b.life = 0;
             newHits.push({ id: bulletId.current++, time: now, headshot: false });
             damageNumbersRef.current.push({ id: bulletId.current++, pos: bodyCenter.clone(), damage: dmg, headshot: false, time: now });
+            playGunSound('enemyHit');
             if (e.hp <= 0) {
               e.state = 'dead';
               e.deathTime = now;
@@ -1523,6 +1827,7 @@ function GameLoop({
           const dmg = armorActiveRef.current ? ENEMY_DAMAGE * 0.5 : ENEMY_DAMAGE;
           gs.hp = Math.max(0, gs.hp - dmg);
           lastDamageTime.current = now;
+          playGunSound('playerHit');
           gs.streakCount = 0;
           streakRewardsGiven.current.clear();
           screenShakeRef.current = Math.max(screenShakeRef.current, 0.02);
@@ -1636,6 +1941,8 @@ function GameLoop({
       killstreakTimer: killstreakTimerRef.current,
       scoreMultiplier: scoreMultiplierRef.current,
       armorActive: armorActiveRef.current,
+      waveAnnounce: gs.waveAnnounce,
+      waveAnnounceTime: gs.waveAnnounceTime,
     }));
 
     if (gs.damageDir !== null && now - lastDamageTime.current > 0.5) gs.damageDir = null;
@@ -1724,6 +2031,8 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
     killstreakTimer: 0,
     scoreMultiplier: 1,
     armorActive: false,
+    waveAnnounce: 0,
+    waveAnnounceTime: 0,
   });
 
   const [gs, setGs] = useState<GameState>(makeInitialState);
@@ -1950,6 +2259,7 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
           <hemisphereLight args={['#87ceeb', '#44403c', 0.7]} />
           <fog attach="fog" args={['#78716c', 80, 160]} />
           <SkyDome />
+          <ProceduralEnvMap />
           <GameMap />
           <GameLoop gameState={gsRef} setGameState={setGs} />
         </Suspense>
@@ -1960,6 +2270,30 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
         <>
           <HUD gs={gs} />
           <Minimap playerPos={gs.playerPos} playerYaw={gs.playerYaw} enemies={gs.enemyPositions} mapSize={MAP_SIZE} />
+          {/* Wave announce overlay */}
+          {gs.waveAnnounce > 0 && (() => {
+            const elapsed = (Date.now() / 1000) - gs.waveAnnounceTime;
+            const ANNOUNCE_DURATION = 3.5;
+            if (elapsed < ANNOUNCE_DURATION) {
+              const fadeIn = Math.min(1, elapsed / 0.4);
+              const fadeOut = elapsed > ANNOUNCE_DURATION - 1 ? Math.max(0, (ANNOUNCE_DURATION - elapsed)) : 1;
+              const opacity = fadeIn * fadeOut * 0.85;
+              const scale = 0.8 + fadeIn * 0.2;
+              return (
+                <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none" style={{ opacity }}>
+                  <div className="text-center" style={{ transform: `scale(${scale})` }}>
+                    <div className="text-7xl md:text-9xl font-black tracking-widest text-transparent bg-clip-text bg-gradient-to-b from-red-400 to-orange-500" style={{ textShadow: '0 0 40px rgba(255,100,0,0.4)' }}>
+                      WAVE {gs.waveAnnounce}
+                    </div>
+                    <div className="text-lg md:text-2xl font-bold text-red-300/70 mt-2 tracking-wider">
+                      ─ 敵が強化された ─
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+            return null;
+          })()}
         </>
       )}
 

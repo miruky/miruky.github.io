@@ -28,8 +28,14 @@ next-env.d.ts
 .DS_Store
 Thumbs.db
 
+# Original GLB models (too large for git)
+public/images/fps/*.glb
+
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
+
+# Python venv
+.venv/

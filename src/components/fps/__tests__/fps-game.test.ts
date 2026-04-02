@@ -457,10 +457,17 @@ assert(fpsSource.includes('sniperHitscan ? 5000 : undefined'), 'Sniper ADS hitsc
 assert(fpsSource.includes('speedOverride?: number'), 'fireBullet has speedOverride param');
 
 // Commit 2 → v5: 3D model colors fix + standard GLB + audio
-assert(fpsSource.includes('std.metalness = Math.min(std.metalness, 0.15)'), 'Metalness capped at 0.15 (no Environment)');
-assert(fpsSource.includes('std.roughness = Math.max(std.roughness, 0.5)'), 'Roughness minimum 0.5');
-assert(!fpsSource.includes('Environment preset='), 'Environment map removed (standard GLB only)');
+assert(fpsSource.includes('std.metalness = Math.min(std.metalness, 0.25)'), 'Metalness capped at 0.25 for env map');
+assert(fpsSource.includes('std.roughness = Math.max(std.roughness, 0.45)'), 'Roughness minimum 0.45');
+assert(fpsSource.includes('MODEL_TINTS'), 'Model color tinting via MODEL_TINTS');
+assert(fpsSource.includes('ProceduralEnvMap'), 'Procedural environment map for PBR reflections');
+assert(fpsSource.includes('PMREMGenerator'), 'PMREM generator for environment map');
 assert(fpsSource.includes('playGunSound'), 'Procedural gun sounds via Web Audio API');
+assert(fpsSource.includes("'enemyHit'"), 'Enemy hit sound effect');
+assert(fpsSource.includes("'playerHit'"), 'Player hit sound effect');
+assert(fpsSource.includes("'reload'"), 'Reload sound effect');
+assert(fpsSource.includes("'footstep'"), 'Footstep sound effect');
+assert(fpsSource.includes("'dryfire'"), 'Dry fire click sound');
 assert(fpsSource.includes('shouldDie'), 'Bullet boundary check deferred after hit detection');
 assert(fpsSource.includes('GRENADE_DAMAGE = 250'), 'Grenade damage increased to 250');
 assert(fpsSource.includes('enemy2'), 'Enemy model variant 2 available');
@@ -468,11 +475,21 @@ assert(fpsSource.includes('barricade2'), 'Barricade model variant 2 available');
 assert(fpsSource.includes('[0, -Math.PI / 2, 0]'), 'Weapon rotation corrected (-PI/2)');
 assert(!fpsSource.includes('[0, Math.PI, 0]'), 'Old weapon rotation [0,PI,0] removed');
 
+// v6: Intelligent enemy AI + wave announce
+assert(fpsSource.includes("'flank'"), 'Enemy AI has flank state');
+assert(fpsSource.includes("'cover'"), 'Enemy AI has cover state');
+assert(fpsSource.includes("'retreat'"), 'Enemy AI has retreat state');
+assert(fpsSource.includes('e.accuracy'), 'Enemies have individual accuracy');
+assert(fpsSource.includes('e.strafeDir'), 'Enemies have strafe direction');
+assert(fpsSource.includes('waveAnnounce'), 'Wave announce system');
+assert(fpsSource.includes('WAVE {gs.waveAnnounce}'), 'Wave announce UI overlay');
+assert(fpsSource.includes('footstepTimer'), 'Footstep timer for movement sounds');
+
 // Commit 3: Bug fixes
 assert(fpsSource.includes('playedTimeRef'), 'Pause-safe timer (playedTimeRef)');
 assert(fpsSource.includes('playedTimeRef.current += dt'), 'Timer uses dt accumulation');
 assert(!fpsSource.includes('(Date.now() - matchStart.current) / 1000'), 'No Date.now-based elapsed time');
-assert(fpsSource.includes('mouseJustPressed.current = false;\n    setGameState'), 'mouseJustPressed reset on reload');
+assert(fpsSource.includes('mouseJustPressed.current = false;\n    playGunSound'), 'mouseJustPressed reset on reload (with sound)');
 assert(fpsSource.includes('new THREE.Vector2(-b.vel.x, -b.vel.z)'), 'Damage direction correct (negated)');
 assert(fpsSource.includes('nukeKills'), 'NUKE has dedicated kill processing');
 assert(fpsSource.includes("texture.dispose()"), 'DamageNumber texture disposed on unmount');
@@ -502,12 +519,16 @@ const missRay = new THREE.Ray(new THREE.Vector3(2, 1.4, 10), new THREE.Vector3(0
 const missResult = missRay.intersectSphere(sphere, hitPoint);
 assert(missResult === null, 'Ray misses sphere when aimed away');
 
-// Test: Enemy speed is slower now
+// Test: Enemy speed is slower now, with distinct state speeds
 const ENEMY_SPEED_TEST = 2.0;
 const chaseSpeed = ENEMY_SPEED_TEST * 1.2;
-assert(chaseSpeed < 3, `Chase speed ${chaseSpeed} < 3 (was 4.2 before)`);
+assert(chaseSpeed < 3, `Chase speed ${chaseSpeed} < 3 (balanced)`);
 const patrolSpeed = ENEMY_SPEED_TEST * 0.5;
 assert(patrolSpeed <= 1, `Patrol speed ${patrolSpeed} <= 1 (slow enough)`);
+const flankSpeed = ENEMY_SPEED_TEST * 1.4;
+assert(flankSpeed < 3, `Flank speed ${flankSpeed} < 3 (fast but manageable)`);
+const retreatSpeed = ENEMY_SPEED_TEST * 1.6;
+assert(retreatSpeed < 4, `Retreat speed ${retreatSpeed} < 4 (enemies flee quickly)`);
 
 // Test: Head hitbox covers reasonable area
 const HEAD_R = 0.45;
