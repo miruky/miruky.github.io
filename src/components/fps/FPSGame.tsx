@@ -9,6 +9,78 @@ import { HUD } from './HUD';
 import { Minimap } from './Minimap';
 
 /* ═══════════════════════════════════════════════════════════
+   Audio System (Web Audio API – procedural, no external files)
+   ═══════════════════════════════════════════════════════════ */
+let _audioCtx: AudioContext | null = null;
+function getAudioCtx(): AudioContext {
+  if (!_audioCtx) _audioCtx = new AudioContext();
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+
+function playGunSound(type: 'ar' | 'smg' | 'shotgun' | 'sniper' | 'explosion') {
+  try {
+    const ctx = getAudioCtx();
+    const now = ctx.currentTime;
+    // White noise buffer
+    const len = Math.floor(ctx.sampleRate * 0.4);
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    // Bandpass filter
+    const bp = ctx.createBiquadFilter();
+    bp.type = 'bandpass';
+    // Low-pass for body
+    const lp = ctx.createBiquadFilter();
+    lp.type = 'lowpass';
+    // Gain envelope
+    const g = ctx.createGain();
+    // Soft-clip distortion
+    const dist = ctx.createWaveShaper();
+    const curve = new Float32Array(256);
+    for (let i = 0; i < 256; i++) { const x = (i / 128) - 1; curve[i] = (3 + 10) * x / (3 + 10 * Math.abs(x)); }
+    dist.curve = curve;
+
+    switch (type) {
+      case 'ar':
+        bp.frequency.value = 900; bp.Q.value = 1.2;
+        lp.frequency.value = 3500;
+        g.gain.setValueAtTime(0.18, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+        break;
+      case 'smg':
+        bp.frequency.value = 1400; bp.Q.value = 1.5;
+        lp.frequency.value = 4500;
+        g.gain.setValueAtTime(0.14, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+        break;
+      case 'shotgun':
+        bp.frequency.value = 350; bp.Q.value = 0.7;
+        lp.frequency.value = 2000;
+        g.gain.setValueAtTime(0.30, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+        break;
+      case 'sniper':
+        bp.frequency.value = 500; bp.Q.value = 2.0;
+        lp.frequency.value = 2500;
+        g.gain.setValueAtTime(0.28, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        break;
+      case 'explosion':
+        bp.frequency.value = 120; bp.Q.value = 0.4;
+        lp.frequency.value = 800;
+        g.gain.setValueAtTime(0.40, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        break;
+    }
+    src.connect(bp); bp.connect(lp); lp.connect(dist); dist.connect(g); g.connect(ctx.destination);
+    src.start(now); src.stop(now + 0.7);
+  } catch { /* audio not supported – silent fallback */ }
+}
+
+/* ═══════════════════════════════════════════════════════════
    Error Boundary
    ═══════════════════════════════════════════════════════════ */
 interface EBProps { children: ReactNode; onError?: (msg: string) => void }
@@ -125,17 +197,16 @@ function useClonedGLTF(path: string, targetSize: number) {
           if (std.normalMap) std.normalMap.needsUpdate = true;
           if (std.roughnessMap) std.roughnessMap.needsUpdate = true;
           if (std.metalnessMap) std.metalnessMap.needsUpdate = true;
-          // With <Environment> providing scene.environment, metallic materials
-          // get proper reflections. Cap metalness only for materials without envMap
-          // AND when scene environment may not be loaded yet.
+          // Without Environment map, high metalness appears black (no reflections).
+          // Keep metalness very low so diffuse color is visible.
           if (typeof std.metalness === 'number') {
-            std.metalness = Math.min(std.metalness, 0.8);
+            std.metalness = Math.min(std.metalness, 0.15);
           }
           if (typeof std.roughness === 'number') {
-            std.roughness = Math.max(std.roughness, 0.2);
+            std.roughness = Math.max(std.roughness, 0.5);
           }
-          // Ensure proper side rendering
-          std.side = THREE.FrontSide;
+          // Respect GLB doubleSided flag
+          std.side = THREE.DoubleSide;
           c.needsUpdate = true;
           return c;
         };
@@ -192,7 +263,7 @@ const WEAPON_SWITCH_TIME = 0.45;
 const GRENADE_MAX = 4;
 const GRENADE_FUSE = 3.0;
 const GRENADE_RADIUS = 7;
-const GRENADE_DAMAGE = 180;
+const GRENADE_DAMAGE = 250;
 const GRENADE_SPEED = 18;
 const FALL_DAMAGE_THRESHOLD = 4;
 const FALL_DAMAGE_MULT = 10;
@@ -1012,6 +1083,7 @@ function GameLoop({
   const explodeGrenade = useCallback((gpos: THREE.Vector3, now: number) => {
     explosionsRef.current.push({ id: bulletId.current++, pos: gpos.clone(), time: now });
     screenShakeRef.current = Math.max(screenShakeRef.current, 0.06);
+    playGunSound('explosion');
     for (const e of enemies.current) {
       if (e.state === 'dead') continue;
       const d = e.pos.distanceTo(gpos);
@@ -1220,6 +1292,8 @@ function GameLoop({
         dir.normalize();
         fireBullet(playerPos.current.clone().add(dir.clone().multiplyScalar(0.5)), dir, false, weaponIdx.current, sniperHitscan ? 5000 : undefined);
       }
+      const _gunTypes = ['ar', 'smg', 'shotgun', 'sniper'] as const;
+      playGunSound(_gunTypes[weaponIdx.current]);
       screenShakeRef.current = Math.max(screenShakeRef.current, 0.005);
       setGameState((s) => ({ ...s, ammo: gs.ammo }));
       if (gs.ammo <= 0 && gs.reserve > 0) startReload();
@@ -1357,14 +1431,18 @@ function GameLoop({
       const prevPos = b.pos.clone();
       b.pos.add(b.vel.clone().multiplyScalar(dt));
       b.life -= dt;
-      if (b.pos.y < 0 || Math.abs(b.pos.x) > MAP_SIZE + 10 || Math.abs(b.pos.z) > MAP_SIZE + 10) b.life = 0;
-      if (collidesWithBuildings(b.pos, 0.1)) b.life = 0;
-      if (b.life <= 0) continue;
 
+      // Compute ray BEFORE boundary/building checks so hitscan bullets
+      // (speed 5000) can still hit enemies even if endpoint exceeds map.
       const moveVec = b.pos.clone().sub(prevPos);
       const moveDist = moveVec.length();
       const moveDir = moveDist > 0.001 ? moveVec.clone().normalize() : b.vel.clone().normalize();
       const ray = new THREE.Ray(prevPos, moveDir);
+
+      // Mark for death but process hits first
+      let shouldDie = b.life <= 0;
+      if (b.pos.y < 0 || Math.abs(b.pos.x) > MAP_SIZE + 10 || Math.abs(b.pos.z) > MAP_SIZE + 10) shouldDie = true;
+      if (!shouldDie && collidesWithBuildings(b.pos, 0.1)) shouldDie = true;
 
       if (!b.isEnemy) {
         const bWeapon = WEAPONS[b.weaponIdx];
@@ -1465,6 +1543,8 @@ function GameLoop({
           }
         }
       }
+      // Apply deferred death from boundary/building collision
+      if (shouldDie) b.life = 0;
     }
     bullets.current = bullets.current.filter((b) => b.life > 0);
 
@@ -1854,10 +1934,10 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
         style={{ position: 'absolute', inset: 0 }}
       >
         <Suspense fallback={null}>
-          <ambientLight intensity={0.7} />
+          <ambientLight intensity={0.9} />
           <directionalLight
             position={[30, 50, 20]}
-            intensity={1.5}
+            intensity={2.0}
             castShadow
             shadow-mapSize-width={2048}
             shadow-mapSize-height={2048}
@@ -1867,7 +1947,7 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
             shadow-camera-top={50}
             shadow-camera-bottom={-50}
           />
-          <hemisphereLight args={['#87ceeb', '#44403c', 0.5]} />
+          <hemisphereLight args={['#87ceeb', '#44403c', 0.7]} />
           <fog attach="fog" args={['#78716c', 80, 160]} />
           <SkyDome />
           <GameMap />

@@ -456,10 +456,13 @@ assert(fpsSource.includes('ray.intersectSphere'), 'Ray-sphere intersection for h
 assert(fpsSource.includes('sniperHitscan ? 5000 : undefined'), 'Sniper ADS hitscan (speed 5000)');
 assert(fpsSource.includes('speedOverride?: number'), 'fireBullet has speedOverride param');
 
-// Commit 2 → v4: 3D model colors + weapon orientation + standard GLB loading
-assert(fpsSource.includes('std.metalness = Math.min(std.metalness, 0.8)'), 'Metalness capped at 0.8');
-assert(fpsSource.includes('std.roughness = Math.max(std.roughness, 0.2)'), 'Roughness minimum 0.2');
+// Commit 2 → v5: 3D model colors fix + standard GLB + audio
+assert(fpsSource.includes('std.metalness = Math.min(std.metalness, 0.15)'), 'Metalness capped at 0.15 (no Environment)');
+assert(fpsSource.includes('std.roughness = Math.max(std.roughness, 0.5)'), 'Roughness minimum 0.5');
 assert(!fpsSource.includes('Environment preset='), 'Environment map removed (standard GLB only)');
+assert(fpsSource.includes('playGunSound'), 'Procedural gun sounds via Web Audio API');
+assert(fpsSource.includes('shouldDie'), 'Bullet boundary check deferred after hit detection');
+assert(fpsSource.includes('GRENADE_DAMAGE = 250'), 'Grenade damage increased to 250');
 assert(fpsSource.includes('enemy2'), 'Enemy model variant 2 available');
 assert(fpsSource.includes('barricade2'), 'Barricade model variant 2 available');
 assert(fpsSource.includes('[0, -Math.PI / 2, 0]'), 'Weapon rotation corrected (-PI/2)');
