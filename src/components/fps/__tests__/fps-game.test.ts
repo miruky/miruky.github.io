@@ -526,35 +526,35 @@ assert(fpsSource.includes('visibilitychange'), 'Visibility change handler clears
 assert(fpsSource.includes('switchTimeoutRef'), 'Weapon switch timeout tracked for cleanup');
 assert(fpsSource.includes('el?.querySelector'), 'Canvas querySelector scoped to container');
 
-// v8: Katana + Dash tests
-console.log('\n🗡️ === v8 KATANA + DASH TESTS ===');
+// v8: Katana + Sprint tests
+console.log('\n🗡️ === v8 KATANA + SPRINT TESTS ===');
 assert(fpsSource.includes("'katanaSlash'"), 'katanaSlash sound type defined');
 assert(fpsSource.includes("'katanaCharge'"), 'katanaCharge sound type defined');
 assert(fpsSource.includes('isMelee?: boolean'), 'WeaponDef has isMelee field');
 assert(fpsSource.includes('isMelee: true'), 'Katana weapon has isMelee: true');
-assert(fpsSource.includes('DASH_SPEED'), 'DASH_SPEED constant exists');
-assert(fpsSource.includes('DASH_DURATION'), 'DASH_DURATION constant exists');
-assert(fpsSource.includes('DASH_COOLDOWN'), 'DASH_COOLDOWN constant exists');
 assert(fpsSource.includes('KATANA_CHARGE_TIME'), 'KATANA_CHARGE_TIME constant exists');
-assert(fpsSource.includes('KATANA_CHARGE_DASH_DIST'), 'KATANA_CHARGE_DASH_DIST constant exists');
+assert(fpsSource.includes('KATANA_CHARGE_DASH_DIST = 18'), 'KATANA_CHARGE_DASH_DIST = 18 (extended range)');
 assert(fpsSource.includes('KATANA_SLASH_DAMAGE'), 'KATANA_SLASH_DAMAGE constant exists');
 assert(fpsSource.includes('KATANA_CHARGE_DAMAGE'), 'KATANA_CHARGE_DAMAGE constant exists');
 assert(fpsSource.includes('KATANA_MELEE_RANGE'), 'KATANA_MELEE_RANGE constant exists');
 assert(fpsSource.includes('katanaCharge: number'), 'GameState has katanaCharge field');
 assert(fpsSource.includes('isDashing: boolean'), 'GameState has isDashing field');
 assert(fpsSource.includes('isKatanaSlashing: boolean'), 'GameState has isKatanaSlashing field');
-assert(fpsSource.includes('lastWTapTime'), 'Double-tap W dash detection ref exists');
-assert(fpsSource.includes('dashTimer'), 'Dash timer ref exists');
-assert(fpsSource.includes('isDashingRef'), 'isDashingRef ref exists');
+assert(fpsSource.includes('lastWTapTime'), 'Double-tap W sprint detection ref exists');
+assert(fpsSource.includes('isDoubleTapSprintRef'), 'isDoubleTapSprintRef ref exists');
 assert(fpsSource.includes('katanaChargeRef'), 'katanaChargeRef ref exists');
 assert(fpsSource.includes('katanaSlashingRef'), 'katanaSlashingRef ref exists');
 assert(fpsSource.includes('KatanaWeapon'), 'KatanaWeapon component exists');
 assert(fpsSource.includes('katana.glb'), 'Katana model path configured');
 assert(fpsSource.includes("Digit5") || fpsSource.includes("'Digit5'"), 'Digit5 key binding for katana');
+assert(fpsSource.includes('keepOriginalMats'), 'useClonedGLTF supports keeping original materials');
 assert(hudSource.includes('MELEE'), 'HUD shows MELEE mode for katana');
 assert(hudSource.includes('katanaCharge'), 'HUD shows katana charge bar');
 assert(hudSource.includes('1-5'), 'HUD controls show 1-5 weapon keys');
-assert(hudSource.includes('ダッシュ'), 'HUD shows dash hint');
+assert(hudSource.includes('スプリント'), 'HUD shows sprint hint');
+
+// v9: No screen shake (motion sickness fix)
+assert(!fpsSource.includes('screenShakeRef.current = Math.max(screenShakeRef.current'), 'All screen shake triggers removed');
 
 // Katana weapon balance tests
 const katana = WEAPONS[4];

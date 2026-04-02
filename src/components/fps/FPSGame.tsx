@@ -237,50 +237,47 @@ function playGunSound(type: SoundType) {
       click.start(now); click.stop(now + 0.05);
       nSrc.start(now); nSrc.stop(now + 0.15);
     } else if (type === 'katanaCharge') {
-      // Charged katana dash-slash: epic build-up reverse + massive impact
-      // Reverse whoosh (increasing noise)
+      // 「ずどん」= massive heavy impact: deep boom + body slam + rumble tail
+      // Layer 1: Deep bass boom (the "zu" part)
+      const boom = ctx.createOscillator(); boom.type = 'sine';
+      boom.frequency.setValueAtTime(55, now);
+      boom.frequency.exponentialRampToValueAtTime(25, now + 0.4);
+      const bg = ctx.createGain();
+      bg.gain.setValueAtTime(0.55, now);
+      bg.gain.exponentialRampToValueAtTime(0.15, now + 0.2);
+      bg.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+      boom.connect(bg); bg.connect(master);
+      // Layer 2: Mid slam impact (the "don" crack)
+      const slam = ctx.createOscillator(); slam.type = 'sawtooth';
+      slam.frequency.setValueAtTime(200, now);
+      slam.frequency.exponentialRampToValueAtTime(40, now + 0.15);
+      const slg = ctx.createGain();
+      slg.gain.setValueAtTime(0.45, now);
+      slg.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+      slam.connect(slg); slg.connect(master);
+      // Layer 3: Noise burst for texture (crunch/debris feel)
       const nSrc = ctx.createBufferSource(); nSrc.buffer = getNoiseBuf();
-      const bp = ctx.createBiquadFilter(); bp.type = 'bandpass';
-      bp.frequency.setValueAtTime(300, now);
-      bp.frequency.exponentialRampToValueAtTime(3000, now + 0.06);
-      bp.Q.value = 1.5;
+      const lp = ctx.createBiquadFilter(); lp.type = 'lowpass';
+      lp.frequency.setValueAtTime(800, now);
+      lp.frequency.exponentialRampToValueAtTime(100, now + 0.3);
+      lp.Q.value = 0.7;
       const ng = ctx.createGain();
-      ng.gain.setValueAtTime(0.05, now);
-      ng.gain.linearRampToValueAtTime(0.30, now + 0.06);
-      ng.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
-      nSrc.connect(bp); bp.connect(ng); ng.connect(master);
-      // Heavy metallic impact
-      const impact = ctx.createOscillator(); impact.type = 'sawtooth';
-      impact.frequency.setValueAtTime(5000, now + 0.05);
-      impact.frequency.exponentialRampToValueAtTime(400, now + 0.12);
-      const ig = ctx.createGain();
-      ig.gain.setValueAtTime(0.0, now);
-      ig.gain.setValueAtTime(0.30, now + 0.05);
-      ig.gain.exponentialRampToValueAtTime(0.08, now + 0.12);
-      ig.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
-      impact.connect(ig); ig.connect(master);
-      // Sub bass thump on impact
+      ng.gain.setValueAtTime(0.35, now);
+      ng.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      nSrc.connect(lp); lp.connect(ng); ng.connect(master);
+      // Layer 4: Sub-rumble tail (ground shake feel)
       const sub = ctx.createOscillator(); sub.type = 'sine';
-      sub.frequency.setValueAtTime(80, now + 0.05);
-      sub.frequency.exponentialRampToValueAtTime(30, now + 0.3);
+      sub.frequency.setValueAtTime(35, now + 0.05);
+      sub.frequency.exponentialRampToValueAtTime(18, now + 0.7);
       const sg = ctx.createGain();
       sg.gain.setValueAtTime(0.0, now);
-      sg.gain.setValueAtTime(0.25, now + 0.05);
-      sg.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      sg.gain.linearRampToValueAtTime(0.3, now + 0.05);
+      sg.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
       sub.connect(sg); sg.connect(master);
-      // Resonant ring (katana vibration after strike)
-      const ring = ctx.createOscillator(); ring.type = 'sine';
-      ring.frequency.setValueAtTime(2200, now + 0.06);
-      ring.frequency.exponentialRampToValueAtTime(1800, now + 0.5);
-      const rg = ctx.createGain();
-      rg.gain.setValueAtTime(0.0, now);
-      rg.gain.setValueAtTime(0.08, now + 0.06);
-      rg.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-      ring.connect(rg); rg.connect(master);
-      nSrc.start(now); nSrc.stop(now + 0.3);
-      impact.start(now + 0.05); impact.stop(now + 0.45);
-      sub.start(now + 0.05); sub.stop(now + 0.4);
-      ring.start(now + 0.06); ring.stop(now + 0.55);
+      boom.start(now); boom.stop(now + 0.65);
+      slam.start(now); slam.stop(now + 0.3);
+      nSrc.start(now); nSrc.stop(now + 0.4);
+      sub.start(now + 0.05); sub.stop(now + 0.75);
     }
   } catch { /* audio not supported – silent fallback */ }
 }
@@ -410,7 +407,7 @@ const MODEL_COLORS: Record<string, { color: THREE.Color; metalness: number; roug
   [MODEL_PATHS.katana]:    { color: new THREE.Color(0.85, 0.88, 0.92), metalness: 0.95, roughness: 0.08 }, // polished steel blade
 };
 
-function useClonedGLTF(path: string, targetSize: number) {
+function useClonedGLTF(path: string, targetSize: number, keepOriginalMats = false) {
   const gltf = useGLTF(path);
   return useMemo(() => {
     const clone = gltf.scene.clone(true);
@@ -418,26 +415,42 @@ function useClonedGLTF(path: string, targetSize: number) {
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
-        const fixMat = (m: THREE.Material): THREE.Material => {
-          const orig = m as THREE.MeshStandardMaterial;
-          // Create fresh material - the GLB baseColorTextures are greyscale
-          // (sRGB ~50/255 → linear ~0.03) so they render near-black.
-          // We replace with direct color + keep normalMap for surface detail.
-          const mat = new THREE.MeshStandardMaterial({
-            color: preset.color,
-            metalness: preset.metalness,
-            roughness: preset.roughness,
-            normalMap: orig.normalMap || null,
-            normalScale: orig.normalScale ? orig.normalScale.clone() : new THREE.Vector2(1, 1),
-            side: THREE.DoubleSide,
-            envMapIntensity: 1.0,
-          });
-          return mat;
-        };
-        if (Array.isArray(mesh.material)) {
-          mesh.material = mesh.material.map(fixMat);
+        if (keepOriginalMats) {
+          // Keep original GLB materials (for models with proper textures)
+          const fixOriginal = (m: THREE.Material): THREE.Material => {
+            const orig = m as THREE.MeshStandardMaterial;
+            orig.side = THREE.DoubleSide;
+            orig.envMapIntensity = 1.0;
+            orig.needsUpdate = true;
+            return orig;
+          };
+          if (Array.isArray(mesh.material)) {
+            mesh.material = mesh.material.map(fixOriginal);
+          } else {
+            mesh.material = fixOriginal(mesh.material);
+          }
         } else {
-          mesh.material = fixMat(mesh.material);
+          const fixMat = (m: THREE.Material): THREE.Material => {
+            const orig = m as THREE.MeshStandardMaterial;
+            // Create fresh material - the GLB baseColorTextures are greyscale
+            // (sRGB ~50/255 → linear ~0.03) so they render near-black.
+            // We replace with direct color + keep normalMap for surface detail.
+            const mat = new THREE.MeshStandardMaterial({
+              color: preset.color,
+              metalness: preset.metalness,
+              roughness: preset.roughness,
+              normalMap: orig.normalMap || null,
+              normalScale: orig.normalScale ? orig.normalScale.clone() : new THREE.Vector2(1, 1),
+              side: THREE.DoubleSide,
+              envMapIntensity: 1.0,
+            });
+            return mat;
+          };
+          if (Array.isArray(mesh.material)) {
+            mesh.material = mesh.material.map(fixMat);
+          } else {
+            mesh.material = fixMat(mesh.material);
+          }
         }
         mesh.castShadow = true;
         mesh.receiveShadow = true;
@@ -451,7 +464,7 @@ function useClonedGLTF(path: string, targetSize: number) {
     const center = box2.getCenter(new THREE.Vector3());
     clone.position.set(-center.x, -box2.min.y, -center.z);
     return clone;
-  }, [gltf.scene, targetSize]);
+  }, [gltf.scene, targetSize, keepOriginalMats]);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -492,11 +505,8 @@ const GRENADE_SPEED = 18;
 const FALL_DAMAGE_THRESHOLD = 4;
 const FALL_DAMAGE_MULT = 10;
 const WAVE_INTERVAL = 30;
-const DASH_SPEED = 28;
-const DASH_DURATION = 0.18;
-const DASH_COOLDOWN = 0.8;
 const KATANA_CHARGE_TIME = 1.2;
-const KATANA_CHARGE_DASH_DIST = 8;
+const KATANA_CHARGE_DASH_DIST = 18;
 const KATANA_SLASH_DAMAGE = 80;
 const KATANA_CHARGE_DAMAGE = 200;
 const KATANA_MELEE_RANGE = 3.5;
@@ -922,22 +932,22 @@ function GLBWeapon({
 }
 
 function KatanaWeapon({ charge }: { charge: number }) {
-  const model = useClonedGLTF(MODEL_PATHS.katana, 0.6);
+  const model = useClonedGLTF(MODEL_PATHS.katana, 0.6, true);
   const glowRef = useRef<THREE.PointLight>(null);
   useFrame(() => {
     if (glowRef.current) {
-      // Glow intensity increases with charge
       glowRef.current.intensity = charge * 12;
     }
   });
   return (
     <group>
-      <primitive object={model} position={[0, -0.04, -0.1]} rotation={[-0.3, -Math.PI / 2, 0]} />
+      {/* blade up, handle toward player: rotate so blade points upward and grip faces the camera */}
+      <primitive object={model} position={[0.02, -0.12, -0.08]} rotation={[Math.PI * 0.05, 0, Math.PI]} />
       {/* Charge glow effect on blade tip */}
       {charge > 0.1 && (
         <pointLight
           ref={glowRef}
-          position={[0, 0, -0.35]}
+          position={[0, 0.2, -0.15]}
           color={charge >= 1 ? '#ff4444' : '#4488ff'}
           intensity={charge * 12}
           distance={1.5}
@@ -1225,12 +1235,9 @@ function GameLoop({
 
   const weaponGroupRef = useRef<THREE.Group>(null);
 
-  // Dash state (double-tap W)
+  // Sprint toggle via double-tap W
   const lastWTapTime = useRef(0);
-  const dashTimer = useRef(0);
-  const dashCooldown = useRef(0);
-  const dashDir = useRef(new THREE.Vector3());
-  const isDashingRef = useRef(false);
+  const isDoubleTapSprintRef = useRef(false);
 
   // Katana state
   const katanaChargeRef = useRef(0);
@@ -1357,13 +1364,9 @@ function GameLoop({
       // Double-tap W to dash
       if (e.code === 'KeyW') {
         const now = performance.now() / 1000;
-        if (now - lastWTapTime.current < 0.3 && dashCooldown.current <= 0 && !isDashingRef.current) {
-          // Trigger dash in forward direction
-          const fwd = new THREE.Vector3(0, 0, -1).applyEuler(new THREE.Euler(0, yaw.current, 0));
-          dashDir.current.copy(fwd);
-          dashTimer.current = DASH_DURATION;
-          dashCooldown.current = DASH_COOLDOWN;
-          isDashingRef.current = true;
+        if (now - lastWTapTime.current < 0.3) {
+          // Double-tap W → toggle continuous sprint
+          isDoubleTapSprintRef.current = true;
         }
         lastWTapTime.current = now;
       }
@@ -1463,7 +1466,6 @@ function GameLoop({
 
   const explodeGrenade = useCallback((gpos: THREE.Vector3, now: number) => {
     explosionsRef.current.push({ id: bulletId.current++, pos: gpos.clone(), time: now });
-    screenShakeRef.current = Math.max(screenShakeRef.current, 0.015);
     playGunSound('explosion');
     for (const e of enemies.current) {
       if (e.state === 'dead') continue;
@@ -1532,16 +1534,13 @@ function GameLoop({
     cam.updateProjectionMatrix();
 
     // ── Movement ──
-    const isSprinting = keys.current.has('ShiftLeft') && !gs.isADS && !isCrouch;
+    // Sprint: Shift OR double-tap W (auto-cancel when W released or crouching)
+    if (isDoubleTapSprintRef.current && (!keys.current.has('KeyW') || isCrouch || gs.isADS)) {
+      isDoubleTapSprintRef.current = false;
+    }
+    const isSprinting = (keys.current.has('ShiftLeft') || isDoubleTapSprintRef.current) && !gs.isADS && !isCrouch;
     const baseSpeed = isCrouch ? CROUCH_SPEED : (isSprinting ? SPRINT_SPEED : MOVE_SPEED);
     const speed = baseSpeed * weapon.moveSpeedMult;
-
-    // ── Dash logic ──
-    if (dashCooldown.current > 0) dashCooldown.current -= dt;
-    if (isDashingRef.current) {
-      dashTimer.current -= dt;
-      if (dashTimer.current <= 0) isDashingRef.current = false;
-    }
 
     const forward = new THREE.Vector3(0, 0, -1).applyEuler(new THREE.Euler(0, yaw.current, 0));
     const right = new THREE.Vector3(1, 0, 0).applyEuler(new THREE.Euler(0, yaw.current, 0));
@@ -1552,10 +1551,6 @@ function GameLoop({
     if (keys.current.has('KeyD')) moveDir.add(right);
     if (moveDir.lengthSq() > 0) moveDir.normalize();
     isMovingRef.current = moveDir.lengthSq() > 0;
-
-    // Apply dash movement (overrides normal speed)
-    const actualSpeed = isDashingRef.current ? DASH_SPEED : speed;
-    const actualMoveDir = isDashingRef.current ? dashDir.current : moveDir;
 
     // Footstep sounds
     if (isMovingRef.current && onGround.current) {
@@ -1570,8 +1565,8 @@ function GameLoop({
 
     playerVel.current.y += GRAVITY * dt;
     const desired = playerPos.current.clone();
-    desired.x += actualMoveDir.x * actualSpeed * dt;
-    desired.z += actualMoveDir.z * actualSpeed * dt;
+    desired.x += moveDir.x * speed * dt;
+    desired.z += moveDir.z * speed * dt;
     desired.y += playerVel.current.y * dt;
 
     // Horizontal collision
@@ -1596,7 +1591,6 @@ function GameLoop({
             const dmg = Math.min(50, (fallDist - FALL_DAMAGE_THRESHOLD) * FALL_DAMAGE_MULT);
             gs.hp = Math.max(0, gs.hp - dmg);
             lastDamageTime.current = now;
-            screenShakeRef.current = Math.max(screenShakeRef.current, dmg * 0.001);
             if (gs.hp <= 0) {
               gs.deaths++;
               gs.hp = PLAYER_MAX_HP;
@@ -1632,7 +1626,6 @@ function GameLoop({
           const dmg = Math.min(50, (fallDist - FALL_DAMAGE_THRESHOLD) * FALL_DAMAGE_MULT);
           gs.hp = Math.max(0, gs.hp - dmg);
           lastDamageTime.current = now;
-          screenShakeRef.current = Math.max(screenShakeRef.current, dmg * 0.001);
         }
       }
       playerPos.current.y = pHeight;
@@ -1730,7 +1723,6 @@ function GameLoop({
               }
             }
           }
-          screenShakeRef.current = Math.max(screenShakeRef.current, 0.008);
         } else if (now - lastFire.current > KATANA_SLASH_RATE) {
           // Normal slash (quick click or partial charge)
           lastFire.current = now;
@@ -1791,7 +1783,6 @@ function GameLoop({
       }
       const _gunTypes = ['ar', 'smg', 'shotgun', 'sniper'] as const;
       playGunSound(_gunTypes[weaponIdx.current]);
-      screenShakeRef.current = Math.max(screenShakeRef.current, 0.002);
       setGameState((s) => ({ ...s, ammo: gs.ammo }));
       if (gs.ammo <= 0 && gs.reserve > 0) startReload();
     }
@@ -2051,7 +2042,6 @@ function GameLoop({
             b.life = 0;
             newHits.push({ id: bulletId.current++, time: now, headshot: true });
             damageNumbersRef.current.push({ id: bulletId.current++, pos: headCenter.clone(), damage: dmg, headshot: true, time: now });
-            screenShakeRef.current = Math.max(screenShakeRef.current, 0.003);
             playGunSound('enemyHit');
             if (e.hp <= 0) {
               e.state = 'dead';
@@ -2116,7 +2106,6 @@ function GameLoop({
           playGunSound('playerHit');
           gs.streakCount = 0;
           streakRewardsGiven.current.clear();
-          screenShakeRef.current = Math.max(screenShakeRef.current, 0.008);
           const ddir = new THREE.Vector2(-b.vel.x, -b.vel.z);
           const pdir = new THREE.Vector2(-Math.sin(yaw.current), -Math.cos(yaw.current));
           gs.damageDir = Math.atan2(ddir.cross(pdir), ddir.dot(pdir));
@@ -2230,7 +2219,7 @@ function GameLoop({
       waveAnnounce: gs.waveAnnounce,
       waveAnnounceTime: gs.waveAnnounceTime,
       katanaCharge: katanaChargeRef.current,
-      isDashing: isDashingRef.current,
+      isDashing: isDoubleTapSprintRef.current,
       isKatanaSlashing: katanaSlashingRef.current,
     }));
 

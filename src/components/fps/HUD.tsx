@@ -317,7 +317,7 @@ export function HUD({ gs }: { gs: GameState }) {
           ['G', 'グレネード'],
           ['C', 'しゃがみ'],
           ['1-5', '武器'],
-          ['WW', 'ダッシュ'],
+          ['WW', 'スプリント'],
           ['Esc', 'ポーズ'],
         ].map(([key, label]) => (
           <div key={key} className="flex items-center gap-1">
