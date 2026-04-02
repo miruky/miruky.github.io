@@ -436,7 +436,7 @@ assert(fpsSource.includes('MEGA KILL'), 'Mega kill message exists');
 
 // useClonedGLTF material/color fix
 assert(fpsSource.includes('MeshStandardMaterial'), 'useClonedGLTF creates fresh MeshStandardMaterial');
-assert(fpsSource.includes('mesh.castShadow = true'), 'Meshes have castShadow');
+assert(fpsSource.includes('mesh.castShadow = castShadows'), 'Meshes have configurable castShadow');
 assert(fpsSource.includes('mesh.receiveShadow = true'), 'Meshes have receiveShadow');
 
 // Weapon rendering (scene-space, not camera.add)

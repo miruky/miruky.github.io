@@ -407,7 +407,7 @@ const MODEL_COLORS: Record<string, { color: THREE.Color; metalness: number; roug
   [MODEL_PATHS.katana]:    { color: new THREE.Color(0.85, 0.88, 0.92), metalness: 0.95, roughness: 0.08 }, // polished steel blade
 };
 
-function useClonedGLTF(path: string, targetSize: number, keepOriginalMats = false) {
+function useClonedGLTF(path: string, targetSize: number, keepOriginalMats = false, castShadows = true) {
   const gltf = useGLTF(path);
   return useMemo(() => {
     const clone = gltf.scene.clone(true);
@@ -452,7 +452,7 @@ function useClonedGLTF(path: string, targetSize: number, keepOriginalMats = fals
             mesh.material = fixMat(mesh.material);
           }
         }
-        mesh.castShadow = true;
+        mesh.castShadow = castShadows;
         mesh.receiveShadow = true;
       }
     });
@@ -464,7 +464,7 @@ function useClonedGLTF(path: string, targetSize: number, keepOriginalMats = fals
     const center = box2.getCenter(new THREE.Vector3());
     clone.position.set(-center.x, -box2.min.y, -center.z);
     return clone;
-  }, [gltf.scene, targetSize, keepOriginalMats]);
+  }, [gltf.scene, targetSize, keepOriginalMats, castShadows]);
 }
 
 /* ═══════════════════════════════════════════════════════════
@@ -721,13 +721,13 @@ function calcDamage(baseDmg: number, dist: number, weapon: WeaponDef): number {
    Map component
    ═══════════════════════════════════════════════════════════ */
 function CrateModel({ position }: { position: [number, number, number] }) {
-  const model = useClonedGLTF(MODEL_PATHS.crate, 1.2);
-  return <primitive object={model} position={position} castShadow receiveShadow />;
+  const model = useClonedGLTF(MODEL_PATHS.crate, 1.2, false, false);
+  return <primitive object={model} position={position} />;
 }
 
 function BarricadeModel({ position, rotation = 0, variant = 0 }: { position: [number, number, number]; rotation?: number; variant?: number }) {
-  const model = useClonedGLTF(variant === 0 ? MODEL_PATHS.barricade : MODEL_PATHS.barricade2, 2.0);
-  return <primitive object={model} position={position} rotation={[0, rotation, 0]} castShadow receiveShadow />;
+  const model = useClonedGLTF(variant === 0 ? MODEL_PATHS.barricade : MODEL_PATHS.barricade2, 2.0, false, false);
+  return <primitive object={model} position={position} rotation={[0, rotation, 0]} />;
 }
 
 function GameMap() {
@@ -785,7 +785,7 @@ function SkyDome() {
   const tex = useLoader(THREE.TextureLoader, '/images/fps/sky.png');
   return (
     <mesh>
-      <sphereGeometry args={[300, 32, 16]} />
+      <sphereGeometry args={[300, 24, 12]} />
       <meshBasicMaterial map={tex} side={THREE.BackSide} />
     </mesh>
   );
@@ -914,7 +914,7 @@ function GLBWeapon({
   path: string; isFiring: boolean; muzzleTex: THREE.Texture;
   muzzlePos?: [number, number, number]; flashSize?: number;
 }) {
-  const model = useClonedGLTF(path, 0.5);
+  const model = useClonedGLTF(path, 0.5, false, false);
   return (
     <group>
       <primitive object={model} position={[0, -0.06, 0]} rotation={[0, -Math.PI / 2, 0]} />
@@ -932,7 +932,7 @@ function GLBWeapon({
 }
 
 function KatanaWeapon({ charge }: { charge: number }) {
-  const model = useClonedGLTF(MODEL_PATHS.katana, 0.6, true);
+  const model = useClonedGLTF(MODEL_PATHS.katana, 0.6, false, false);
   const glowRef = useRef<THREE.PointLight>(null);
   useFrame(() => {
     if (glowRef.current) {
@@ -941,8 +941,8 @@ function KatanaWeapon({ charge }: { charge: number }) {
   });
   return (
     <group>
-      {/* blade up, handle toward player: rotate so blade points upward and grip faces the camera */}
-      <primitive object={model} position={[0.02, -0.12, -0.08]} rotation={[Math.PI * 0.05, 0, Math.PI]} />
+      {/* blade forward, handle in player grip: Y flip swaps blade/handle direction */}
+      <primitive object={model} position={[0.02, -0.12, -0.08]} rotation={[Math.PI * 0.05, Math.PI, Math.PI]} />
       {/* Charge glow effect on blade tip */}
       {charge > 0.1 && (
         <pointLight
@@ -963,7 +963,7 @@ function KatanaWeapon({ charge }: { charge: number }) {
 function EnemyMesh({ enemy, modelPath }: { enemy: Enemy; modelPath: string }) {
   const groupRef = useRef<THREE.Group>(null);
   const hpBarRef = useRef<THREE.Group>(null);
-  const model = useClonedGLTF(modelPath, 1.6);
+  const model = useClonedGLTF(modelPath, 1.6, false, false);
   const { camera } = useThree();
 
   useFrame(() => {
@@ -1053,7 +1053,7 @@ function GrenadeVisual({ grenade }: { grenade: Grenade }) {
   const urgent = grenade.timer < 1;
   return (
     <mesh ref={meshRef}>
-      <sphereGeometry args={[0.12, 8, 8]} />
+      <sphereGeometry args={[0.12, 6, 6]} />
       <meshStandardMaterial
         color={urgent ? '#ef4444' : '#4a5568'}
         emissive={urgent ? '#ef4444' : '#000000'}
@@ -1107,7 +1107,7 @@ function ExplosionEffect({ position, startTime }: { position: THREE.Vector3; sta
   return (
     <group position={position}>
       <mesh ref={meshRef}>
-        <sphereGeometry args={[1, 16, 16]} />
+        <sphereGeometry args={[1, 8, 8]} />
         <meshBasicMaterial color="#ff6600" transparent opacity={1} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
       <pointLight ref={lightRef} color="#ff4400" intensity={20} distance={15} />
@@ -1244,6 +1244,9 @@ function GameLoop({
   const katanaSlashingRef = useRef(false);
   const katanaSlashTimer = useRef(0);
 
+  // Performance: throttle React state sync to ~30fps
+  const frameSyncCounter = useRef(0);
+
   // Weapon group follows camera in scene space (not camera.add, which breaks R3F rendering)
   // Updated in useFrame below
 
@@ -1331,6 +1334,10 @@ function GameLoop({
       gameState.current.isReloading = false;
       reloadTimer.current = 0;
       mouseJustPressed.current = false;
+      // Reset katana state on any weapon switch
+      katanaChargeRef.current = 0;
+      katanaSlashingRef.current = false;
+      katanaSlashTimer.current = 0;
       isSwitchingRef.current = true;
       switchTimer.current = WEAPON_SWITCH_TIME;
       gameState.current.isSwitching = true;
@@ -2172,7 +2179,6 @@ function GameLoop({
           }
         }
       }
-      screenShakeRef.current = 0.1;
       newKills.push({ id: bulletId.current++, text: `NUKE発動！${nukeKills}体撃破！`, time: now });
     }
 
@@ -2186,42 +2192,46 @@ function GameLoop({
       }
     }
 
-    // ── Sync to React state ──
-    const epos = enemies.current.filter((e) => e.state !== 'dead').map((e) => ({ x: e.pos.x, z: e.pos.z }));
-    setGameState((s) => ({
-      ...s,
-      kills: gs.kills,
-      deaths: gs.deaths,
-      score: gs.score,
-      hp: Math.round(gs.hp),
-      ammo: gs.ammo,
-      reserve: gs.reserve,
-      timeLeft,
-      isSprinting,
-      isCrouching: isCrouch,
-      streakCount: gs.streakCount,
-      damageDir: gs.damageDir,
-      hitMarkers: [...s.hitMarkers.filter((h) => now - h.time < 0.3), ...newHits],
-      killFeed: [...s.killFeed.filter((k) => now - k.time < 4), ...newKills],
-      playerPos: { x: playerPos.current.x, z: playerPos.current.z },
-      playerYaw: yaw.current,
-      enemyPositions: epos,
-      weaponIndex: weaponIdx.current,
-      weaponName: weapon.name,
-      isSwitching: isSwitchingRef.current,
-      grenades: grenadeCount.current,
-      screenShake: screenShakeRef.current,
-      wave,
-      killstreakActive: killstreakActiveRef.current,
-      killstreakTimer: killstreakTimerRef.current,
-      scoreMultiplier: scoreMultiplierRef.current,
-      armorActive: armorActiveRef.current,
-      waveAnnounce: gs.waveAnnounce,
-      waveAnnounceTime: gs.waveAnnounceTime,
-      katanaCharge: katanaChargeRef.current,
-      isDashing: isDoubleTapSprintRef.current,
-      isKatanaSlashing: katanaSlashingRef.current,
-    }));
+    // ── Sync to React state (throttled to ~30fps for performance) ──
+    frameSyncCounter.current++;
+    const hasEvents = newHits.length > 0 || newKills.length > 0;
+    if (frameSyncCounter.current % 2 === 0 || hasEvents) {
+      const epos = enemies.current.filter((e) => e.state !== 'dead').map((e) => ({ x: e.pos.x, z: e.pos.z }));
+      setGameState((s) => ({
+        ...s,
+        kills: gs.kills,
+        deaths: gs.deaths,
+        score: gs.score,
+        hp: Math.round(gs.hp),
+        ammo: gs.ammo,
+        reserve: gs.reserve,
+        timeLeft,
+        isSprinting,
+        isCrouching: isCrouch,
+        streakCount: gs.streakCount,
+        damageDir: gs.damageDir,
+        hitMarkers: [...s.hitMarkers.filter((h) => now - h.time < 0.3), ...newHits],
+        killFeed: [...s.killFeed.filter((k) => now - k.time < 4), ...newKills],
+        playerPos: { x: playerPos.current.x, z: playerPos.current.z },
+        playerYaw: yaw.current,
+        enemyPositions: epos,
+        weaponIndex: weaponIdx.current,
+        weaponName: weapon.name,
+        isSwitching: isSwitchingRef.current,
+        grenades: grenadeCount.current,
+        screenShake: screenShakeRef.current,
+        wave,
+        killstreakActive: killstreakActiveRef.current,
+        killstreakTimer: killstreakTimerRef.current,
+        scoreMultiplier: scoreMultiplierRef.current,
+        armorActive: armorActiveRef.current,
+        waveAnnounce: gs.waveAnnounce,
+        waveAnnounceTime: gs.waveAnnounceTime,
+        katanaCharge: katanaChargeRef.current,
+        isDashing: isDoubleTapSprintRef.current,
+        isKatanaSlashing: katanaSlashingRef.current,
+      }));
+    }
 
     if (gs.damageDir !== null && now - lastDamageTime.current > 0.5) gs.damageDir = null;
   });
@@ -2519,6 +2529,7 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
       <GLBErrorBoundary>
       <Canvas
         shadows
+        dpr={[1, 1.5]}
         camera={{ fov: NORMAL_FOV, near: 0.1, far: 500 }}
         gl={{ antialias: true, powerPreference: 'high-performance' }}
         style={{ position: 'absolute', inset: 0 }}
@@ -2529,8 +2540,8 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
             position={[30, 50, 20]}
             intensity={2.0}
             castShadow
-            shadow-mapSize-width={1024}
-            shadow-mapSize-height={1024}
+            shadow-mapSize-width={512}
+            shadow-mapSize-height={512}
             shadow-camera-far={80}
             shadow-camera-left={-40}
             shadow-camera-right={40}
