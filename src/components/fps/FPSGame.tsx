@@ -3,7 +3,7 @@
 import { Component, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { ErrorInfo, ReactNode } from 'react';
 import { Canvas, useFrame, useThree, useLoader } from '@react-three/fiber';
-import { useGLTF } from '@react-three/drei';
+import { useGLTF, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import { HUD } from './HUD';
 import { Minimap } from './Minimap';
@@ -85,8 +85,10 @@ const MODEL_PATHS = {
   shotgun: '/models/fps/shotgun.glb',
   sniper: '/models/fps/sniper.glb',
   enemy: '/models/fps/enemy.glb',
+  enemy2: '/models/fps/enemy2.glb',
   crate: '/models/fps/crate.glb',
   barricade: '/models/fps/barricade.glb',
+  barricade2: '/models/fps/barricade2.glb',
 };
 Object.values(MODEL_PATHS).forEach((p) => useGLTF.preload(p));
 
@@ -109,13 +111,17 @@ function useClonedGLTF(path: string, targetSize: number) {
           if (std.normalMap) std.normalMap.needsUpdate = true;
           if (std.roughnessMap) std.roughnessMap.needsUpdate = true;
           if (std.metalnessMap) std.metalnessMap.needsUpdate = true;
-          // Cap metalness to prevent black appearance without environment map
-          if (!std.envMap && typeof std.metalness === 'number') {
-            std.metalness = Math.min(std.metalness, 0.3);
+          // With <Environment> providing scene.environment, metallic materials
+          // get proper reflections. Cap metalness only for materials without envMap
+          // AND when scene environment may not be loaded yet.
+          if (typeof std.metalness === 'number') {
+            std.metalness = Math.min(std.metalness, 0.8);
           }
           if (typeof std.roughness === 'number') {
-            std.roughness = Math.max(std.roughness, 0.35);
+            std.roughness = Math.max(std.roughness, 0.2);
           }
+          // Ensure proper side rendering
+          std.side = THREE.FrontSide;
           c.needsUpdate = true;
           return c;
         };
@@ -382,8 +388,8 @@ function CrateModel({ position }: { position: [number, number, number] }) {
   return <primitive object={model} position={position} castShadow receiveShadow />;
 }
 
-function BarricadeModel({ position, rotation = 0 }: { position: [number, number, number]; rotation?: number }) {
-  const model = useClonedGLTF(MODEL_PATHS.barricade, 2.0);
+function BarricadeModel({ position, rotation = 0, variant = 0 }: { position: [number, number, number]; rotation?: number; variant?: number }) {
+  const model = useClonedGLTF(variant === 0 ? MODEL_PATHS.barricade : MODEL_PATHS.barricade2, 2.0);
   return <primitive object={model} position={position} rotation={[0, rotation, 0]} castShadow receiveShadow />;
 }
 
@@ -425,7 +431,7 @@ function GameMap() {
       </Suspense>
       <Suspense fallback={null}>
         {BARRICADE_DEFS.map((b, i) => (
-          <BarricadeModel key={`barr-${i}`} position={b.pos} rotation={b.rot} />
+          <BarricadeModel key={`barr-${i}`} position={b.pos} rotation={b.rot} variant={i % 2} />
         ))}
       </Suspense>
     </group>
@@ -519,10 +525,10 @@ function GLBWeapon({
 /* ═══════════════════════════════════════════════════════════
    Enemy mesh
    ═══════════════════════════════════════════════════════════ */
-function EnemyMesh({ enemy }: { enemy: Enemy }) {
+function EnemyMesh({ enemy, modelPath }: { enemy: Enemy; modelPath: string }) {
   const groupRef = useRef<THREE.Group>(null);
   const hpBarRef = useRef<THREE.Group>(null);
-  const model = useClonedGLTF(MODEL_PATHS.enemy, 1.6);
+  const model = useClonedGLTF(modelPath, 1.6);
   const { camera } = useThree();
 
   useFrame(() => {
@@ -1557,7 +1563,7 @@ function GameLoop({
       </group>
       <Suspense fallback={null}>
         {enemies.current.map((e) => (
-          <EnemyMesh key={e.id} enemy={e} />
+          <EnemyMesh key={e.id} enemy={e} modelPath={e.id % 2 === 0 ? MODEL_PATHS.enemy : MODEL_PATHS.enemy2} />
         ))}
       </Suspense>
       {bullets.current.map((b) => (
@@ -1841,10 +1847,11 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
         style={{ position: 'absolute', inset: 0 }}
       >
         <Suspense fallback={null}>
-          <ambientLight intensity={0.4} />
+          <Environment preset="sunset" background={false} />
+          <ambientLight intensity={0.6} />
           <directionalLight
             position={[30, 50, 20]}
-            intensity={1.2}
+            intensity={1.5}
             castShadow
             shadow-mapSize-width={2048}
             shadow-mapSize-height={2048}
@@ -1854,7 +1861,7 @@ export default function FPSGame({ onBack }: { onBack: () => void }) {
             shadow-camera-top={50}
             shadow-camera-bottom={-50}
           />
-          <hemisphereLight args={['#87ceeb', '#44403c', 0.3]} />
+          <hemisphereLight args={['#87ceeb', '#44403c', 0.5]} />
           <fog attach="fog" args={['#78716c', 80, 160]} />
           <SkyDome />
           <GameMap />
