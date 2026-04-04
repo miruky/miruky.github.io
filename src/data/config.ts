@@ -22,6 +22,7 @@ export const navItems = [
   { href: '/architect/', label: 'Architect' },
   { href: '/projects/', label: 'Projects' },
   { href: '/blog/', label: 'Blog' },
+  { href: '/english/', label: 'English' },
   { href: '/game/', label: 'Game' },
   { href: '/dashboard/', label: 'Dashboard' },
   { href: '/contact/', label: 'Contact' },

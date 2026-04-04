@@ -30,8 +30,8 @@ export default function Header() {
   }, [pathname]);
 
   // 常にダーク背景を持つページ
-  const darkBgRoutes = ['/', '/game', '/game/', '/skilltree', '/skilltree/', '/program', '/program/', '/architect', '/architect/'];
-    const isOnDarkBgPage = darkBgRoutes.includes(pathname) || pathname.startsWith('/program/') || pathname.startsWith('/architect/');
+  const darkBgRoutes = ['/', '/game', '/game/', '/skilltree', '/skilltree/', '/program', '/program/', '/architect', '/architect/', '/english', '/english/'];
+    const isOnDarkBgPage = darkBgRoutes.includes(pathname) || pathname.startsWith('/program/') || pathname.startsWith('/architect/') || pathname.startsWith('/english/');
   // ヘッダーが透明（未スクロール）かつダーク背景ページ → 背景は暗い → 白文字
   // ヘッダーがglass-nav（スクロール済み）→ ライトモードでは白い背景 → 黒文字
   // 通常ページ（白背景）→ 黒文字
