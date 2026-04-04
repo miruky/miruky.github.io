@@ -81,7 +81,12 @@ export default function ToeicPart5Quiz({ onBack }: { onBack: () => void }) {
         <div className="relative z-10 section-container max-w-md">
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
             <button onClick={onBack} className="text-slate-400 hover:text-white text-sm mb-6">← 戻る</button>
-            <h1 className="text-3xl font-bold text-white mb-2">📝 TOEIC Part 5</h1>
+            <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+              <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-orange-500/20 to-red-500/20 flex items-center justify-center border border-orange-500/20">
+                <svg className="w-5 h-5 text-orange-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+              </span>
+              TOEIC Part 5
+            </h1>
             <p className="text-slate-400 mb-8">短文穴埋め問題 — 100問</p>
 
             <p className="text-sm text-slate-400 mb-3">出題数を選択</p>
@@ -109,7 +114,15 @@ export default function ToeicPart5Quiz({ onBack }: { onBack: () => void }) {
         <div className="relative z-10 section-container max-w-md text-center">
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
             <div className="glass-card p-8 neon-border">
-              <p className="text-6xl mb-4">{pct >= 80 ? '🏆' : pct >= 60 ? '💪' : '📝'}</p>
+              <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-orange-500/20 to-red-500/20 flex items-center justify-center border border-orange-500/20">
+                {pct >= 80 ? (
+                  <svg className="w-10 h-10 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                ) : pct >= 60 ? (
+                  <svg className="w-10 h-10 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                ) : (
+                  <svg className="w-10 h-10 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
+                )}
+              </div>
               <p className="text-5xl font-black text-white mb-1">{pct}%</p>
               <p className="text-slate-400 mb-6">{score} / {questions.length} 正解</p>
               <div className="flex gap-3">
@@ -180,7 +193,7 @@ export default function ToeicPart5Quiz({ onBack }: { onBack: () => void }) {
               {showAnswer && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-4 mb-6">
                   <p className={`text-sm font-bold mb-1 ${selected === q.answer ? 'text-green-400' : 'text-red-400'}`}>
-                    {selected === q.answer ? '✅ 正解！' : '❌ 不正解'}
+                    {selected === q.answer ? (<span className="text-green-400 font-bold">正解！</span>) : (<span className="text-red-400 font-bold">不正解</span>)}
                   </p>
                   <p className="text-sm text-slate-300">{q.explanation}</p>
                 </motion.div>

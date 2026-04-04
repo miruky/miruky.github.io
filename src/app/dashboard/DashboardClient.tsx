@@ -11,6 +11,7 @@ import {
   FaChartLine,
   FaLayerGroup,
   FaCheckCircle,
+  FaLanguage,
 } from 'react-icons/fa';
 
 /* ── Types ─────────────────────────────────────── */
@@ -201,6 +202,15 @@ export default function DashboardClient() {
   const [readingProgress, setReadingProgress] = useState<LangProgress[]>([]);
   const [architectProgress, setArchitectProgress] = useState<number[]>([]);
   const [typingBest, setTypingBest] = useState<TypingBest | null>(null);
+  const [englishProgress, setEnglishProgress] = useState<{
+    vocab: { correct: number; total: number; mastered: number[] };
+    grammar: Record<number, { correct: number; total: number }>;
+    reading: { correct: number; total: number };
+    toeicPart5: { correct: number; total: number };
+    toeicPart6: { correct: number; total: number };
+    toeicPart7: { correct: number; total: number };
+    studyStreak: number;
+  } | null>(null);
 
   useEffect(() => {
     setWritingProgress(
@@ -254,6 +264,15 @@ export default function DashboardClient() {
     } catch {
       /* silent */
     }
+
+    try {
+      const raw = localStorage.getItem('english-progress');
+      if (raw) {
+        setEnglishProgress(JSON.parse(raw));
+      }
+    } catch {
+      /* silent */
+    }
   }, []);
 
   const totalWriting = useMemo(
@@ -276,12 +295,27 @@ export default function DashboardClient() {
     totalWriting + totalReading + architectProgress.length;
   const overallTotal = totalWritingMax + totalReadingMax + ARCHITECT_TOTAL;
 
+  const englishTotal = englishProgress ? (
+    englishProgress.vocab.total +
+    (englishProgress.grammar[650]?.total || 0) + (englishProgress.grammar[800]?.total || 0) + (englishProgress.grammar[950]?.total || 0) +
+    englishProgress.reading.total +
+    englishProgress.toeicPart5.total + englishProgress.toeicPart6.total + englishProgress.toeicPart7.total
+  ) : 0;
+  const englishCorrect = englishProgress ? (
+    englishProgress.vocab.correct +
+    (englishProgress.grammar[650]?.correct || 0) + (englishProgress.grammar[800]?.correct || 0) + (englishProgress.grammar[950]?.correct || 0) +
+    englishProgress.reading.correct +
+    englishProgress.toeicPart5.correct + englishProgress.toeicPart6.correct + englishProgress.toeicPart7.correct
+  ) : 0;
+  const ENGLISH_TOTAL_QUESTIONS = 1495; // 1000+300+~145+50(sets)
+
   const C = {
     primary: '#0284c7',
     writing: '#0891b2',
     reading: '#7c3aed',
     architect: '#d97706',
     typing: '#db2777',
+    english: '#10b981',
   };
 
   return (
@@ -307,7 +341,7 @@ export default function DashboardClient() {
         </div>
 
         {/* KPI Summary */}
-        <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        <section className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-10">
           <KpiCard
             icon={
               <FaChartLine
@@ -357,6 +391,20 @@ export default function DashboardClient() {
             max={ARCHITECT_TOTAL}
             color={C.architect}
             delay={0.3}
+          />
+          <KpiCard
+            icon={
+              <FaLanguage
+                className="w-4 h-4"
+                style={{ color: C.english }}
+              />
+            }
+            label="English"
+            sublabel="TOEIC学習"
+            value={englishTotal}
+            max={ENGLISH_TOTAL_QUESTIONS}
+            color={C.english}
+            delay={0.4}
           />
         </section>
 
@@ -605,6 +653,120 @@ export default function DashboardClient() {
             </div>
           </motion.section>
         </div>
+
+        {/* English Section */}
+        <motion.section
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="mt-6 rounded-2xl bg-white dark:bg-dark-800 border border-slate-200 dark:border-dark-600/60 shadow-sm overflow-hidden"
+        >
+          <div className="px-6 py-4 border-b border-slate-100 dark:border-dark-600/40 flex items-center gap-3">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center"
+              style={{ backgroundColor: `${C.english}18` }}
+            >
+              <FaLanguage className="w-4 h-4" style={{ color: C.english }} />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">
+                English学習
+              </h2>
+              <p className="text-xs text-slate-400 dark:text-slate-500">
+                TOEIC 900点対策 ― 単語・文法・長文・Part 5/6/7
+              </p>
+            </div>
+            <span
+              className="ml-auto text-sm font-mono font-bold"
+              style={{ color: C.english }}
+            >
+              {englishTotal}問回答
+            </span>
+          </div>
+          <div className="px-6 py-5">
+            {englishProgress && englishTotal > 0 ? (
+              <div className="space-y-4">
+                <BarRow
+                  label={`単語 (${englishProgress.vocab.mastered?.length || 0}語マスター)`}
+                  value={englishProgress.vocab.correct}
+                  max={englishProgress.vocab.total || 1}
+                  color={C.english}
+                />
+                <BarRow
+                  label="文法 (650/800/950)"
+                  value={
+                    (englishProgress.grammar[650]?.correct || 0) +
+                    (englishProgress.grammar[800]?.correct || 0) +
+                    (englishProgress.grammar[950]?.correct || 0)
+                  }
+                  max={
+                    (englishProgress.grammar[650]?.total || 0) +
+                    (englishProgress.grammar[800]?.total || 0) +
+                    (englishProgress.grammar[950]?.total || 0) || 1
+                  }
+                  color="#7c3aed"
+                />
+                <BarRow
+                  label="長文読解"
+                  value={englishProgress.reading.correct}
+                  max={englishProgress.reading.total || 1}
+                  color="#0891b2"
+                />
+                <BarRow
+                  label="TOEIC Part 5"
+                  value={englishProgress.toeicPart5.correct}
+                  max={englishProgress.toeicPart5.total || 1}
+                  color="#f97316"
+                />
+                <BarRow
+                  label="TOEIC Part 6"
+                  value={englishProgress.toeicPart6.correct}
+                  max={englishProgress.toeicPart6.total || 1}
+                  color="#f43f5e"
+                />
+                <BarRow
+                  label="TOEIC Part 7"
+                  value={englishProgress.toeicPart7.correct}
+                  max={englishProgress.toeicPart7.total || 1}
+                  color="#eab308"
+                />
+                {englishTotal > 0 && (
+                  <div className="mt-4 pt-4 border-t border-slate-100 dark:border-dark-600/40 flex items-center justify-between">
+                    <div className="text-sm text-slate-500 dark:text-slate-400">
+                      正答率: <span className="font-bold" style={{ color: C.english }}>
+                        {Math.round((englishCorrect / englishTotal) * 100)}%
+                      </span>
+                    </div>
+                    {englishProgress.studyStreak > 0 && (
+                      <div className="text-sm text-slate-500 dark:text-slate-400">
+                        連続学習: <span className="font-bold" style={{ color: C.english }}>
+                          {englishProgress.studyStreak}日
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8 text-center">
+                <FaLanguage className="w-10 h-10 text-slate-200 dark:text-dark-600 mb-3" />
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  まだ学習記録がありません
+                </p>
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+                  English ページで学習するとここに記録されます
+                </p>
+                <Link
+                  href="/english/"
+                  className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium px-4 py-2 rounded-lg border border-slate-200 dark:border-dark-600 text-slate-600 dark:text-slate-300 hover:border-emerald-300 dark:hover:border-emerald-500/40 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors"
+                >
+                  <FaLanguage className="w-3 h-3" />
+                  English学習を始める
+                </Link>
+              </div>
+            )}
+          </div>
+        </motion.section>
 
         {/* Footer */}
         <motion.div

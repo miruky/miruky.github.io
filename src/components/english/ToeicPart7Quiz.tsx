@@ -72,7 +72,12 @@ export default function ToeicPart7Quiz({ onBack }: { onBack: () => void }) {
         <div className="relative z-10 section-container max-w-3xl">
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
             <button onClick={onBack} className="text-slate-400 hover:text-white text-sm mb-6">← 戻る</button>
-            <h1 className="text-3xl font-bold text-white mb-2">📰 TOEIC Part 7</h1>
+            <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+              <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-yellow-500/20 flex items-center justify-center border border-amber-500/20">
+                <svg className="w-5 h-5 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>
+              </span>
+              TOEIC Part 7
+            </h1>
             <p className="text-slate-400 mb-6">読解問題 — {toeicPart7Questions.length}セット</p>
             <div className="space-y-3">
               {toeicPart7Questions.map((s, i) => (
@@ -106,7 +111,15 @@ export default function ToeicPart7Quiz({ onBack }: { onBack: () => void }) {
         <div className="relative z-10 section-container max-w-md text-center">
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
             <div className="glass-card p-8 neon-border">
-              <p className="text-6xl mb-4">{pct >= 80 ? '🏆' : pct >= 60 ? '💪' : '📰'}</p>
+              <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-amber-500/20 to-yellow-500/20 flex items-center justify-center border border-amber-500/20">
+                {pct >= 80 ? (
+                  <svg className="w-10 h-10 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                ) : pct >= 60 ? (
+                  <svg className="w-10 h-10 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                ) : (
+                  <svg className="w-10 h-10 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2" /><line x1="8" y1="21" x2="16" y2="21" /><line x1="12" y1="17" x2="12" y2="21" /></svg>
+                )}
+              </div>
               <p className="text-5xl font-black text-white mb-1">{pct}%</p>
               <p className="text-slate-400 mb-6">{correctCount} / {currentSet.questions.length} 正解</p>
               <div className="text-left space-y-3 mb-6">
@@ -114,7 +127,7 @@ export default function ToeicPart7Quiz({ onBack }: { onBack: () => void }) {
                   <div key={q.id} className={`p-3 rounded-lg border ${answers[i] === q.answer ? 'border-green-500/30 bg-green-500/10' : 'border-red-500/30 bg-red-500/10'}`}>
                     <p className="text-xs text-slate-300 mb-1">{q.question}</p>
                     <p className={`text-sm font-bold ${answers[i] === q.answer ? 'text-green-400' : 'text-red-400'}`}>
-                      {answers[i] === q.answer ? '✅' : '❌'} {q.choices[q.answer]}
+                      {answers[i] === q.answer ? <span className="text-green-400">&#10003;</span> : <span className="text-red-400">&#10007;</span>} {q.choices[q.answer]}
                     </p>
                     {answers[i] !== q.answer && <p className="text-xs text-slate-500 mt-1">{q.explanation}</p>}
                   </div>
@@ -184,7 +197,7 @@ export default function ToeicPart7Quiz({ onBack }: { onBack: () => void }) {
               {showAnswer && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-4 mb-6">
                   <p className={`text-sm font-bold mb-1 ${selected === q.answer ? 'text-green-400' : 'text-red-400'}`}>
-                    {selected === q.answer ? '✅ 正解！' : '❌ 不正解'}
+                    {selected === q.answer ? (<span className="text-green-400 font-bold">正解！</span>) : (<span className="text-red-400 font-bold">不正解</span>)}
                   </p>
                   <p className="text-sm text-slate-300">{q.explanation}</p>
                 </motion.div>

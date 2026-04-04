@@ -74,7 +74,12 @@ export default function GrammarQuiz({ onBack }: { onBack: () => void }) {
         <div className="relative z-10 section-container max-w-2xl">
           <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}>
             <button onClick={onBack} className="text-slate-400 hover:text-white text-sm mb-6 flex items-center gap-1">← 戻る</button>
-            <h1 className="text-3xl font-bold text-white mb-2">📐 文法ドリル</h1>
+            <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-3">
+              <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-purple/20 to-indigo-500/20 flex items-center justify-center border border-accent-purple/20">
+                <svg className="w-5 h-5 text-accent-purple" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" /></svg>
+              </span>
+              文法ドリル
+            </h1>
             <p className="text-slate-400 mb-8">レベル別100問ずつ、合計300問</p>
             <div className="glass-card p-6 mb-6">
               <h3 className="text-white font-bold mb-4">レベル選択</h3>
@@ -119,7 +124,15 @@ export default function GrammarQuiz({ onBack }: { onBack: () => void }) {
         <div className="relative z-10 section-container max-w-md text-center">
           <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
             <div className="glass-card p-8 neon-border">
-              <p className="text-6xl mb-4">{pct >= 80 ? '🎉' : pct >= 60 ? '💪' : '📚'}</p>
+              <div className="w-20 h-20 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-accent-purple/20 to-indigo-500/20 flex items-center justify-center border border-accent-purple/20">
+                {pct >= 80 ? (
+                  <svg className="w-10 h-10 text-green-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" /><polyline points="22 4 12 14.01 9 11.01" /></svg>
+                ) : pct >= 60 ? (
+                  <svg className="w-10 h-10 text-yellow-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+                ) : (
+                  <svg className="w-10 h-10 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z" /><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z" /></svg>
+                )}
+              </div>
               <h2 className="text-2xl font-bold text-white mb-2">文法ドリル結果</h2>
               <p className="text-sm text-slate-400 mb-1">{level}点レベル</p>
               <p className="text-5xl font-black text-white mb-1">{pct}%</p>
@@ -188,7 +201,7 @@ export default function GrammarQuiz({ onBack }: { onBack: () => void }) {
             <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
               className="glass-card p-5 mb-6">
               <p className={`text-sm font-bold mb-2 ${selected === q.answer ? 'text-emerald-400' : 'text-red-400'}`}>
-                {selected === q.answer ? '✅ 正解！' : '❌ 不正解'}
+                {selected === q.answer ? (<span className="text-green-400 font-bold">正解！</span>) : (<span className="text-red-400 font-bold">不正解</span>)}
               </p>
               <p className="text-sm text-slate-300">{q.explanation}</p>
             </motion.div>
